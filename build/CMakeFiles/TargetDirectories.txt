@@ -1,0 +1,3 @@
+/home/matheus/Documents/Mestrado/Tese/code/build/CMakeFiles/rebuild_cache.dir
+/home/matheus/Documents/Mestrado/Tese/code/build/CMakeFiles/edit_cache.dir
+/home/matheus/Documents/Mestrado/Tese/code/build/CMakeFiles/main.dir
