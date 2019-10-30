@@ -6,5 +6,5 @@ CXX_FLAGS =   -Wall -DIL_STD -Wfatal-errors -pedantic -fopenmp -DDEBUG -fdiagnos
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -isystem /home/matheus/Documents/Mestrado/Tese/code/build -isystem /opt/ibm/ILOG/CPLEX_Studio_Community129/concert/include -isystem /opt/ibm/ILOG/CPLEX_Studio_Community129/cplex/include 
+CXX_INCLUDES = -isystem /home/matheus/Documents/Mestrado/Tese/code/includes -isystem /home/matheus/Documents/Mestrado/Tese/code/build -isystem /opt/ibm/ILOG/CPLEX_Studio_Community129/concert/include -isystem /opt/ibm/ILOG/CPLEX_Studio_Community129/cplex/include 
 

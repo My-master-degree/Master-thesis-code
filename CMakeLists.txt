@@ -4,6 +4,7 @@ project(Master_project)
 set (Sample_VERSION_MAJOR 0)
 set (Sample_VERSION_MINOR 0)
 set (Sample_VERSION_PATCH 1)
+set (Project_PATH "${PROJECT_SOURCE_DIR}")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/support/cmake)
 
@@ -16,6 +17,7 @@ configure_file(
 
 include_directories(
 SYSTEM
+includes
 "${PROJECT_BINARY_DIR}"
 "${CPLEX_CONCERT_INCLUDE_DIR}"
 "${CPLEX_ILOCPLEX_INCLUDE_DIR}"
@@ -36,7 +38,9 @@ set(BUILD_SHARED_LIBS On)
 
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fopenmp")
 
-add_executable(main main.cpp)
+file(GLOB SOURCES "src/*.cpp")
+
+add_executable(main ${SOURCES})
 
 target_link_libraries(main "${CPLEX_CONCERT_LIBRARY}" "${CPLEX_ILOCPLEX_LIBRARY}" "${CPLEX_LIBRARY}" pthread)
 

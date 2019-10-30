@@ -6,7 +6,9 @@
 
 #IncludeRegexTransform: 
 
-/home/matheus/Documents/Mestrado/Tese/code/main.cpp
+../includes/vertex.hpp
+
+/home/matheus/Documents/Mestrado/Tese/code/src/main.cpp
 ilcplex/ilocplex.h
 -
 iostream
@@ -20,7 +22,19 @@ cstdlib
 sstream
 -
 SampleConfig.h
-/home/matheus/Documents/Mestrado/Tese/code/SampleConfig.h
+/home/matheus/Documents/Mestrado/Tese/code/src/SampleConfig.h
+vertex.hpp
+/home/matheus/Documents/Mestrado/Tese/code/src/vertex.hpp
+list
+-
+vector
+-
+
+/home/matheus/Documents/Mestrado/Tese/code/src/vertex.cpp
+string
+-
+vertex.hpp
+/home/matheus/Documents/Mestrado/Tese/code/src/vertex.hpp
 
 /opt/ibm/ILOG/CPLEX_Studio_Community129/concert/include/ilconcert/iloalg.h
 ilconcert/iloenv.h
