@@ -103,9 +103,9 @@ int main (int argc, char **argv)
   vector<vertex::Vertex> vertexes (total_size);
   int j =0; 
   vertexes[j++] = depot;
-  for (list<vertex::Vertex>::iterator i = afss.begin(); i != afss.end(); i++)
-    vertexes[j++] = *i;
   for (list<vertex::Vertex>::iterator i = customers.begin(); i != customers.end(); i++)
+    vertexes[j++] = *i;
+  for (list<vertex::Vertex>::iterator i = afss.begin(); i != afss.end(); i++)
     vertexes[j++] = *i;
   vector<vector<double> > distances(total_size);
   for (int i = 0; i < total_size; i++){
@@ -128,43 +128,105 @@ int main (int argc, char **argv)
   try {
     IloModel model(env);
     IloArray<IloNumVarArray> x_vars (env, total_size),
-                            y_vars(env, customers_size),
+                            y_vars(env, customers_size + 1),
                             w_vars(env, customers_size);
-    IloNumVarArray e_vars(env, total_size, 0, vehicleFuelCapacity, IloNumVar::Int);
+    IloNumVarArray e_vars(env, total_size, 0, vehicleFuelCapacity, IloNumVar::Float);
     //x var
     for (int i = 0; i < total_size; i++)
       x_vars[i] = IloNumVarArray(env, total_size, 0, 1, IloNumVar::Int);
-    //y and w var
-    for (int i = 0; i < customers_size; i++){
-      y_vars[i] = IloNumVarArray(env, customers_size, 0, 1, IloNumVar::Int);
+    //y var
+    for (int i = 0; i <= customers_size; i++)
+      y_vars[i] = IloNumVarArray(env, customers_size + 1, 0, 1, IloNumVar::Int);
+    //w var
+    for (int i = 0; i < customers_size; i++)
       w_vars[i] = IloNumVarArray(env, afss_size, 0, NUM_MAX_VISITS_AFS, IloNumVar::Int);
-    }
     //objective function
     IloExpr fo (env);
     for (int i = 0; i < total_size; i++)
       for (int j = 0; j < total_size; j++)
         fo +=  distances[i][j] * x_vars[i][j];
     model.add(IloMaximize(env, fo));
-    //constrins
-    //...
-//    model.add(IloMaximize(env, vars[0] + 2 * vars[1] + 3 * vars[2]));
-//    model.add( - vars[0] +     vars[1] + vars[2] <= 20);
-//    model.add(   vars[0] - 3 * vars[1] + vars[2] <= 30);
-//
-//    IloCplex cplex(model);
-//    if ( !cplex.solve() ) {
-//      env.error() << "Failed to optimize LP." << endl;
-//      throw(-1);
-//    }
-//
-//    IloNumArray vals(env);
-//    env.out() << "Solution status = " << cplex.getStatus() << endl;
-//    env.out() << "Solution value = " << cplex.getObjValue() << endl;
-//    cplex.getValues(vals, vars);
-//    env.out() << "Values = " << vals << endl;
+    //constriaints
+    IloExpr expr(env),
+            expr1(env),
+            expr2(env);
+    //y[k][0] = 1, \forall k \in M
+    for (int k = 0; k < customers_size; k++)
+      model.add(y_vars[k][0] == 1);
+    //\sum_{k \in M} y_{i}^{k} = 1, \forall v_i \in C
+    for (int i = 1; i <= customers_size; i++){
+      for (int k = 0; k < customers_size; k++)
+        expr += y_vars[k][i];
+      model.add(expr == 1);
+      expr.end();
+      expr = IloExpr(env);
+    }
+    //\sum_{j \in V} x_{ij} = \sum_{j \in V} x_{ji} = \sum_{k \in  M} y_{i}^k, \forall v_i \in C \cup \{v_0\}
+    for (int i = 0; i <= customers_size; i++){
+      for (int j = 0; j <= customers_size; j++){
+        expr += x_vars[i][j];     
+        expr1 += x_vars[j][i];    
+      }
+      for (int k = 0; k < customers_size; k++)
+        expr2 += y_vars[k][i];
+      model.add(expr == (expr1 == expr2));
+      expr.end();
+      expr1.end();
+      expr2.end();
+      expr = IloExpr(env);
+      expr1 = IloExpr(env);
+      expr2 = IloExpr(env);
+    }
+    //w_f^k = \sum_{j \in V} x_{fj} = \sum_{j \in V} x_{jf}, \forall v_j \in F, k \in M
+    for (int f = 0; f < afss_size; f++){
+      for (int k = 0; k < customers_size; k++){
+        for (int j = 0; j < total_size; j++){
+          expr += x_vars[customers_size + 1 + f][j];
+          expr1 += x_vars[j][customers_size + 1 + f];
+        }
+        model.add(w_vars[k][f] == (expr == expr1));
+        expr.end();
+        expr1.end();
+        expr = IloExpr(env);
+        expr1 = IloExpr(env);
+      }
+    }
+    //y_i^k \geq x_{ij} + y_j^k - 1, \forall v_i, v_j \in C, k \in M
+    //y_j^k \geq x_{ij} + y_i^k - 1, \forall v_i, v_j \in C, k \in M
+    for (int i = 1; i <= customers_size; i++)
+      for (int j = 1; j <= customers_size; j++)
+        for (int k = 0; k < customers_size; k++){
+          model.add(y_vars[k][i] >= x_vars[i][j] + y_vars[k][j] - 1);
+          model.add(y_vars[k][j] >= x_vars[i][j] + y_vars[k][i] - 1);
+        }
+    //e_0 = \beta
+    model.add(e_vars[0] == vehicleFuelCapacity);
+    //e_f = \beta, \forall v_f \in F
+    for (int f = 0; f < afss_size; f++)
+      model.add(e_vars[customers_size + 1 + f] == vehicleFuelCapacity);
+    //e_j \leq e_i - c_{ij} x_{ij} + \beta (1 - x_{ij}), \forall v_j \in C, v_i \in V
+    for (int j = 1; j <= customers_size; j++)
+      for (int i = 0; i < total_size; i++)
+        model.add(e_vars[j] <= e_vars[i] - distances[i][j] * x_vars[i][j] + vehicleFuelCapacity * (1 - x_vars[i][j]));
+    //e_i \geq c_{ij} x_{ij}, \forall v_i, v_j \in V
+    for (int i = 0; i < total_size; i++)
+      for (int j = 0; j < total_size; j++)
+        model.add(e_vars[i] >= distances[i][j] * x_vars[i][j]);
+    //e_i \geq x_{i0} c_{i0}
+    for (int i = 0; i < total_size; i++)
+      model.add(e_vars[i] >= x_vars[i][0] * distances[i][0]);
+    //run model
+    IloCplex cplex(model);
+    if ( !cplex.solve() ) {
+      env.error() << "Failed to optimize LP." << endl;
+      throw(-1);
+    }
 
-    //variables
-//    IloNumVarArray x()
+    //IloNumArray vals(env);
+//    env.out() << "Solution status = " << cplex.getStatus() << endl;
+  //  env.out() << "Solution value = " << cplex.getObjValue() << endl;
+//    cplex.getValues(vals, x_vars);
+//    env.out() << "Values = " << vals << endl;
   }catch (IloException& e) {
     cerr << "Concert exception caught: " << e << endl;
   }
