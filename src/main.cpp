@@ -131,21 +131,28 @@ int main (int argc, char **argv)
                             y_vars(env, customers_size + 1),
                             w_vars(env, customers_size);
     IloNumVarArray e_vars(env, total_size, 0, vehicleFuelCapacity, IloNumVar::Float);
+    IloArray<IloNumArray> x_vals (env, total_size),
+                            y_vals(env, customers_size + 1),
+                            w_vals(env, customers_size);
+    IloNumArray e_vals(env, total_size, 0, vehicleFuelCapacity, IloNumVar::Float);
     //x var
-    for (int i = 0; i < total_size; i++)
+    for (int i = 0; i < total_size; i++){
       x_vars[i] = IloNumVarArray(env, total_size, 0, 1, IloNumVar::Int);
-    //y var
-    for (int i = 0; i <= customers_size; i++)
+      x_vals[i] = IloNumArray(env, total_size, 0, 1, IloNumVar::Int);
+    }
+    //y and w var
+    for (int i = 0; i < customers_size; i++){
       y_vars[i] = IloNumVarArray(env, customers_size + 1, 0, 1, IloNumVar::Int);
-    //w var
-    for (int i = 0; i < customers_size; i++)
+      y_vals[i] = IloNumArray(env, total_size, 0, 1, IloNumVar::Int);
       w_vars[i] = IloNumVarArray(env, afss_size, 0, NUM_MAX_VISITS_AFS, IloNumVar::Int);
+      w_vals[i] = IloNumArray(env, afss_size, 0, NUM_MAX_VISITS_AFS, IloNumVar::Int);
+    }
     //objective function
     IloExpr fo (env);
     for (int i = 0; i < total_size; i++)
       for (int j = 0; j < total_size; j++)
         fo +=  distances[i][j] * x_vars[i][j];
-    model.add(IloMaximize(env, fo));
+    model.add(IloMinimize(env, fo));
     //constriaints
     IloExpr expr(env),
             expr1(env),
@@ -169,7 +176,8 @@ int main (int argc, char **argv)
       }
       for (int k = 0; k < customers_size; k++)
         expr2 += y_vars[k][i];
-      model.add(expr == (expr1 == expr2));
+      model.add(expr == expr1);
+      model.add(expr1 == expr2);
       expr.end();
       expr1.end();
       expr2.end();
@@ -184,7 +192,8 @@ int main (int argc, char **argv)
           expr += x_vars[customers_size + 1 + f][j];
           expr1 += x_vars[j][customers_size + 1 + f];
         }
-        model.add(w_vars[k][f] == (expr == expr1));
+        model.add(w_vars[k][f] == expr);
+        model.add(expr == expr1);
         expr.end();
         expr1.end();
         expr = IloExpr(env);
@@ -196,8 +205,14 @@ int main (int argc, char **argv)
     for (int i = 1; i <= customers_size; i++)
       for (int j = 1; j <= customers_size; j++)
         for (int k = 0; k < customers_size; k++){
-          model.add(y_vars[k][i] >= x_vars[i][j] + y_vars[k][j] - 1);
-          model.add(y_vars[k][j] >= x_vars[i][j] + y_vars[k][i] - 1);
+          expr = x_vars[i][j] + y_vars[k][j] - 1;
+          model.add(y_vars[k][i] >= expr);
+          expr.end();
+          expr = IloExpr(env);
+          expr = x_vars[i][j] + y_vars[k][i] - 1;
+          model.add(y_vars[k][j] >= expr);
+          expr.end();
+          expr = IloExpr(env);
         }
     //e_0 = \beta
     model.add(e_vars[0] == vehicleFuelCapacity);
@@ -206,15 +221,27 @@ int main (int argc, char **argv)
       model.add(e_vars[customers_size + 1 + f] == vehicleFuelCapacity);
     //e_j \leq e_i - c_{ij} x_{ij} + \beta (1 - x_{ij}), \forall v_j \in C, v_i \in V
     for (int j = 1; j <= customers_size; j++)
-      for (int i = 0; i < total_size; i++)
-        model.add(e_vars[j] <= e_vars[i] - distances[i][j] * x_vars[i][j] + vehicleFuelCapacity * (1 - x_vars[i][j]));
+      for (int i = 0; i < total_size; i++){
+        expr = e_vars[i] - distances[i][j] * x_vars[i][j] + vehicleFuelCapacity * (1 - x_vars[i][j]);
+        model.add(e_vars[j] <= expr);
+        expr.end();
+        expr = IloExpr (env);
+      }
     //e_i \geq c_{ij} x_{ij}, \forall v_i, v_j \in V
     for (int i = 0; i < total_size; i++)
-      for (int j = 0; j < total_size; j++)
-        model.add(e_vars[i] >= distances[i][j] * x_vars[i][j]);
+      for (int j = 0; j < total_size; j++){
+        expr = distances[i][j] * x_vars[i][j];
+        model.add(e_vars[i] >= expr);
+        expr.end();
+        expr = IloExpr(env);
+      }
     //e_i \geq x_{i0} c_{i0}
-    for (int i = 0; i < total_size; i++)
-      model.add(e_vars[i] >= x_vars[i][0] * distances[i][0]);
+    for (int i = 0; i < total_size; i++){
+      expr = x_vars[i][0] * distances[i][0];
+      model.add(e_vars[i] >= expr);
+      expr.end();
+      expr = IloExpr(env);
+    }
     //run model
     IloCplex cplex(model);
     if ( !cplex.solve() ) {
@@ -222,11 +249,18 @@ int main (int argc, char **argv)
       throw(-1);
     }
 
-    //IloNumArray vals(env);
-//    env.out() << "Solution status = " << cplex.getStatus() << endl;
-  //  env.out() << "Solution value = " << cplex.getObjValue() << endl;
-//    cplex.getValues(vals, x_vars);
-//    env.out() << "Values = " << vals << endl;
+    IloNumArray vals(env);
+    env.out() << "Solution status = " << cplex.getStatus() << endl;
+    env.out() << "Solution value = " << cplex.getObjValue() << endl;
+    for (int i = 0; i < total_size; i++)
+      cplex.getValues(x_vals[i], x_vars[i]);
+    for (int i = 0; i < customers_size; i++){
+      cplex.getValues(y_vals[i], y_vars[i]);
+      cplex.getValues(w_vals[i], w_vars[i]);
+    }
+    //separation algorithm
+
+    env.out() << "Values = " << x_vals << endl;
   }catch (IloException& e) {
     cerr << "Concert exception caught: " << e << endl;
   }
