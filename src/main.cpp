@@ -1,21 +1,21 @@
+#include <map>
+#include <set>
+#include <queue>
 #include <ilcplex/ilocplex.h>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <cstdlib>
 #include <sstream>
-#include "SampleConfig.h"
-#include "vertex.hpp"
 #include <list>
 #include <vector>
+#include "models/vertex.hpp"
+#include "models/gvrp_instance.hpp"
+#include "utils/cplex/quadratic_model_subcycle_constraint_callback.hpp"
+#include "SampleConfig.h"
 ILOSTLBEGIN
 
 using namespace std;
-
-void version()
-{
-    cout << "Version : " << SAMPLE_VERSION_MAJOR <<"." << SAMPLE_VERSION_MINOR <<"." << SAMPLE_VERSION_PATCH << endl;
-}
 
 int main (int argc, char **argv)
 { 
@@ -249,18 +249,82 @@ int main (int argc, char **argv)
       throw(-1);
     }
 
-    IloNumArray vals(env);
-    env.out() << "Solution status = " << cplex.getStatus() << endl;
-    env.out() << "Solution value = " << cplex.getObjValue() << endl;
-    for (int i = 0; i < total_size; i++)
-      cplex.getValues(x_vals[i], x_vars[i]);
-    for (int i = 0; i < customers_size; i++){
-      cplex.getValues(y_vals[i], y_vars[i]);
-      cplex.getValues(w_vals[i], w_vars[i]);
-    }
+//    IloNumArray vals(env);
+//    env.out() << "Solution status = " << cplex.getStatus() << endl;
+//    env.out() << "Solution value = " << cplex.getObjValue() << endl;
+//    for (int i = 0; i < total_size; i++)
+//      cplex.getValues(x_vals[i], x_vars[i]);
+//    for (int i = 0; i < customers_size; i++){
+//      cplex.getValues(y_vals[i], y_vars[i]);
+//      cplex.getValues(w_vals[i], w_vars[i]);
+//    }
+//    cplex.getValues(e_vals, e_vars);
+    
     //separation algorithm
-
-    env.out() << "Values = " << x_vals << endl;
+    for (int k = 0; k < customers_size; k++){
+      list<int> vertexes;
+      //get customers
+      for (int i = 0; i <= customers_size; i++)
+        if (y_vals[k][i] > 0)
+          vertexes.push_back(i);
+      //get afss
+      for (int f = 0; f < afss_size; f++)
+        if (w_vals[k][f] > 0)
+          vertexes.push_back(f + customers_size + 1);
+      //get edges
+      map<int, list<int>> adj;
+      for (list<int>::iterator it1 = vertexes.begin(); it1 != vertexes.end(); it1++)
+        for (list<int>::iterator it2 = vertexes.begin(); it2 != vertexes.end(); it2++)
+          if (x_vals[*it1][*it2] > 0)
+            adj[*it1].push_back(*it2);
+      //get connected components
+      map<int, bool> visited;
+      for (map<int, list<int> >::iterator it = adj.begin(); it != adj.end(); it++){
+        if (!visited[it->first]){
+          set<int> connectedCompVertexes;
+          queue<int> q;
+          q.push(it->first);
+          visited[it->first] = true;
+          while (!q.empty()){
+            int vertex = q.front();
+            connectedCompVertexes.insert(vertex);
+            q.pop();
+            list<int> neighbors = adj[vertex];
+            for (list<int>::iterator it1 = neighbors.begin(); it1 != neighbors.end(); it1++)
+              if (!visited[*it1]){
+                q.push(*it1);
+                visited[*it1] = true;
+              }
+          }
+          //add constraints
+          if (connectedCompVertexes.find(0) == connectedCompVertexes.end()){            
+            int i_start = -1;
+            //\sum_{v_i \in V\S} \sum_{v_j \in S} x_{ij}
+            for (int i = 0; i < total_size; i++)
+              if (connectedCompVertexes.find(i) == connectedCompVertexes.end()) 
+                for (set<int>::iterator it1 = connectedCompVertexes.begin(); it1 != connectedCompVertexes.end(); it1++)
+                    expr += x_vars[i][*it1];                      
+            //\sum_{v_p \in V} x_{pi*}
+            for (set<int>::iterator it1 = connectedCompVertexes.begin(); it1 != connectedCompVertexes.end(); it1++)
+              if (1 <= *it1 && *it1 <= customers_size)
+                i_start = *it1;
+            if (i_start == -1)
+              break;           
+            for (int p = 0; p < total_size; p++)
+              expr -= x_vars[p][i_start];
+            //\sum_{v_i \in V\S} \sum_{v_j \in S} x_{ij} - \sum_{v_p \in V} x_{pi*}>= 0
+            IloExprArray lhs (env, 1);
+            IloNumArray rhs(env, 1);
+            lhs[0] = expr;
+            rhs[0] = 0; 
+            cplex.use((IloCplex::Callback(new(env) quadratic_model_subcycle_constraint_callback::Quadratic_model_subcycle_constraint_callback(env, lhs, rhs, cplex.getParam(IloCplex::EpRHS)))));
+            expr.end();
+            expr = IloExpr(env);
+          }
+        }
+      }
+    }
+//    env.out() << "Values = " << x_vals << endl;
   }catch (IloException& e) {
     cerr << "Concert exception caught: " << e << endl;
   }

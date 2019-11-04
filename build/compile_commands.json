@@ -6,7 +6,22 @@
 },
 {
   "directory": "/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/build",
-  "command": "/usr/bin/c++    -isystem /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/includes -isystem /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/build -isystem /opt/ibm/ILOG/CPLEX_Studio129/concert/include -isystem /opt/ibm/ILOG/CPLEX_Studio129/cplex/include    -Wall -DIL_STD -Wfatal-errors -pedantic -fopenmp -DDEBUG -fdiagnostics-color=always -lz -std=c++14 -lconcert -lilocplex -lcplex -lm -lpthread -ldl -o CMakeFiles/main.dir/src/vertex.cpp.o -c /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/vertex.cpp",
-  "file": "/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/vertex.cpp"
+  "command": "/usr/bin/c++    -isystem /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/includes -isystem /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/build -isystem /opt/ibm/ILOG/CPLEX_Studio129/concert/include -isystem /opt/ibm/ILOG/CPLEX_Studio129/cplex/include    -Wall -DIL_STD -Wfatal-errors -pedantic -fopenmp -DDEBUG -fdiagnostics-color=always -lz -std=c++14 -lconcert -lilocplex -lcplex -lm -lpthread -ldl -o CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o -c /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp",
+  "file": "/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp"
+},
+{
+  "directory": "/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/build",
+  "command": "/usr/bin/c++    -isystem /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/includes -isystem /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/build -isystem /opt/ibm/ILOG/CPLEX_Studio129/concert/include -isystem /opt/ibm/ILOG/CPLEX_Studio129/cplex/include    -Wall -DIL_STD -Wfatal-errors -pedantic -fopenmp -DDEBUG -fdiagnostics-color=always -lz -std=c++14 -lconcert -lilocplex -lcplex -lm -lpthread -ldl -o CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o -c /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/erdogan_instance_reader.cpp",
+  "file": "/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/erdogan_instance_reader.cpp"
+},
+{
+  "directory": "/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/build",
+  "command": "/usr/bin/c++    -isystem /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/includes -isystem /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/build -isystem /opt/ibm/ILOG/CPLEX_Studio129/concert/include -isystem /opt/ibm/ILOG/CPLEX_Studio129/cplex/include    -Wall -DIL_STD -Wfatal-errors -pedantic -fopenmp -DDEBUG -fdiagnostics-color=always -lz -std=c++14 -lconcert -lilocplex -lcplex -lm -lpthread -ldl -o CMakeFiles/main.dir/src/models/vertex.cpp.o -c /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/models/vertex.cpp",
+  "file": "/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/models/vertex.cpp"
+},
+{
+  "directory": "/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/build",
+  "command": "/usr/bin/c++    -isystem /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/includes -isystem /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/build -isystem /opt/ibm/ILOG/CPLEX_Studio129/concert/include -isystem /opt/ibm/ILOG/CPLEX_Studio129/cplex/include    -Wall -DIL_STD -Wfatal-errors -pedantic -fopenmp -DDEBUG -fdiagnostics-color=always -lz -std=c++14 -lconcert -lilocplex -lcplex -lm -lpthread -ldl -o CMakeFiles/main.dir/src/models/gvrp_instance.cpp.o -c /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/models/gvrp_instance.cpp",
+  "file": "/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/models/gvrp_instance.cpp"
 }
 ]

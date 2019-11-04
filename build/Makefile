@@ -150,32 +150,113 @@ src/main.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
-src/vertex.o: src/vertex.cpp.o
+src/models/gvrp_instance.o: src/models/gvrp_instance.cpp.o
 
-.PHONY : src/vertex.o
+.PHONY : src/models/gvrp_instance.o
 
 # target to build an object file
-src/vertex.cpp.o:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/vertex.cpp.o
-.PHONY : src/vertex.cpp.o
+src/models/gvrp_instance.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/gvrp_instance.cpp.o
+.PHONY : src/models/gvrp_instance.cpp.o
 
-src/vertex.i: src/vertex.cpp.i
+src/models/gvrp_instance.i: src/models/gvrp_instance.cpp.i
 
-.PHONY : src/vertex.i
+.PHONY : src/models/gvrp_instance.i
 
 # target to preprocess a source file
-src/vertex.cpp.i:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/vertex.cpp.i
-.PHONY : src/vertex.cpp.i
+src/models/gvrp_instance.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/gvrp_instance.cpp.i
+.PHONY : src/models/gvrp_instance.cpp.i
 
-src/vertex.s: src/vertex.cpp.s
+src/models/gvrp_instance.s: src/models/gvrp_instance.cpp.s
 
-.PHONY : src/vertex.s
+.PHONY : src/models/gvrp_instance.s
 
 # target to generate assembly for a file
-src/vertex.cpp.s:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/vertex.cpp.s
-.PHONY : src/vertex.cpp.s
+src/models/gvrp_instance.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/gvrp_instance.cpp.s
+.PHONY : src/models/gvrp_instance.cpp.s
+
+src/models/vertex.o: src/models/vertex.cpp.o
+
+.PHONY : src/models/vertex.o
+
+# target to build an object file
+src/models/vertex.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/vertex.cpp.o
+.PHONY : src/models/vertex.cpp.o
+
+src/models/vertex.i: src/models/vertex.cpp.i
+
+.PHONY : src/models/vertex.i
+
+# target to preprocess a source file
+src/models/vertex.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/vertex.cpp.i
+.PHONY : src/models/vertex.cpp.i
+
+src/models/vertex.s: src/models/vertex.cpp.s
+
+.PHONY : src/models/vertex.s
+
+# target to generate assembly for a file
+src/models/vertex.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/vertex.cpp.s
+.PHONY : src/models/vertex.cpp.s
+
+src/utils/cplex/quadratic_model_subcycle_constraint_callback.o: src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o
+
+.PHONY : src/utils/cplex/quadratic_model_subcycle_constraint_callback.o
+
+# target to build an object file
+src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o
+.PHONY : src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o
+
+src/utils/cplex/quadratic_model_subcycle_constraint_callback.i: src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.i
+
+.PHONY : src/utils/cplex/quadratic_model_subcycle_constraint_callback.i
+
+# target to preprocess a source file
+src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.i
+.PHONY : src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.i
+
+src/utils/cplex/quadratic_model_subcycle_constraint_callback.s: src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.s
+
+.PHONY : src/utils/cplex/quadratic_model_subcycle_constraint_callback.s
+
+# target to generate assembly for a file
+src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.s
+.PHONY : src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.s
+
+src/utils/erdogan_instance_reader.o: src/utils/erdogan_instance_reader.cpp.o
+
+.PHONY : src/utils/erdogan_instance_reader.o
+
+# target to build an object file
+src/utils/erdogan_instance_reader.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o
+.PHONY : src/utils/erdogan_instance_reader.cpp.o
+
+src/utils/erdogan_instance_reader.i: src/utils/erdogan_instance_reader.cpp.i
+
+.PHONY : src/utils/erdogan_instance_reader.i
+
+# target to preprocess a source file
+src/utils/erdogan_instance_reader.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.i
+.PHONY : src/utils/erdogan_instance_reader.cpp.i
+
+src/utils/erdogan_instance_reader.s: src/utils/erdogan_instance_reader.cpp.s
+
+.PHONY : src/utils/erdogan_instance_reader.s
+
+# target to generate assembly for a file
+src/utils/erdogan_instance_reader.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.s
+.PHONY : src/utils/erdogan_instance_reader.cpp.s
 
 # Help Target
 help:
@@ -189,9 +270,18 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
-	@echo "... src/vertex.o"
-	@echo "... src/vertex.i"
-	@echo "... src/vertex.s"
+	@echo "... src/models/gvrp_instance.o"
+	@echo "... src/models/gvrp_instance.i"
+	@echo "... src/models/gvrp_instance.s"
+	@echo "... src/models/vertex.o"
+	@echo "... src/models/vertex.i"
+	@echo "... src/models/vertex.s"
+	@echo "... src/utils/cplex/quadratic_model_subcycle_constraint_callback.o"
+	@echo "... src/utils/cplex/quadratic_model_subcycle_constraint_callback.i"
+	@echo "... src/utils/cplex/quadratic_model_subcycle_constraint_callback.s"
+	@echo "... src/utils/erdogan_instance_reader.o"
+	@echo "... src/utils/erdogan_instance_reader.i"
+	@echo "... src/utils/erdogan_instance_reader.s"
 .PHONY : help
 
 
