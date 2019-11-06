@@ -204,59 +204,59 @@ src/models/vertex.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/vertex.cpp.s
 .PHONY : src/models/vertex.cpp.s
 
-src/utils/cplex/quadratic_model_subcycle_constraint_callback.o: src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o
+src/utils/cplex/quadratic_model.o: src/utils/cplex/quadratic_model.cpp.o
 
-.PHONY : src/utils/cplex/quadratic_model_subcycle_constraint_callback.o
-
-# target to build an object file
-src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o
-.PHONY : src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o
-
-src/utils/cplex/quadratic_model_subcycle_constraint_callback.i: src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.i
-
-.PHONY : src/utils/cplex/quadratic_model_subcycle_constraint_callback.i
-
-# target to preprocess a source file
-src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.i:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.i
-.PHONY : src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.i
-
-src/utils/cplex/quadratic_model_subcycle_constraint_callback.s: src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.s
-
-.PHONY : src/utils/cplex/quadratic_model_subcycle_constraint_callback.s
-
-# target to generate assembly for a file
-src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.s:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.s
-.PHONY : src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.s
-
-src/utils/erdogan_instance_reader.o: src/utils/erdogan_instance_reader.cpp.o
-
-.PHONY : src/utils/erdogan_instance_reader.o
+.PHONY : src/utils/cplex/quadratic_model.o
 
 # target to build an object file
-src/utils/erdogan_instance_reader.cpp.o:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o
-.PHONY : src/utils/erdogan_instance_reader.cpp.o
+src/utils/cplex/quadratic_model.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o
+.PHONY : src/utils/cplex/quadratic_model.cpp.o
 
-src/utils/erdogan_instance_reader.i: src/utils/erdogan_instance_reader.cpp.i
+src/utils/cplex/quadratic_model.i: src/utils/cplex/quadratic_model.cpp.i
 
-.PHONY : src/utils/erdogan_instance_reader.i
+.PHONY : src/utils/cplex/quadratic_model.i
 
 # target to preprocess a source file
-src/utils/erdogan_instance_reader.cpp.i:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.i
-.PHONY : src/utils/erdogan_instance_reader.cpp.i
+src/utils/cplex/quadratic_model.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.i
+.PHONY : src/utils/cplex/quadratic_model.cpp.i
 
-src/utils/erdogan_instance_reader.s: src/utils/erdogan_instance_reader.cpp.s
+src/utils/cplex/quadratic_model.s: src/utils/cplex/quadratic_model.cpp.s
 
-.PHONY : src/utils/erdogan_instance_reader.s
+.PHONY : src/utils/cplex/quadratic_model.s
 
 # target to generate assembly for a file
-src/utils/erdogan_instance_reader.cpp.s:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.s
-.PHONY : src/utils/erdogan_instance_reader.cpp.s
+src/utils/cplex/quadratic_model.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.s
+.PHONY : src/utils/cplex/quadratic_model.cpp.s
+
+src/utils/util.o: src/utils/util.cpp.o
+
+.PHONY : src/utils/util.o
+
+# target to build an object file
+src/utils/util.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/util.cpp.o
+.PHONY : src/utils/util.cpp.o
+
+src/utils/util.i: src/utils/util.cpp.i
+
+.PHONY : src/utils/util.i
+
+# target to preprocess a source file
+src/utils/util.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/util.cpp.i
+.PHONY : src/utils/util.cpp.i
+
+src/utils/util.s: src/utils/util.cpp.s
+
+.PHONY : src/utils/util.s
+
+# target to generate assembly for a file
+src/utils/util.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/util.cpp.s
+.PHONY : src/utils/util.cpp.s
 
 # Help Target
 help:
@@ -276,12 +276,12 @@ help:
 	@echo "... src/models/vertex.o"
 	@echo "... src/models/vertex.i"
 	@echo "... src/models/vertex.s"
-	@echo "... src/utils/cplex/quadratic_model_subcycle_constraint_callback.o"
-	@echo "... src/utils/cplex/quadratic_model_subcycle_constraint_callback.i"
-	@echo "... src/utils/cplex/quadratic_model_subcycle_constraint_callback.s"
-	@echo "... src/utils/erdogan_instance_reader.o"
-	@echo "... src/utils/erdogan_instance_reader.i"
-	@echo "... src/utils/erdogan_instance_reader.s"
+	@echo "... src/utils/cplex/quadratic_model.o"
+	@echo "... src/utils/cplex/quadratic_model.i"
+	@echo "... src/utils/cplex/quadratic_model.s"
+	@echo "... src/utils/util.o"
+	@echo "... src/utils/util.i"
+	@echo "... src/utils/util.s"
 .PHONY : help
 
 

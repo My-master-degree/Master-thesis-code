@@ -81,52 +81,52 @@ CMakeFiles/main.dir/src/main.cpp.o.provides: CMakeFiles/main.dir/src/main.cpp.o.
 CMakeFiles/main.dir/src/main.cpp.o.provides.build: CMakeFiles/main.dir/src/main.cpp.o
 
 
-CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o: CMakeFiles/main.dir/flags.make
-CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o: ../src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o -c /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp
+CMakeFiles/main.dir/src/utils/util.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/utils/util.cpp.o: ../src/utils/util.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/src/utils/util.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/util.cpp.o -c /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/util.cpp
 
-CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp > CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.i
+CMakeFiles/main.dir/src/utils/util.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/utils/util.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/util.cpp > CMakeFiles/main.dir/src/utils/util.cpp.i
 
-CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp -o CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.s
+CMakeFiles/main.dir/src/utils/util.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/util.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/util.cpp -o CMakeFiles/main.dir/src/utils/util.cpp.s
 
-CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o.requires:
+CMakeFiles/main.dir/src/utils/util.cpp.o.requires:
 
-.PHONY : CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o.requires
+.PHONY : CMakeFiles/main.dir/src/utils/util.cpp.o.requires
 
-CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o.provides: CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o.requires
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o.provides.build
-.PHONY : CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o.provides
+CMakeFiles/main.dir/src/utils/util.cpp.o.provides: CMakeFiles/main.dir/src/utils/util.cpp.o.requires
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/util.cpp.o.provides.build
+.PHONY : CMakeFiles/main.dir/src/utils/util.cpp.o.provides
 
-CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o.provides.build: CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o
+CMakeFiles/main.dir/src/utils/util.cpp.o.provides.build: CMakeFiles/main.dir/src/utils/util.cpp.o
 
 
-CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o: CMakeFiles/main.dir/flags.make
-CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o: ../src/utils/erdogan_instance_reader.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o -c /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/erdogan_instance_reader.cpp
+CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o: ../src/utils/cplex/quadratic_model.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o -c /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model.cpp
 
-CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/erdogan_instance_reader.cpp > CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.i
+CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model.cpp > CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.i
 
-CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/erdogan_instance_reader.cpp -o CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.s
+CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model.cpp -o CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.s
 
-CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o.requires:
+CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o.requires:
 
-.PHONY : CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o.requires
+.PHONY : CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o.requires
 
-CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o.provides: CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o.requires
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o.provides.build
-.PHONY : CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o.provides
+CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o.provides: CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o.requires
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o.provides.build
+.PHONY : CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o.provides
 
-CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o.provides.build: CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o
+CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o.provides.build: CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o
 
 
 CMakeFiles/main.dir/src/models/vertex.cpp.o: CMakeFiles/main.dir/flags.make
@@ -180,8 +180,8 @@ CMakeFiles/main.dir/src/models/gvrp_instance.cpp.o.provides.build: CMakeFiles/ma
 # Object files for target main
 main_OBJECTS = \
 "CMakeFiles/main.dir/src/main.cpp.o" \
-"CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o" \
-"CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o" \
+"CMakeFiles/main.dir/src/utils/util.cpp.o" \
+"CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o" \
 "CMakeFiles/main.dir/src/models/vertex.cpp.o" \
 "CMakeFiles/main.dir/src/models/gvrp_instance.cpp.o"
 
@@ -189,8 +189,8 @@ main_OBJECTS = \
 main_EXTERNAL_OBJECTS =
 
 main: CMakeFiles/main.dir/src/main.cpp.o
-main: CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o
-main: CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o
+main: CMakeFiles/main.dir/src/utils/util.cpp.o
+main: CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o
 main: CMakeFiles/main.dir/src/models/vertex.cpp.o
 main: CMakeFiles/main.dir/src/models/gvrp_instance.cpp.o
 main: CMakeFiles/main.dir/build.make
@@ -207,8 +207,8 @@ CMakeFiles/main.dir/build: main
 .PHONY : CMakeFiles/main.dir/build
 
 CMakeFiles/main.dir/requires: CMakeFiles/main.dir/src/main.cpp.o.requires
-CMakeFiles/main.dir/requires: CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o.requires
-CMakeFiles/main.dir/requires: CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o.requires
+CMakeFiles/main.dir/requires: CMakeFiles/main.dir/src/utils/util.cpp.o.requires
+CMakeFiles/main.dir/requires: CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o.requires
 CMakeFiles/main.dir/requires: CMakeFiles/main.dir/src/models/vertex.cpp.o.requires
 CMakeFiles/main.dir/requires: CMakeFiles/main.dir/src/models/gvrp_instance.cpp.o.requires
 

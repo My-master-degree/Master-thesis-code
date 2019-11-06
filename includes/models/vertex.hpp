@@ -3,7 +3,8 @@
 
 using namespace std;
 
-namespace vertex {
+namespace models {
+
   class Vertex {
     public:
       explicit Vertex(int id, double x, double y);

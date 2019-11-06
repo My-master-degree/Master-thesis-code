@@ -11,12 +11,26 @@ vertex.hpp
 ../includes/models/vertex.hpp
 list
 -
+vector
+-
+iostream
+-
 
 ../includes/models/vertex.hpp
 
-../includes/utils/cplex/quadratic_model_subcycle_constraint_callback.hpp
+../includes/utils/cplex/quadratic_model.hpp
+list
+-
+models/gvrp_instance.hpp
+-
 ilcplex/ilocplex.h
 -
+
+../includes/utils/util.hpp
+string
+-
+models/gvrp_instance.hpp
+../includes/utils/models/gvrp_instance.hpp
 
 /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/main.cpp
 map
@@ -27,15 +41,7 @@ queue
 -
 ilcplex/ilocplex.h
 -
-iostream
--
-fstream
--
 string
--
-cstdlib
--
-sstream
 -
 list
 -
@@ -45,30 +51,58 @@ models/vertex.hpp
 /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/models/vertex.hpp
 models/gvrp_instance.hpp
 /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/models/gvrp_instance.hpp
-utils/cplex/quadratic_model_subcycle_constraint_callback.hpp
-/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model_subcycle_constraint_callback.hpp
+utils/cplex/quadratic_model.hpp
+/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model.hpp
+utils/util.hpp
+/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/util.hpp
 SampleConfig.h
 /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/SampleConfig.h
 
 /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/models/gvrp_instance.cpp
 models/gvrp_instance.hpp
 /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/models/models/gvrp_instance.hpp
-list
--
 models/vertex.hpp
 /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/models/models/vertex.hpp
+vector
+-
+list
+-
+string
+-
 
 /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/models/vertex.cpp
 models/vertex.hpp
 /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/models/models/vertex.hpp
 
-/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp
-utils/cplex/quadratic_model_subcycle_constraint_callback.hpp
-/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/utils/cplex/quadratic_model_subcycle_constraint_callback.hpp
+/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model.cpp
+utils/cplex/quadratic_model.hpp
+/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/utils/cplex/quadratic_model.hpp
+models/vertex.hpp
+/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/models/vertex.hpp
+models/gvrp_instance.hpp
+/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/models/gvrp_instance.hpp
+list
+-
 ilcplex/ilocplex.h
 -
 
-/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/erdogan_instance_reader.cpp
+/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/util.cpp
+models/gvrp_instance.hpp
+/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/models/gvrp_instance.hpp
+utils/util.hpp
+/home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/utils/util.hpp
+iostream
+-
+fstream
+-
+cstdlib
+-
+sstream
+-
+string
+-
+math.h
+-
 
 /opt/ibm/ILOG/CPLEX_Studio129/concert/include/ilconcert/iloalg.h
 ilconcert/iloenv.h

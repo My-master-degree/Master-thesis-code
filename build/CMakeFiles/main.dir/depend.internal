@@ -4,7 +4,8 @@
 CMakeFiles/main.dir/src/main.cpp.o
  ../includes/models/gvrp_instance.hpp
  ../includes/models/vertex.hpp
- ../includes/utils/cplex/quadratic_model_subcycle_constraint_callback.hpp
+ ../includes/utils/cplex/quadratic_model.hpp
+ ../includes/utils/util.hpp
  /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/main.cpp
  /opt/ibm/ILOG/CPLEX_Studio129/concert/include/ilconcert/iloalg.h
  /opt/ibm/ILOG/CPLEX_Studio129/concert/include/ilconcert/iloalgi.h
@@ -67,9 +68,11 @@ CMakeFiles/main.dir/src/models/gvrp_instance.cpp.o
 CMakeFiles/main.dir/src/models/vertex.cpp.o
  ../includes/models/vertex.hpp
  /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/models/vertex.cpp
-CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp.o
- ../includes/utils/cplex/quadratic_model_subcycle_constraint_callback.hpp
- /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model_subcycle_constraint_callback.cpp
+CMakeFiles/main.dir/src/utils/cplex/quadratic_model.cpp.o
+ ../includes/models/gvrp_instance.hpp
+ ../includes/models/vertex.hpp
+ ../includes/utils/cplex/quadratic_model.hpp
+ /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/cplex/quadratic_model.cpp
  /opt/ibm/ILOG/CPLEX_Studio129/concert/include/ilconcert/iloalg.h
  /opt/ibm/ILOG/CPLEX_Studio129/concert/include/ilconcert/iloalgi.h
  /opt/ibm/ILOG/CPLEX_Studio129/concert/include/ilconcert/iloallocator.h
@@ -123,5 +126,8 @@ CMakeFiles/main.dir/src/utils/cplex/quadratic_model_subcycle_constraint_callback
  /opt/ibm/ILOG/CPLEX_Studio129/cplex/include/ilcplex/ilogoals.h
  /opt/ibm/ILOG/CPLEX_Studio129/cplex/include/ilcplex/ilomodelasst.h
  /opt/ibm/ILOG/CPLEX_Studio129/cplex/include/ilcplex/iloparam.h
-CMakeFiles/main.dir/src/utils/erdogan_instance_reader.cpp.o
- /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/erdogan_instance_reader.cpp
+CMakeFiles/main.dir/src/utils/util.cpp.o
+ ../includes/models/gvrp_instance.hpp
+ ../includes/models/vertex.hpp
+ ../includes/utils/util.hpp
+ /home/matheus/Documents/Mestrado/Tese/Master-thesis-code/src/utils/util.cpp
