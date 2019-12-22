@@ -1,4 +1,5 @@
 #include "models/gvrp_instance.hpp"
+#include "models/dinstances_enum.hpp"
 #include "utils/util.hpp"
 #include <iostream>
 #include <fstream>
@@ -95,7 +96,7 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
   total_size = customers_size + afss_size + 1;
   //calculate distances
   vector<Vertex> vertexes (total_size);
-  int j =0; 
+  int j = 0; 
   vertexes[j++] = depot;
   for (list<Vertex>::iterator i = customers.begin(); i != customers.end(); i++)
     vertexes[j++] = *i;
@@ -107,5 +108,5 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
     for (int j = 0; j < total_size; j++)
       distances[i][j] = hypot(vertexes[i].x - vertexes[j].x, vertexes[i].y - vertexes[j].y);
   }
-  return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances);
+  return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC);
 }
