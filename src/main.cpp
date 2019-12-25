@@ -7,7 +7,6 @@
 #include <vector>
 #include "models/vertex.hpp"
 #include "models/gvrp_instance.hpp"
-#include "utils/cplex/quadratic_model.hpp"
 #include "utils/util.hpp"
 #include "SampleConfig.h"
 ILOSTLBEGIN

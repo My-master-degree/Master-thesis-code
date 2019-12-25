@@ -1,5 +1,5 @@
 #include "models/gvrp_instance.hpp"
-#include "models/dinstances_enum.hpp"
+#include "models/distances_enum.hpp"
 #include "utils/util.hpp"
 #include <iostream>
 #include <fstream>

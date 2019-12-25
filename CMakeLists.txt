@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 project(Master_project)
 
 set (Sample_VERSION_MAJOR 0)
@@ -23,7 +23,6 @@ includes
 "${CPLEX_ILOCPLEX_INCLUDE_DIR}"
 )
 
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 add_compile_options(-Wall
   -DIL_STD
@@ -34,7 +33,7 @@ add_compile_options(-Wall
   -fdiagnostics-color=always
   -Wall 
   -lz
-  -std=c++14
+  -std=c++17
   -lconcert 
   -lilocplex 
   -lcplex 
@@ -49,9 +48,14 @@ set(BUILD_SHARED_LIBS On)
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
 add_executable(main ${SOURCES})
+#set(CMAKE_CXX_STANDARD 17)
+#set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#set(CMAKE_CXX_EXTENSIONS OFF)
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+set(CMAKE_CXX_COMPILER "g++-7")
+
 #add_library(concert SHARED IMPORTED)
 target_link_libraries(main "${CPLEX_CONCERT_LIBRARY}" "${CPLEX_ILOCPLEX_LIBRARY}" "${CPLEX_LIBRARY}" pthread m dl)
-
 
 
 #SET(GCC_COVERAGE_COMPILE_FLAGS "-fprofile-arcs -ftest-coverage")

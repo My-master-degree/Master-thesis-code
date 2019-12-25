@@ -9,7 +9,7 @@ using namespace std;
 
 namespace models {
   enum Distances_enum {
-    SYMMETRIC, METRIC, NONE;
+    SYMMETRIC, METRIC, NONE
   };
 }
 #endif
