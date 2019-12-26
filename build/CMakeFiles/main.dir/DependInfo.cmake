@@ -16,8 +16,8 @@ set(CMAKE_CXX_COMPILER_ID "GNU")
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../includes"
   "."
-  "/opt/ibm/ILOG/CPLEX_Studio_Community129/concert/include"
-  "/opt/ibm/ILOG/CPLEX_Studio_Community129/cplex/include"
+  "/opt/ibm/ILOG/CPLEX_Studio1210/concert/include"
+  "/opt/ibm/ILOG/CPLEX_Studio1210/cplex/include"
   )
 
 # Targets to which this target links.

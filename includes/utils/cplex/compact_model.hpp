@@ -12,7 +12,7 @@ namespace utils {
   namespace cplex {
     class Compact_model {
       public:
-        explicit Compact_model(Gvrp_instance gvrp_instance); 
+        explicit Compact_model(Gvrp_instance& gvrp_instance); 
         list<list<Vertex> > run();
         Gvrp_instance gvrp_instance;
     };

@@ -22,8 +22,6 @@ includes
 "${CPLEX_CONCERT_INCLUDE_DIR}"
 "${CPLEX_ILOCPLEX_INCLUDE_DIR}"
 )
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 add_compile_options(-Wall
   -DIL_STD
   -Wfatal-errors

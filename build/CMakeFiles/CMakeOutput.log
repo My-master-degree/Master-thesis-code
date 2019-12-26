@@ -28,25 +28,13 @@ The CXX compiler identification is GNU, found in "/home/matheus/Dropbox/Mestrado
 Determining if the C compiler works passed with the following output:
 Change Dir: /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_e14e6/fast && /usr/bin/make -f CMakeFiles/cmTC_e14e6.dir/build.make CMakeFiles/cmTC_e14e6.dir/build
+Run Build Command(s):/usr/bin/make cmTC_a0cb6/fast && /usr/bin/make -f CMakeFiles/cmTC_a0cb6.dir/build.make CMakeFiles/cmTC_a0cb6.dir/build
 make[1]: Entering directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Building C object CMakeFiles/cmTC_e14e6.dir/testCCompiler.c.o
-/usr/bin/cc    -o CMakeFiles/cmTC_e14e6.dir/testCCompiler.c.o   -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp/testCCompiler.c
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Linking C executable cmTC_e14e6
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e14e6.dir/link.txt --verbose=1
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/bin/cc      CMakeFiles/cmTC_e14e6.dir/testCCompiler.c.o  -o cmTC_e14e6 
+Building C object CMakeFiles/cmTC_a0cb6.dir/testCCompiler.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_a0cb6.dir/testCCompiler.c.o   -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_a0cb6
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a0cb6.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_a0cb6.dir/testCCompiler.c.o  -o cmTC_a0cb6 
 make[1]: Leaving directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
 
 
@@ -54,22 +42,18 @@ make[1]: Leaving directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-co
 Detecting C compiler ABI info compiled with the following output:
 Change Dir: /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_8bded/fast && /usr/bin/make -f CMakeFiles/cmTC_8bded.dir/build.make CMakeFiles/cmTC_8bded.dir/build
+Run Build Command(s):/usr/bin/make cmTC_775c3/fast && /usr/bin/make -f CMakeFiles/cmTC_775c3.dir/build.make CMakeFiles/cmTC_775c3.dir/build
 make[1]: Entering directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Building C object CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o
-/usr/bin/cc   -v -o CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.16/Modules/CMakeCCompilerABI.c
+Building C object CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc   -v -o CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.16/Modules/CMakeCCompilerABI.c
 Using built-in specs.
 COLLECT_GCC=/usr/bin/cc
 Target: x86_64-linux-gnu
 Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.11' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c,ada,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
 Thread model: posix
 gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.11) 
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/5/cc1 -quiet -v -imultiarch x86_64-linux-gnu /usr/local/share/cmake-3.16/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o -version -fstack-protector-strong -Wformat -Wformat-security -o /tmp/ccKB9FnC.s
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/5/cc1 -quiet -v -imultiarch x86_64-linux-gnu /usr/local/share/cmake-3.16/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o -version -fstack-protector-strong -Wformat -Wformat-security -o /tmp/cc25mcU1.s
 GNU C11 (Ubuntu 5.4.0-6ubuntu1~16.04.11) version 5.4.0 20160609 (x86_64-linux-gnu)
 	compiled by GNU C version 5.4.0 20160609, GMP version 6.1.0, MPFR version 3.1.4, MPC version 1.0.3
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
@@ -87,23 +71,15 @@ GNU C11 (Ubuntu 5.4.0-6ubuntu1~16.04.11) version 5.4.0 20160609 (x86_64-linux-gn
 	compiled by GNU C version 5.4.0 20160609, GMP version 6.1.0, MPFR version 3.1.4, MPC version 1.0.3
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 Compiler executable checksum: 5f69ca549f086e2c3748f9d1423a4dee
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64'
- as -v --64 -o CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o /tmp/ccKB9FnC.s
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64'
+ as -v --64 -o CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o /tmp/cc25mcU1.s
 GNU assembler version 2.26.1 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.26.1
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64'
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Linking C executable cmTC_8bded
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8bded.dir/link.txt --verbose=1
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/bin/cc     -v CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o  -o cmTC_8bded 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64'
+Linking C executable cmTC_775c3
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_775c3.dir/link.txt --verbose=1
+/usr/bin/cc     -v CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o  -o cmTC_775c3 
 Using built-in specs.
 COLLECT_GCC=/usr/bin/cc
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper
@@ -113,8 +89,8 @@ Thread model: posix
 gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.11) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_8bded' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccbgaNVA.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_8bded /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_775c3' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccMGZdJa.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_775c3 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
 make[1]: Leaving directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
 
 
@@ -140,22 +116,18 @@ Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command(s):/usr/bin/make cmTC_8bded/fast && /usr/bin/make -f CMakeFiles/cmTC_8bded.dir/build.make CMakeFiles/cmTC_8bded.dir/build]
+  ignore line: [Run Build Command(s):/usr/bin/make cmTC_775c3/fast && /usr/bin/make -f CMakeFiles/cmTC_775c3.dir/build.make CMakeFiles/cmTC_775c3.dir/build]
   ignore line: [make[1]: Entering directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [Building C object CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o]
-  ignore line: [/usr/bin/cc   -v -o CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.16/Modules/CMakeCCompilerABI.c]
+  ignore line: [Building C object CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc   -v -o CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.16/Modules/CMakeCCompilerABI.c]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/cc]
   ignore line: [Target: x86_64-linux-gnu]
   ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.11' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c ada c++ java go d fortran objc obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32 m64 mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu]
   ignore line: [Thread model: posix]
   ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.11) ]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64']
-  ignore line: [ /usr/lib/gcc/x86_64-linux-gnu/5/cc1 -quiet -v -imultiarch x86_64-linux-gnu /usr/local/share/cmake-3.16/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o -version -fstack-protector-strong -Wformat -Wformat-security -o /tmp/ccKB9FnC.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64']
+  ignore line: [ /usr/lib/gcc/x86_64-linux-gnu/5/cc1 -quiet -v -imultiarch x86_64-linux-gnu /usr/local/share/cmake-3.16/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o -version -fstack-protector-strong -Wformat -Wformat-security -o /tmp/cc25mcU1.s]
   ignore line: [GNU C11 (Ubuntu 5.4.0-6ubuntu1~16.04.11) version 5.4.0 20160609 (x86_64-linux-gnu)]
   ignore line: [	compiled by GNU C version 5.4.0 20160609  GMP version 6.1.0  MPFR version 3.1.4  MPC version 1.0.3]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
@@ -173,23 +145,15 @@ Parsed C implicit link information from above output:
   ignore line: [	compiled by GNU C version 5.4.0 20160609  GMP version 6.1.0  MPFR version 3.1.4  MPC version 1.0.3]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
   ignore line: [Compiler executable checksum: 5f69ca549f086e2c3748f9d1423a4dee]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64']
-  ignore line: [ as -v --64 -o CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o /tmp/ccKB9FnC.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64']
+  ignore line: [ as -v --64 -o CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o /tmp/cc25mcU1.s]
   ignore line: [GNU assembler version 2.26.1 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.26.1]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64']
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [Linking C executable cmTC_8bded]
-  ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8bded.dir/link.txt --verbose=1]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/bin/cc     -v CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o  -o cmTC_8bded ]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64']
+  ignore line: [Linking C executable cmTC_775c3]
+  ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_775c3.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc     -v CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o  -o cmTC_775c3 ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/cc]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper]
@@ -199,13 +163,13 @@ Parsed C implicit link information from above output:
   ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.11) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_8bded' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccbgaNVA.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_8bded /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_775c3' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccMGZdJa.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_775c3 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/ccbgaNVA.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccMGZdJa.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -222,7 +186,7 @@ Parsed C implicit link information from above output:
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-zrelro] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_8bded] ==> ignore
+    arg [cmTC_775c3] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o] ==> ignore
@@ -234,7 +198,7 @@ Parsed C implicit link information from above output:
     arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-linux-gnu/5/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../..]
-    arg [CMakeFiles/cmTC_8bded.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [CMakeFiles/cmTC_775c3.dir/CMakeCCompilerABI.c.o] ==> ignore
     arg [-lgcc] ==> lib [gcc]
     arg [--as-needed] ==> ignore
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -262,25 +226,13 @@ Parsed C implicit link information from above output:
 Determining if the CXX compiler works passed with the following output:
 Change Dir: /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_8930e/fast && /usr/bin/make -f CMakeFiles/cmTC_8930e.dir/build.make CMakeFiles/cmTC_8930e.dir/build
+Run Build Command(s):/usr/bin/make cmTC_ca41a/fast && /usr/bin/make -f CMakeFiles/cmTC_ca41a.dir/build.make CMakeFiles/cmTC_ca41a.dir/build
 make[1]: Entering directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Building CXX object CMakeFiles/cmTC_8930e.dir/testCXXCompiler.cxx.o
-/usr/bin/c++     -o CMakeFiles/cmTC_8930e.dir/testCXXCompiler.cxx.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Linking CXX executable cmTC_8930e
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8930e.dir/link.txt --verbose=1
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/bin/c++       CMakeFiles/cmTC_8930e.dir/testCXXCompiler.cxx.o  -o cmTC_8930e 
+Building CXX object CMakeFiles/cmTC_ca41a.dir/testCXXCompiler.cxx.o
+/usr/bin/c++     -o CMakeFiles/cmTC_ca41a.dir/testCXXCompiler.cxx.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_ca41a
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ca41a.dir/link.txt --verbose=1
+/usr/bin/c++       CMakeFiles/cmTC_ca41a.dir/testCXXCompiler.cxx.o  -o cmTC_ca41a 
 make[1]: Leaving directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
 
 
@@ -288,22 +240,18 @@ make[1]: Leaving directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-co
 Detecting CXX compiler ABI info compiled with the following output:
 Change Dir: /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_b0fde/fast && /usr/bin/make -f CMakeFiles/cmTC_b0fde.dir/build.make CMakeFiles/cmTC_b0fde.dir/build
+Run Build Command(s):/usr/bin/make cmTC_b18c7/fast && /usr/bin/make -f CMakeFiles/cmTC_b18c7.dir/build.make CMakeFiles/cmTC_b18c7.dir/build
 make[1]: Entering directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Building CXX object CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o
-/usr/bin/c++    -v -o CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp
+Building CXX object CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++    -v -o CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp
 Using built-in specs.
 COLLECT_GCC=/usr/bin/c++
 Target: x86_64-linux-gnu
 Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.11' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c,ada,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
 Thread model: posix
 gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.11) 
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/5/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/local/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o -version -fstack-protector-strong -Wformat -Wformat-security -o /tmp/ccqpakeF.s
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/5/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/local/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o -version -fstack-protector-strong -Wformat -Wformat-security -o /tmp/ccpzSL73.s
 GNU C++ (Ubuntu 5.4.0-6ubuntu1~16.04.11) version 5.4.0 20160609 (x86_64-linux-gnu)
 	compiled by GNU C version 5.4.0 20160609, GMP version 6.1.0, MPFR version 3.1.4, MPC version 1.0.3
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
@@ -325,23 +273,15 @@ GNU C++ (Ubuntu 5.4.0-6ubuntu1~16.04.11) version 5.4.0 20160609 (x86_64-linux-gn
 	compiled by GNU C version 5.4.0 20160609, GMP version 6.1.0, MPFR version 3.1.4, MPC version 1.0.3
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 Compiler executable checksum: 8c2b43f572cd3f060e41aeab70254763
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
- as -v --64 -o CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccqpakeF.s
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ as -v --64 -o CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccpzSL73.s
 GNU assembler version 2.26.1 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.26.1
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Linking CXX executable cmTC_b0fde
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b0fde.dir/link.txt --verbose=1
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/bin/c++      -v CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_b0fde 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+Linking CXX executable cmTC_b18c7
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b18c7.dir/link.txt --verbose=1
+/usr/bin/c++      -v CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_b18c7 
 Using built-in specs.
 COLLECT_GCC=/usr/bin/c++
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper
@@ -351,8 +291,8 @@ Thread model: posix
 gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.11) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_b0fde' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccKI0YWH.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_b0fde /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_b18c7' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccgSVnEa.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_b18c7 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
 make[1]: Leaving directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
 
 
@@ -384,22 +324,18 @@ Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command(s):/usr/bin/make cmTC_b0fde/fast && /usr/bin/make -f CMakeFiles/cmTC_b0fde.dir/build.make CMakeFiles/cmTC_b0fde.dir/build]
+  ignore line: [Run Build Command(s):/usr/bin/make cmTC_b18c7/fast && /usr/bin/make -f CMakeFiles/cmTC_b18c7.dir/build.make CMakeFiles/cmTC_b18c7.dir/build]
   ignore line: [make[1]: Entering directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [Building CXX object CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o]
-  ignore line: [/usr/bin/c++    -v -o CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Building CXX object CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/c++    -v -o CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/c++]
   ignore line: [Target: x86_64-linux-gnu]
   ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.11' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c ada c++ java go d fortran objc obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32 m64 mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu]
   ignore line: [Thread model: posix]
   ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.11) ]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  ignore line: [ /usr/lib/gcc/x86_64-linux-gnu/5/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/local/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o -version -fstack-protector-strong -Wformat -Wformat-security -o /tmp/ccqpakeF.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  ignore line: [ /usr/lib/gcc/x86_64-linux-gnu/5/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/local/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o -version -fstack-protector-strong -Wformat -Wformat-security -o /tmp/ccpzSL73.s]
   ignore line: [GNU C++ (Ubuntu 5.4.0-6ubuntu1~16.04.11) version 5.4.0 20160609 (x86_64-linux-gnu)]
   ignore line: [	compiled by GNU C version 5.4.0 20160609  GMP version 6.1.0  MPFR version 3.1.4  MPC version 1.0.3]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
@@ -421,23 +357,15 @@ Parsed CXX implicit link information from above output:
   ignore line: [	compiled by GNU C version 5.4.0 20160609  GMP version 6.1.0  MPFR version 3.1.4  MPC version 1.0.3]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
   ignore line: [Compiler executable checksum: 8c2b43f572cd3f060e41aeab70254763]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  ignore line: [ as -v --64 -o CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccqpakeF.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  ignore line: [ as -v --64 -o CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccpzSL73.s]
   ignore line: [GNU assembler version 2.26.1 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.26.1]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [Linking CXX executable cmTC_b0fde]
-  ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b0fde.dir/link.txt --verbose=1]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)]
-  ignore line: [/usr/bin/c++      -v CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_b0fde ]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  ignore line: [Linking CXX executable cmTC_b18c7]
+  ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b18c7.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/c++      -v CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_b18c7 ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/c++]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper]
@@ -447,13 +375,13 @@ Parsed CXX implicit link information from above output:
   ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.11) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_b0fde' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccKI0YWH.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_b0fde /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_b18c7' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccgSVnEa.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_b18c7 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/ccKI0YWH.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccgSVnEa.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -470,7 +398,7 @@ Parsed CXX implicit link information from above output:
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-zrelro] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_b0fde] ==> ignore
+    arg [cmTC_b18c7] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o] ==> ignore
@@ -482,7 +410,7 @@ Parsed CXX implicit link information from above output:
     arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-linux-gnu/5/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../..]
-    arg [CMakeFiles/cmTC_b0fde.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [CMakeFiles/cmTC_b18c7.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
     arg [-lstdc++] ==> lib [stdc++]
     arg [-lm] ==> lib [m]
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -508,25 +436,13 @@ Parsed CXX implicit link information from above output:
 Determining if the include file pthread.h exists passed with the following output:
 Change Dir: /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_5fc0c/fast && /usr/bin/make -f CMakeFiles/cmTC_5fc0c.dir/build.make CMakeFiles/cmTC_5fc0c.dir/build
+Run Build Command(s):/usr/bin/make cmTC_ef57a/fast && /usr/bin/make -f CMakeFiles/cmTC_ef57a.dir/build.make CMakeFiles/cmTC_ef57a.dir/build
 make[1]: Entering directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Building C object CMakeFiles/cmTC_5fc0c.dir/CheckIncludeFile.c.o
-/usr/bin/cc    -o CMakeFiles/cmTC_5fc0c.dir/CheckIncludeFile.c.o   -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Linking C executable cmTC_5fc0c
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5fc0c.dir/link.txt --verbose=1
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/bin/cc      CMakeFiles/cmTC_5fc0c.dir/CheckIncludeFile.c.o  -o cmTC_5fc0c 
+Building C object CMakeFiles/cmTC_ef57a.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_ef57a.dir/CheckIncludeFile.c.o   -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_ef57a
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ef57a.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_ef57a.dir/CheckIncludeFile.c.o  -o cmTC_ef57a 
 make[1]: Leaving directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
 
 
@@ -534,25 +450,13 @@ make[1]: Leaving directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-co
 Determining if the function pthread_create exists in the pthread passed with the following output:
 Change Dir: /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_298df/fast && /usr/bin/make -f CMakeFiles/cmTC_298df.dir/build.make CMakeFiles/cmTC_298df.dir/build
+Run Build Command(s):/usr/bin/make cmTC_545f1/fast && /usr/bin/make -f CMakeFiles/cmTC_545f1.dir/build.make CMakeFiles/cmTC_545f1.dir/build
 make[1]: Entering directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Building C object CMakeFiles/cmTC_298df.dir/CheckFunctionExists.c.o
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_298df.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.16/Modules/CheckFunctionExists.c
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Linking C executable cmTC_298df
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_298df.dir/link.txt --verbose=1
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_298df.dir/CheckFunctionExists.c.o  -o cmTC_298df  -lpthread 
+Building C object CMakeFiles/cmTC_545f1.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_545f1.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.16/Modules/CheckFunctionExists.c
+Linking C executable cmTC_545f1
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_545f1.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_545f1.dir/CheckFunctionExists.c.o  -o cmTC_545f1  -lpthread 
 make[1]: Leaving directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
 
 
@@ -560,29 +464,17 @@ make[1]: Leaving directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-co
 Determining if the function floor exists in the m passed with the following output:
 Change Dir: /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_083bb/fast && /usr/bin/make -f CMakeFiles/cmTC_083bb.dir/build.make CMakeFiles/cmTC_083bb.dir/build
+Run Build Command(s):/usr/bin/make cmTC_e498b/fast && /usr/bin/make -f CMakeFiles/cmTC_e498b.dir/build.make CMakeFiles/cmTC_e498b.dir/build
 make[1]: Entering directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Building C object CMakeFiles/cmTC_083bb.dir/CheckFunctionExists.c.o
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=floor   -o CMakeFiles/cmTC_083bb.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.16/Modules/CheckFunctionExists.c
+Building C object CMakeFiles/cmTC_e498b.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=floor   -o CMakeFiles/cmTC_e498b.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.16/Modules/CheckFunctionExists.c
 <command-line>:0:23: warning: conflicting types for built-in function ‘floor’
 /usr/local/share/cmake-3.16/Modules/CheckFunctionExists.c:7:3: note: in expansion of macro ‘CHECK_FUNCTION_EXISTS’
    CHECK_FUNCTION_EXISTS(void);
    ^
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Linking C executable cmTC_083bb
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_083bb.dir/link.txt --verbose=1
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=floor    CMakeFiles/cmTC_083bb.dir/CheckFunctionExists.c.o  -o cmTC_083bb  -lm 
+Linking C executable cmTC_e498b
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e498b.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=floor    CMakeFiles/cmTC_e498b.dir/CheckFunctionExists.c.o  -o cmTC_e498b  -lm 
 make[1]: Leaving directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
 
 
@@ -590,25 +482,13 @@ make[1]: Leaving directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-co
 Performing C++ SOURCE FILE Test HAVE_WNO_LONG_LONG_FLAG succeeded with the following output:
 Change Dir: /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_12760/fast && /usr/bin/make -f CMakeFiles/cmTC_12760.dir/build.make CMakeFiles/cmTC_12760.dir/build
+Run Build Command(s):/usr/bin/make cmTC_74537/fast && /usr/bin/make -f CMakeFiles/cmTC_74537.dir/build.make CMakeFiles/cmTC_74537.dir/build
 make[1]: Entering directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Building CXX object CMakeFiles/cmTC_12760.dir/src.cxx.o
-/usr/bin/c++    -DHAVE_WNO_LONG_LONG_FLAG   -Wno-long-long -o CMakeFiles/cmTC_12760.dir/src.cxx.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp/src.cxx
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-Linking CXX executable cmTC_12760
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_12760.dir/link.txt --verbose=1
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libssl.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/local/bin/cmake: /usr/local/ssl/lib/libcrypto.so.1.0.0: no version information available (required by /usr/local/bin/cmake)
-/usr/bin/c++   -DHAVE_WNO_LONG_LONG_FLAG    CMakeFiles/cmTC_12760.dir/src.cxx.o  -o cmTC_12760 
+Building CXX object CMakeFiles/cmTC_74537.dir/src.cxx.o
+/usr/bin/c++    -DHAVE_WNO_LONG_LONG_FLAG   -Wno-long-long -o CMakeFiles/cmTC_74537.dir/src.cxx.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_74537
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_74537.dir/link.txt --verbose=1
+/usr/bin/c++   -DHAVE_WNO_LONG_LONG_FLAG    CMakeFiles/cmTC_74537.dir/src.cxx.o  -o cmTC_74537 
 make[1]: Leaving directory '/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles/CMakeTmp'
 
 

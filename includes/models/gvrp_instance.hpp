@@ -3,9 +3,11 @@
 
 #include "vertex.hpp"
 #include "distances_enum.hpp"
+
 #include <list>
 #include <vector>
-#include <iostream>
+#include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -14,7 +16,16 @@ namespace models{
   class Gvrp_instance {
     public:
       explicit Gvrp_instance(list<Vertex> afss, list<Vertex> customers, Vertex depot, double vehicleFuelCapacity, vector<vector<double> > distances, Distances_enum distances_enum);
-//      friend std::ostream& operator<<(std::ostream &strm, const Gvrp_instance &a);
+      friend ostream& operator<<(ostream& strm, const Gvrp_instance& gvrp_instance){
+        stringstream output;
+        output<<"Depot:"<<endl<<"\t"<< gvrp_instance.depot<<endl<<"AFSs: ";
+        for (auto afs: gvrp_instance.afss)
+          output<<endl<<"\t"<<afs;
+        output<<endl<<"Customers:";
+        for (auto customer: gvrp_instance.customers)
+          output<<endl<<"\t"<<customer;
+        return strm << output.str();
+      };
       list<Vertex> afss;
       list<Vertex> customers;
       Vertex depot;
@@ -22,8 +33,6 @@ namespace models{
       vector<vector<double> > distances;
       Distances_enum distances_enum;
   };
-
-//  std::ostream& operator<<(std::ostream& output, const Gvrp_instance& a);
 
 }
 #endif
