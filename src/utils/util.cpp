@@ -1,17 +1,18 @@
 #include "models/gvrp_instance.hpp"
 #include "models/distances_enum.hpp"
+
 #include "utils/util.hpp"
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
 #include <sstream>
 #include <string>
-#include <math.h>
+#include <cmath>
 
 using namespace models;
 
-
 Gvrp_instance utils::erdogan_instance_reader(string file_path){
+
   int id = 0,
       customers_size,
       afss_size,
@@ -21,13 +22,15 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
          x, 
          y,
          line;
-  string::size_type sz = 0;
   ifstream inFile;
   list<Vertex> afss, 
     customers;
   stringstream ss;
   Vertex depot;
-  double vehicleFuelCapacity;
+  double vehicleFuelCapacity,
+         vehicleFuelConsumptionRate,
+         timeLimit,
+         vehicleAverageSpeed;
   //read file
   inFile.open(file_path);
   if (!inFile) {
@@ -89,6 +92,27 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
   while (!ss.eof())
     ss>>buff;  
   vehicleFuelCapacity = stod(buff.substr(1), NULL);
+  //get vehicle fuel consumption rate 
+  getline(inFile, line);
+  ss.clear();
+  ss.str(line);  
+  while (!ss.eof())
+    ss>>buff;  
+  vehicleFuelConsumptionRate = stod(buff.substr(1), NULL);
+  //get time limit 
+  getline(inFile, line);
+  ss.clear();
+  ss.str(line);  
+  while (!ss.eof())
+    ss>>buff;  
+  timeLimit = stod(buff.substr(1), NULL);
+  //get vehicle average speed 
+  getline(inFile, line);
+  ss.clear();
+  ss.str(line);  
+  while (!ss.eof())
+    ss>>buff;  
+  vehicleAverageSpeed = stod(buff.substr(1), NULL);
   inFile.close();
   //save data
   customers_size = customers.size();
@@ -103,10 +127,19 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
   for (list<Vertex>::iterator i = afss.begin(); i != afss.end(); i++)
     vertexes[j++] = *i;
   vector<vector<double> > distances(total_size);
+  
+  double radiusOfEarth = 4182.44949; // miles, 6371km; 
   for (int i = 0; i < total_size; i++){
     distances[i] = vector<double> (total_size);
-    for (int j = 0; j < total_size; j++)
-      distances[i][j] = hypot(vertexes[i].x - vertexes[j].x, vertexes[i].y - vertexes[j].y);
+    for (int j = 0; j < total_size; j++){
+      //distances[i][j] = hypot(vertexes[i].x - vertexes[j].x, vertexes[i].y - vertexes[j].y);
+      double dLat = (vertexes[j].y - vertexes[i].y) * M_PI / 180; 
+      double dLon = (vertexes[j].x - vertexes[i].x) * M_PI / 180; 
+    // apply formulae 
+      double a = pow(sin(dLat / 2), 2) + pow(sin(dLon / 2), 2) * cos(vertexes[i].y * M_PI / 180.0) * cos(vertexes[i].y * M_PI / 180.0); 
+      double c = 2 * asin(sqrt(a)); 
+      distances[i][j] = radiusOfEarth * c; 
+    }
   }
-  return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC);
+  return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
 }

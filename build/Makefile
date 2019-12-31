@@ -177,6 +177,33 @@ src/models/gvrp_instance.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/gvrp_instance.cpp.s
 .PHONY : src/models/gvrp_instance.cpp.s
 
+src/models/gvrp_solution.o: src/models/gvrp_solution.cpp.o
+
+.PHONY : src/models/gvrp_solution.o
+
+# target to build an object file
+src/models/gvrp_solution.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/gvrp_solution.cpp.o
+.PHONY : src/models/gvrp_solution.cpp.o
+
+src/models/gvrp_solution.i: src/models/gvrp_solution.cpp.i
+
+.PHONY : src/models/gvrp_solution.i
+
+# target to preprocess a source file
+src/models/gvrp_solution.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/gvrp_solution.cpp.i
+.PHONY : src/models/gvrp_solution.cpp.i
+
+src/models/gvrp_solution.s: src/models/gvrp_solution.cpp.s
+
+.PHONY : src/models/gvrp_solution.s
+
+# target to generate assembly for a file
+src/models/gvrp_solution.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/gvrp_solution.cpp.s
+.PHONY : src/models/gvrp_solution.cpp.s
+
 src/models/vertex.o: src/models/vertex.cpp.o
 
 .PHONY : src/models/vertex.o
@@ -273,6 +300,9 @@ help:
 	@echo "... src/models/gvrp_instance.o"
 	@echo "... src/models/gvrp_instance.i"
 	@echo "... src/models/gvrp_instance.s"
+	@echo "... src/models/gvrp_solution.o"
+	@echo "... src/models/gvrp_solution.i"
+	@echo "... src/models/gvrp_solution.s"
 	@echo "... src/models/vertex.o"
 	@echo "... src/models/vertex.i"
 	@echo "... src/models/vertex.s"

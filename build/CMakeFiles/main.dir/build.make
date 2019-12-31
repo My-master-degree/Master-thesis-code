@@ -83,9 +83,22 @@ CMakeFiles/main.dir/src/models/gvrp_instance.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/models/gvrp_instance.cpp.s"
 	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/models/gvrp_instance.cpp -o CMakeFiles/main.dir/src/models/gvrp_instance.cpp.s
 
+CMakeFiles/main.dir/src/models/gvrp_solution.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/models/gvrp_solution.cpp.o: ../src/models/gvrp_solution.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/models/gvrp_solution.cpp.o"
+	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/models/gvrp_solution.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/models/gvrp_solution.cpp
+
+CMakeFiles/main.dir/src/models/gvrp_solution.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/models/gvrp_solution.cpp.i"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/models/gvrp_solution.cpp > CMakeFiles/main.dir/src/models/gvrp_solution.cpp.i
+
+CMakeFiles/main.dir/src/models/gvrp_solution.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/models/gvrp_solution.cpp.s"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/models/gvrp_solution.cpp -o CMakeFiles/main.dir/src/models/gvrp_solution.cpp.s
+
 CMakeFiles/main.dir/src/models/vertex.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/models/vertex.cpp.o: ../src/models/vertex.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/models/vertex.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/src/models/vertex.cpp.o"
 	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/models/vertex.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/models/vertex.cpp
 
 CMakeFiles/main.dir/src/models/vertex.cpp.i: cmake_force
@@ -98,7 +111,7 @@ CMakeFiles/main.dir/src/models/vertex.cpp.s: cmake_force
 
 CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.o: ../src/utils/cplex/compact_model.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.o"
 	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/compact_model.cpp
 
 CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.i: cmake_force
@@ -111,7 +124,7 @@ CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.s: cmake_force
 
 CMakeFiles/main.dir/src/utils/util.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/utils/util.cpp.o: ../src/utils/util.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/main.dir/src/utils/util.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/main.dir/src/utils/util.cpp.o"
 	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/util.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/util.cpp
 
 CMakeFiles/main.dir/src/utils/util.cpp.i: cmake_force
@@ -126,6 +139,7 @@ CMakeFiles/main.dir/src/utils/util.cpp.s: cmake_force
 main_OBJECTS = \
 "CMakeFiles/main.dir/src/main.cpp.o" \
 "CMakeFiles/main.dir/src/models/gvrp_instance.cpp.o" \
+"CMakeFiles/main.dir/src/models/gvrp_solution.cpp.o" \
 "CMakeFiles/main.dir/src/models/vertex.cpp.o" \
 "CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.o" \
 "CMakeFiles/main.dir/src/utils/util.cpp.o"
@@ -135,6 +149,7 @@ main_EXTERNAL_OBJECTS =
 
 main: CMakeFiles/main.dir/src/main.cpp.o
 main: CMakeFiles/main.dir/src/models/gvrp_instance.cpp.o
+main: CMakeFiles/main.dir/src/models/gvrp_solution.cpp.o
 main: CMakeFiles/main.dir/src/models/vertex.cpp.o
 main: CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.o
 main: CMakeFiles/main.dir/src/utils/util.cpp.o
@@ -143,7 +158,7 @@ main: /opt/ibm/ILOG/CPLEX_Studio1210/concert/lib/x86-64_linux/static_pic/libconc
 main: /opt/ibm/ILOG/CPLEX_Studio1210/cplex/lib/x86-64_linux/static_pic/libilocplex.a
 main: /opt/ibm/ILOG/CPLEX_Studio1210/cplex/lib/x86-64_linux/static_pic/libcplex.a
 main: CMakeFiles/main.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

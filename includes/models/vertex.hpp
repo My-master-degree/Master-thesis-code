@@ -11,15 +11,17 @@ namespace models {
   class Vertex {
     public:
       explicit Vertex(int id, double x, double y);
+      explicit Vertex(int id, double x, double y, double serviceTime);
+      Vertex();
       friend ostream& operator<<(ostream& strm, const Vertex& vertex){
         stringstream output;
         output<<"Vertex(ID:"<<vertex.id<<", X:"<<vertex.x<<", Y:"<<vertex.y<<");";
         return strm << output.str();
       }
-      Vertex();
       int id;
       double x;
       double y;
+      double serviceTime;
   };
 
 } 

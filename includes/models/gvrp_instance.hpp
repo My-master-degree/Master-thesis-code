@@ -16,6 +16,7 @@ namespace models{
   class Gvrp_instance {
     public:
       explicit Gvrp_instance(list<Vertex> afss, list<Vertex> customers, Vertex depot, double vehicleFuelCapacity, vector<vector<double> > distances, Distances_enum distances_enum);
+      explicit Gvrp_instance(list<Vertex> afss, list<Vertex> customers, Vertex depot, double vehicleFuelCapacity, vector<vector<double> > distances, Distances_enum distances_enum, double timeLimit, double vehicleFuelConsumptionRate, double vehicleAverageSpeed);
       friend ostream& operator<<(ostream& strm, const Gvrp_instance& gvrp_instance){
         stringstream output;
         output<<"Depot:"<<endl<<"\t"<< gvrp_instance.depot<<endl<<"AFSs: ";
@@ -30,6 +31,9 @@ namespace models{
       list<Vertex> customers;
       Vertex depot;
       double vehicleFuelCapacity;
+      double timeLimit;
+      double vehicleFuelConsumptionRate;
+      double vehicleAverageSpeed;
       vector<vector<double> > distances;
       Distances_enum distances_enum;
   };
