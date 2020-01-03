@@ -12,7 +12,8 @@
 using namespace models;
 
 Gvrp_instance utils::erdogan_instance_reader(string file_path){
-
+  double time_customer = 0.5,
+          time_afss = 0.25;
   int id = 0,
       customers_size,
       afss_size,
@@ -59,7 +60,7 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
   ss>>x;
   ss>>y;
   while (type == "f"){         
-    afss.push_back(Vertex(id++, stod(x, NULL), stod(y, NULL)));
+    afss.push_back(Vertex(id++, stod(x, NULL), stod(y, NULL), time_afss));
     getline(inFile, line);
     ss.clear();
     ss.str(line);
@@ -72,7 +73,7 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
   }
   //get customers
   while (type == "c"){         
-    customers.push_back(Vertex(id++, stod(x, NULL), stod(y, NULL)));
+    customers.push_back(Vertex(id++, stod(x, NULL), stod(y, NULL), time_customer));
     getline(inFile, line);
     if (line.empty())
       break;
@@ -132,13 +133,13 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
   for (int i = 0; i < total_size; i++){
     distances[i] = vector<double> (total_size);
     for (int j = 0; j < total_size; j++){
-      //distances[i][j] = hypot(vertexes[i].x - vertexes[j].x, vertexes[i].y - vertexes[j].y);
-      double dLat = (vertexes[j].y - vertexes[i].y) * M_PI / 180; 
-      double dLon = (vertexes[j].x - vertexes[i].x) * M_PI / 180; 
-    // apply formulae 
-      double a = pow(sin(dLat / 2), 2) + pow(sin(dLon / 2), 2) * cos(vertexes[i].y * M_PI / 180.0) * cos(vertexes[i].y * M_PI / 180.0); 
-      double c = 2 * asin(sqrt(a)); 
-      distances[i][j] = radiusOfEarth * c; 
+      distances[i][j] = hypot(vertexes[i].x - vertexes[j].x, vertexes[i].y - vertexes[j].y);
+//      double dLat = (vertexes[j].y - vertexes[i].y) * M_PI / 180; 
+//     double dLon = (vertexes[j].x - vertexes[i].x) * M_PI / 180; 
+//   // apply formulae 
+//     double a = pow(sin(dLat / 2), 2) + pow(sin(dLon / 2), 2) * cos(vertexes[i].y * M_PI / 180.0) * cos(vertexes[i].y * M_PI / 180.0); 
+//     double c = 2 * asin(sqrt(a)); 
+//     distances[i][j] = radiusOfEarth * c; 
     }
   }
   return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);

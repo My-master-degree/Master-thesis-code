@@ -163,6 +163,15 @@ void Compact_model::createObjectiveFunction() {
 }
 
 void Compact_model::createModel() {
+  for (pair<int, Vertex> p : all){
+    int i = p.first;
+    for (pair<int, Vertex> p1 : all){
+      int j = p1.first;
+      if (gvrp_instance.distances[i][j] != gvrp_instance.distances[j][i])
+        cout<<"WRONG HERERE"<<endl;
+    }
+  }
+
   try{
     int depot = gvrp_instance.depot.id;
     double beta = gvrp_instance.vehicleFuelCapacity;
@@ -253,21 +262,40 @@ void Compact_model::createModel() {
           expr = IloExpr(env);
         }
       }
-    //t[k][i][j] >= t[k][i] + service_time[j] + travel_times[i][j] - T(1 - x[k][i][j]) \forall k \in M, \forall i,j \in V
+    //t_{0j}^k \geqslant c_{0j} speed x^k_{0j}, \forall k \in M, \forall v_j \in 
     for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
-      for (par<int, Vertex> p : all) {
-        int j = p.id;
+      for (pair<int, Vertex> p2 :all){
+        int j = p2.first;
+        expr = (gvrp_instance.distances[0][j] / gvrp_instance.vehicleAverageSpeed) * x[k][0][j];
+        model.add(t[k][0][j] >= expr);
+        expr.end();
+        expr = IloExpr (env);
+      }
+    //t[k][i][j]\geqslant t[k][h][i] + s_i + c_{ij} x speed - T(1 - x[k][i][j]) \forall k \in M, \forall h, j \in V, \forall i \in V\backslash \{v_0\}
+    for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
+      for (pair<int, Vertex> p : all) {
+        int h = p.first;
         for (pair<int, Vertex> p1 :all){
-          int i = p.first;
-          expr = t[k][i] + gvrp_instance.distances[i][j] * x[k][i][j] * gvrp_instance.vehicleAverageSpeed + p.serviceTime - T * (1 - x[k][i][j]);
-          model.add(t[k][j] >= expr);
-          expr.end();
-          expr = IloExpr (env);
+          int i = p1.first;
+          if (i != depot){
+            for (pair<int, Vertex> p2 :all){
+              int j = p2.first;
+              expr = t[k][h][i] + (gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed) + p1.second.serviceTime - T * (1 - x[k][h][i]);
+              model.add(t[k][i][j] >= expr);
+              expr.end();
+              expr = IloExpr (env);
+            }
+          }
         }
+      }
+    for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
+      for (pair<int, Vertex> p : all) {
+        int i = p.first;
+        model.add(x[k][i][i] == 0);
       }
     cplex = IloCplex(model);
     //\sum_{(v_i, v_j) \in \delta(S)} x_{ij}^k \geq 2, \forall k \in M, \forall S \subseteq V \backlash \{v_0\} : |C \wedge S| \geq 1 \wedge |S \wedge F| \geq 1
-    cplex.use(Subcycle_constraint(env, x, gvrp_instance, all, ub_edge_visit)); 
+//    cplex.use(Subcycle_constraint(env, x, gvrp_instance, all, ub_edge_visit)); 
   } catch (IloException& e) {
     throw e;
   } catch (runtime_error& e) {
@@ -280,28 +308,28 @@ void Compact_model::setCustomParameters(){
     //DOUBTS:
       // Turn off the presolve reductions and set the CPLEX optimizer
       // to solve the worker LP with primal simplex method.
-      cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 0);
-      cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal); 
-      //preprocesing setting
-      cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
-      // Turn on traditional search for use with control callbacks
-      cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
-    //:DOUBTS
-    //LAZY CONSTRAINTS
-    //thread safe setting
-    cplex.setParam(IloCplex::Param::Threads, 1);
-    // Tweak some CPLEX parameters so that CPLEX has a harder time to
-    // solve the model and our cut separators can actually kick in.
-    cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::MIRCut, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Implied, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Gomory, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::FlowCovers, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::PathCut, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::LiftProj, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::ZeroHalfCut, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Covers, -1);
+//      cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 0);
+//    cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal); 
+//    //preprocesing setting
+//    cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
+//    // Turn on traditional search for use with control callbacks
+//    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
+//  //:DOUBTS
+//  //LAZY CONSTRAINTS
+//  //thread safe setting
+//  cplex.setParam(IloCplex::Param::Threads, 1);
+//  // Tweak some CPLEX parameters so that CPLEX has a harder time to
+//  // solve the model and our cut separators can actually kick in.
+//  cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq, -1);
+//  cplex.setParam(IloCplex::Param::MIP::Cuts::MIRCut, -1);
+//  cplex.setParam(IloCplex::Param::MIP::Cuts::Implied, -1);
+//  cplex.setParam(IloCplex::Param::MIP::Cuts::Gomory, -1);
+//  cplex.setParam(IloCplex::Param::MIP::Cuts::FlowCovers, -1);
+//  cplex.setParam(IloCplex::Param::MIP::Cuts::PathCut, -1);
+//  cplex.setParam(IloCplex::Param::MIP::Cuts::LiftProj, -1);
+//  cplex.setParam(IloCplex::Param::MIP::Cuts::ZeroHalfCut, -1);
+//  cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques, -1);
+//  cplex.setParam(IloCplex::Param::MIP::Cuts::Covers, -1);
     //time out
     cplex.setParam(IloCplex::Param::TimeLimit, time_limit);
     //num of feasible integers solution allowed

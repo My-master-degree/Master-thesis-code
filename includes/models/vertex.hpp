@@ -15,7 +15,7 @@ namespace models {
       Vertex();
       friend ostream& operator<<(ostream& strm, const Vertex& vertex){
         stringstream output;
-        output<<"Vertex(ID:"<<vertex.id<<", X:"<<vertex.x<<", Y:"<<vertex.y<<");";
+        output<<"Vertex(ID:"<<vertex.id<<", X:"<<vertex.x<<", Y:"<<vertex.y<<", Time:"<<vertex.serviceTime<<");";
         return strm << output.str();
       }
       int id;

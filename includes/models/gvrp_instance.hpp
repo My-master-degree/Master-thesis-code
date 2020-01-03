@@ -25,6 +25,7 @@ namespace models{
         output<<endl<<"Customers:";
         for (auto customer: gvrp_instance.customers)
           output<<endl<<"\t"<<customer;
+        output<<endl<<"Vehicle:"<<endl<<"\tAverage speed:"<<gvrp_instance.vehicleAverageSpeed<<endl<<"\tTime limit:"<<gvrp_instance.timeLimit<<endl<<"\tFuel comsumption rate:"<<gvrp_instance.vehicleFuelConsumptionRate<<endl<<"\tFuel Capacity:"<<gvrp_instance.vehicleFuelCapacity<<endl;
         return strm << output.str();
       };
       list<Vertex> afss;
