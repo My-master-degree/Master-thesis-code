@@ -100,6 +100,7 @@ list<list<Vertex> > Compact_model::run(){
     cout<<"Setting parameters"<<endl;
     setCustomParameters();
     if ( !cplex.solve() ) {
+      cplex.exportModel("cplexcpp.lp");
       env.error() << "Failed to optimize LP." << endl;
       exit(EXIT_FAILURE);
     }
@@ -124,6 +125,15 @@ void Compact_model::createVariables(){
   e = IloNumVarArray (env, all.size(), 0, gvrp_instance.vehicleFuelCapacity, IloNumVar::Float);
   t = Matrix3DVar (env, gvrp_instance.customers.size());
   try {
+    stringstream nameStream;
+    for (pair<int, Vertex> p : all){
+      int i = p.first;
+      nameStream<<"e["<<i<<"]";
+      const string name = nameStream.str();
+      e[i].setName(name.c_str());
+      nameStream.clear();
+      nameStream.str("");
+    }
     //x var
     for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++){
       x[k] = IloArray<IloNumVarArray> (env, all.size());
@@ -132,6 +142,20 @@ void Compact_model::createVariables(){
         int i = p.first;
         x[k][i] = IloNumVarArray(env, all.size(), 0, ub_edge_visit, IloNumVar::Int);
         t[k][i] = IloNumVarArray(env, all.size(), 0, gvrp_instance.timeLimit, IloNumVar::Float);
+        //setting names
+        for (pair<int, Vertex> p1 : all){
+          int j = p1.first;
+          nameStream<<"x["<<k<<"]["<<i<<"]["<<j<<"]";
+          const string name_x = nameStream.str();
+          x[k][i][j].setName(name_x.c_str());
+          nameStream.clear();
+          nameStream.str("");
+          nameStream<<"t["<<k<<"]["<<i<<"]["<<j<<"]";
+          const string name_t = nameStream.str();
+          t[k][i][j].setName(name_t.c_str());
+          nameStream.clear();
+          nameStream.str("");
+        }
       }
     }
   }catch (IloException& e) {
@@ -163,21 +187,14 @@ void Compact_model::createObjectiveFunction() {
 }
 
 void Compact_model::createModel() {
-  for (pair<int, Vertex> p : all){
-    int i = p.first;
-    for (pair<int, Vertex> p1 : all){
-      int j = p1.first;
-      if (gvrp_instance.distances[i][j] != gvrp_instance.distances[j][i])
-        cout<<"WRONG HERERE"<<endl;
-    }
-  }
-
   try{
     int depot = gvrp_instance.depot.id;
     double beta = gvrp_instance.vehicleFuelCapacity;
     double T = gvrp_instance.timeLimit;
     //constraints
     IloExpr expr(env), expr1(env);    
+    IloConstraint c;
+    stringstream constraintName;
     //\sum_{v_j \in V} x_{ij}^k = \sum_{v_j \in V} x_{ji}^k, \forall v_i \in V, \forall k \in M
     for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
       for (pair<int, Vertex> p : all){
@@ -187,7 +204,9 @@ void Compact_model::createModel() {
           expr += x[k][i][j];
           expr1 += x[k][j][i];
         }
-        model.add(expr == expr1);
+        c = IloConstraint (expr == expr1);
+        c.setName("#entering edges == #exiting edges");
+        model.add(c);
         expr1.end();
         expr.end();
         expr = IloExpr(env);
@@ -199,7 +218,9 @@ void Compact_model::createModel() {
         int i = p.first;
         expr += x[k][depot][i];
       }
-      model.add(expr <= 1);
+      c = IloConstraint (expr <= 1);
+      c.setName("route must be used at most once");
+      model.add(c);
       expr.end();
       expr = IloExpr(env);
     }
@@ -212,19 +233,22 @@ void Compact_model::createModel() {
           expr += x[k][i][j];
         }
       }
-      model.add(expr == 1);
+      c = IloConstraint (expr == 1);
+      c.setName("customer must be visited exactly once");
+      model.add(c);
       expr.end();
       expr = IloExpr(env);
     }
     //e_0 = \beta
-    expr = e[depot];
-    model.add(expr == beta);
-    expr.end();
-    expr = IloExpr(env);
+    c = IloConstraint (e[depot] == beta);
+    c.setName("e_depot = beta");
+    model.add(c);
     //e_f = \beta, \forall v_f \in F
     for (Vertex afs : gvrp_instance.afss)  {
       int f = afs.id;
-      model.add(e[f] == beta);
+      c = IloConstraint (e[f] == beta);
+      c.setName("e_f = beta");
+      model.add(c);
     }
     //e_j \leq e_i - c_{ij} x_{ij}^k + \beta (1 - x_{ij}^k), \forall v_j \in C,\forall v_i \in V, \forall k \in M
     for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
@@ -232,8 +256,10 @@ void Compact_model::createModel() {
         int j = customer.id;
         for (pair<int, Vertex> p :all){
           int i =  p.first;
-          expr = e[i] - gvrp_instance.distances[i][j] * x[k][i][j] * gvrp_instance.vehicleFuelConsumptionRate + beta * (1 - x[k][i][j]);
-          model.add(e[j] <= expr);
+          expr = e[i] - x[k][i][j] * gvrp_instance.distances[i][j] * gvrp_instance.vehicleFuelConsumptionRate + beta * (1 -  x[k][i][j]);
+          c = IloConstraint (e[j] <= expr);
+          c.setName("updating fuel level");
+          model.add(c);
           expr.end();
           expr = IloExpr (env);
         }
@@ -245,7 +271,9 @@ void Compact_model::createModel() {
         for (pair<int, Vertex> p1 : all){
           int j = p1.first;
           expr = gvrp_instance.distances[i][j] * x[k][i][j] * gvrp_instance.vehicleFuelConsumptionRate;
-          model.add(e[i] >= expr);
+          c = IloConstraint (e[i] >= expr);
+          c.setName("disabling infeasible edges");
+          model.add(c);
           expr.end();
           expr = IloExpr(env);
         }
@@ -257,17 +285,35 @@ void Compact_model::createModel() {
         for (pair<int, Vertex> p1 : all){
           int j = p1.first;
           expr = gvrp_instance.distances[i][j] * x[k][i][j] * gvrp_instance.vehicleFuelConsumptionRate;
-          model.add(expr <= beta);
+          c = IloConstraint (expr <= beta);
+          c.setName("disabling infeasible edges 2");
+          model.add(c);
           expr.end();
           expr = IloExpr(env);
         }
       }
-    //t_{0j}^k \geqslant c_{0j} speed x^k_{0j}, \forall k \in M, \forall v_j \in 
+    //x_{ij}^k t_{ij} \leq T, \forall v_i, \forall v_j \in V, \forall k \in M
+    for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
+      for (pair<int, Vertex> p : all){
+        int i = p.first;
+        for (pair<int, Vertex> p1 : all){
+          int j = p1.first;
+          expr = gvrp_instance.distances[i][j] * x[k][i][j] / gvrp_instance.vehicleAverageSpeed;
+          c = IloConstraint (expr <= T);
+          c.setName("disabling infeasible edges 3");
+          model.add(c);
+          expr.end();
+          expr = IloExpr(env);
+        }
+      }
+    //t_{0j}^k >= c_{0j} speed x^k_{0j}, \forall k \in M, \forall v_j \in V
     for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
       for (pair<int, Vertex> p2 :all){
         int j = p2.first;
         expr = (gvrp_instance.distances[0][j] / gvrp_instance.vehicleAverageSpeed) * x[k][0][j];
-        model.add(t[k][0][j] >= expr);
+        c = IloConstraint (t[k][0][j] >= expr);
+        c.setName("updating t from the depot");
+        model.add(c);
         expr.end();
         expr = IloExpr (env);
       }
@@ -280,8 +326,10 @@ void Compact_model::createModel() {
           if (i != depot){
             for (pair<int, Vertex> p2 :all){
               int j = p2.first;
-              expr = t[k][h][i] + (gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed) + p1.second.serviceTime - T * (1 - x[k][h][i]);
-              model.add(t[k][i][j] >= expr);
+              expr = t[k][h][i] + x[k][i][j] * ((gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed) + p1.second.serviceTime) - T * (1 - x[k][h][i]);
+              c = IloConstraint (t[k][i][j] >= expr);
+              c.setName("updating t from the others");
+              model.add(c);
               expr.end();
               expr = IloExpr (env);
             }

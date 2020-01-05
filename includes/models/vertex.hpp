@@ -3,6 +3,7 @@
 
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -15,7 +16,7 @@ namespace models {
       Vertex();
       friend ostream& operator<<(ostream& strm, const Vertex& vertex){
         stringstream output;
-        output<<"Vertex(ID:"<<vertex.id<<", X:"<<vertex.x<<", Y:"<<vertex.y<<", Time:"<<vertex.serviceTime<<");";
+        output<<"Vertex(ID:"<<vertex.id<<", X:"<<setprecision(9)<<vertex.x<<", Y:"<<vertex.y<<", Time:"<<vertex.serviceTime<<");";
         return strm << output.str();
       }
       int id;
