@@ -1,10 +1,14 @@
 #ifndef COMPACT_MODEL_HPP_
 #define COMPACT_MODEL_HPP_
 
+#include "models/gvrp_instance.hpp"
+#include "models/gvrp_solution.hpp"
+#include "models/mip_solution_info.hpp"
+
 #include <map>
 #include <list>
-#include <models/gvrp_instance.hpp>
 #include <ilcplex/ilocplex.h>
+
 ILOSTLBEGIN
 
 using namespace std;
@@ -22,8 +26,9 @@ namespace utils {
       public:
         explicit Compact_model(Gvrp_instance& gvrp_instance, unsigned int time_limit); 
         explicit Compact_model(Gvrp_instance& gvrp_instance, unsigned int time_limit, unsigned int max_num_feasible_integer_sol);
-        list<list<Vertex> > run();
+        pair<Gvrp_solution, Mip_solution_info> run();
         Gvrp_instance gvrp_instance;
+        Gvrp_solution* gvrp_solution;
         unsigned int time_limit;//seconds
         unsigned int max_num_feasible_integer_sol;//0 to 2100000000
       private:
@@ -31,18 +36,16 @@ namespace utils {
         IloEnv env;
         IloCplex cplex;
         Matrix3DVar x;
-        Matrix3DVar t;
         IloNumVarArray e;
         Matrix3DVal x_vals;
         IDVertex all;
-        list<list<Vertex> > routes;
         int ub_edge_visit;
         void createVariables();
         void createObjectiveFunction();
-        void createModel() throw ();
+        void createModel();
         void setCustomParameters();
-        void getSolution();
-        void getRoutes();
+        void fillX_vals();
+        void createGvrp_solution();
     };
 
   } 

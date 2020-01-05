@@ -1,7 +1,9 @@
 #include "utils/cplex/compact_model.hpp"
 #include "models/vertex.hpp"
 #include "models/gvrp_instance.hpp"
+#include "models/gvrp_solution.hpp"
 #include "models/distances_enum.hpp"
+#include "models/mip_solution_info.hpp"
 
 #include <list>
 #include <set>
@@ -10,8 +12,9 @@
 #include <ilcplex/ilocplex.h>
 #include <stdlib.h>
 #include <exception>
-ILOSTLBEGIN
+#include <sstream>
 
+ILOSTLBEGIN
 
 using namespace std;
 using namespace models;
@@ -88,43 +91,49 @@ Compact_model::Compact_model(Gvrp_instance& gvrp_instance, unsigned int time_lim
 
 }
 
-list<list<Vertex> > Compact_model::run(){
+pair<Gvrp_solution, Mip_solution_info> Compact_model::run(){
   //setup
   try {
-    cout<<"Creating variables"<<endl;
+//    cout<<"Creating variables"<<endl;
     createVariables();
-    cout<<"Creating objective function"<<endl;
+//    cout<<"Creating objective function"<<endl;
     createObjectiveFunction();
-    cout<<"Creating model"<<endl;
+//    cout<<"Creating model"<<endl;
     createModel();
-    cout<<"Setting parameters"<<endl;
+//    cout<<"Setting parameters"<<endl;
     setCustomParameters();
+//    cout<<"Solving model"<<endl;
     if ( !cplex.solve() ) {
-      cplex.exportModel("cplexcpp.lp");
-      env.error() << "Failed to optimize LP." << endl;
-      exit(EXIT_FAILURE);
+//      cplex.exportModel("cplexcpp.lp");
+//      env.error() << "Failed to optimize LP." << endl;
+      env.end();
+      throw "Failed to optimize LP";
+    }else{
+//      env.out() << "Solution status = " << cplex.getStatus() << endl;
+//      env.out() << "Solution value = " << cplex.getObjValue() << endl;
+//      cout<<"Getting x values"<<endl;
+      fillX_vals();
+//      cout<<"Creating GVRP solution"<<endl;
+      createGvrp_solution();
+      auto returnPair = make_pair(*gvrp_solution, Mip_solution_info(cplex.getMIPRelativeGap()));
+      env.end();
+      return returnPair;
     }
-    env.out() << "Solution status = " << cplex.getStatus() << endl;
-    env.out() << "Solution value = " << cplex.getObjValue() << endl;
-    getSolution();
-    getRoutes();
-    env.end();
-    return routes;
   }catch (IloException& e) {
-    cerr << "Concert exception caught: " << e << endl;
-    exit(EXIT_FAILURE);
+    stringstream output;
+    output<<"Concert exception caught: " << e;
+    throw output.str();
   }
   catch (const char * s) {
-    cerr << s << endl;
-    exit(EXIT_FAILURE);
+    throw s;
   }
 }
 
 void Compact_model::createVariables(){
   x = Matrix3DVar (env, gvrp_instance.customers.size());
   e = IloNumVarArray (env, all.size(), 0, gvrp_instance.vehicleFuelCapacity, IloNumVar::Float);
-  t = Matrix3DVar (env, gvrp_instance.customers.size());
   try {
+    //setting names
     stringstream nameStream;
     for (pair<int, Vertex> p : all){
       int i = p.first;
@@ -137,22 +146,15 @@ void Compact_model::createVariables(){
     //x var
     for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++){
       x[k] = IloArray<IloNumVarArray> (env, all.size());
-      t[k] = IloArray<IloNumVarArray> (env, all.size());
       for (pair<int, Vertex> p : all){
         int i = p.first;
         x[k][i] = IloNumVarArray(env, all.size(), 0, ub_edge_visit, IloNumVar::Int);
-        t[k][i] = IloNumVarArray(env, all.size(), 0, gvrp_instance.timeLimit, IloNumVar::Float);
         //setting names
         for (pair<int, Vertex> p1 : all){
           int j = p1.first;
           nameStream<<"x["<<k<<"]["<<i<<"]["<<j<<"]";
           const string name_x = nameStream.str();
           x[k][i][j].setName(name_x.c_str());
-          nameStream.clear();
-          nameStream.str("");
-          nameStream<<"t["<<k<<"]["<<i<<"]["<<j<<"]";
-          const string name_t = nameStream.str();
-          t[k][i][j].setName(name_t.c_str());
           nameStream.clear();
           nameStream.str("");
         }
@@ -292,58 +294,24 @@ void Compact_model::createModel() {
           expr = IloExpr(env);
         }
       }
-    //x_{ij}^k t_{ij} \leq T, \forall v_i, \forall v_j \in V, \forall k \in M
-    for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
+    //\sum_{(i, j) \in E} x_{ij}^k ((c_{ij} / S) + time(v_i) )\leq T, \forall k \in M
+    for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++){
       for (pair<int, Vertex> p : all){
         int i = p.first;
         for (pair<int, Vertex> p1 : all){
           int j = p1.first;
-          expr = gvrp_instance.distances[i][j] * x[k][i][j] / gvrp_instance.vehicleAverageSpeed;
-          c = IloConstraint (expr <= T);
-          c.setName("disabling infeasible edges 3");
-          model.add(c);
-          expr.end();
-          expr = IloExpr(env);
+          expr = gvrp_instance.distances[i][j] * x[k][i][j] * gvrp_instance.vehicleAverageSpeed + p.second.serviceTime;
         }
       }
-    //t_{0j}^k >= c_{0j} speed x^k_{0j}, \forall k \in M, \forall v_j \in V
-    for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
-      for (pair<int, Vertex> p2 :all){
-        int j = p2.first;
-        expr = (gvrp_instance.distances[0][j] / gvrp_instance.vehicleAverageSpeed) * x[k][0][j];
-        c = IloConstraint (t[k][0][j] >= expr);
-        c.setName("updating t from the depot");
-        model.add(c);
-        expr.end();
-        expr = IloExpr (env);
-      }
-    //t[k][i][j]\geqslant t[k][h][i] + s_i + c_{ij} x speed - T(1 - x[k][i][j]) \forall k \in M, \forall h, j \in V, \forall i \in V\backslash \{v_0\}
-    for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
-      for (pair<int, Vertex> p : all) {
-        int h = p.first;
-        for (pair<int, Vertex> p1 :all){
-          int i = p1.first;
-          if (i != depot){
-            for (pair<int, Vertex> p2 :all){
-              int j = p2.first;
-              expr = t[k][h][i] + x[k][i][j] * ((gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed) + p1.second.serviceTime) - T * (1 - x[k][h][i]);
-              c = IloConstraint (t[k][i][j] >= expr);
-              c.setName("updating t from the others");
-              model.add(c);
-              expr.end();
-              expr = IloExpr (env);
-            }
-          }
-        }
-      }
-    for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
-      for (pair<int, Vertex> p : all) {
-        int i = p.first;
-        model.add(x[k][i][i] == 0);
-      }
+      c = IloConstraint (expr <= T);
+      c.setName("time limit constraint");
+      model.add(c);
+      expr.end();
+      expr = IloExpr(env);
+    }
     cplex = IloCplex(model);
     //\sum_{(v_i, v_j) \in \delta(S)} x_{ij}^k \geq 2, \forall k \in M, \forall S \subseteq V \backlash \{v_0\} : |C \wedge S| \geq 1 \wedge |S \wedge F| \geq 1
-//    cplex.use(Subcycle_constraint(env, x, gvrp_instance, all, ub_edge_visit)); 
+    cplex.use(Subcycle_constraint(env, x, gvrp_instance, all, ub_edge_visit)); 
   } catch (IloException& e) {
     throw e;
   } catch (runtime_error& e) {
@@ -356,28 +324,28 @@ void Compact_model::setCustomParameters(){
     //DOUBTS:
       // Turn off the presolve reductions and set the CPLEX optimizer
       // to solve the worker LP with primal simplex method.
-//      cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 0);
-//    cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal); 
-//    //preprocesing setting
-//    cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
-//    // Turn on traditional search for use with control callbacks
-//    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
-//  //:DOUBTS
-//  //LAZY CONSTRAINTS
-//  //thread safe setting
-//  cplex.setParam(IloCplex::Param::Threads, 1);
-//  // Tweak some CPLEX parameters so that CPLEX has a harder time to
-//  // solve the model and our cut separators can actually kick in.
-//  cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq, -1);
-//  cplex.setParam(IloCplex::Param::MIP::Cuts::MIRCut, -1);
-//  cplex.setParam(IloCplex::Param::MIP::Cuts::Implied, -1);
-//  cplex.setParam(IloCplex::Param::MIP::Cuts::Gomory, -1);
-//  cplex.setParam(IloCplex::Param::MIP::Cuts::FlowCovers, -1);
-//  cplex.setParam(IloCplex::Param::MIP::Cuts::PathCut, -1);
-//  cplex.setParam(IloCplex::Param::MIP::Cuts::LiftProj, -1);
-//  cplex.setParam(IloCplex::Param::MIP::Cuts::ZeroHalfCut, -1);
-//  cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques, -1);
-//  cplex.setParam(IloCplex::Param::MIP::Cuts::Covers, -1);
+      cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 0);
+    cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal); 
+    //preprocesing setting
+    cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
+    // Turn on traditional search for use with control callbacks
+    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
+  //:DOUBTS
+  //LAZY CONSTRAINTS
+  //thread safe setting
+  cplex.setParam(IloCplex::Param::Threads, 1);
+  // Tweak some CPLEX parameters so that CPLEX has a harder time to
+  // solve the model and our cut separators can actually kick in.
+  cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq, -1);
+  cplex.setParam(IloCplex::Param::MIP::Cuts::MIRCut, -1);
+  cplex.setParam(IloCplex::Param::MIP::Cuts::Implied, -1);
+  cplex.setParam(IloCplex::Param::MIP::Cuts::Gomory, -1);
+  cplex.setParam(IloCplex::Param::MIP::Cuts::FlowCovers, -1);
+  cplex.setParam(IloCplex::Param::MIP::Cuts::PathCut, -1);
+  cplex.setParam(IloCplex::Param::MIP::Cuts::LiftProj, -1);
+  cplex.setParam(IloCplex::Param::MIP::Cuts::ZeroHalfCut, -1);
+  cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques, -1);
+  cplex.setParam(IloCplex::Param::MIP::Cuts::Covers, -1);
     //time out
     cplex.setParam(IloCplex::Param::TimeLimit, time_limit);
     //num of feasible integers solution allowed
@@ -389,7 +357,7 @@ void Compact_model::setCustomParameters(){
   }
 }
 
-void Compact_model::getSolution(){
+void Compact_model::fillX_vals(){
   //getresult
   try{
     x_vals = Matrix3DVal (env, gvrp_instance.customers.size());
@@ -408,12 +376,13 @@ void Compact_model::getSolution(){
   }
 }
 
-void Compact_model::getRoutes(){
-  //dfs
+void Compact_model::createGvrp_solution(){
   try{
+    list<list<Vertex> > routes;
+    //dfs
     int depot = gvrp_instance.depot.id;
     int curr,
-        next;
+        next;    
     for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++) {
       curr = depot;
       next = depot;
@@ -437,6 +406,7 @@ void Compact_model::getRoutes(){
       if (route.size() > 2)
         routes.push_back(route);
     }
+    gvrp_solution = new Gvrp_solution(routes, gvrp_instance);
   } catch (IloException& e) {
     throw e;
   } catch (...) {

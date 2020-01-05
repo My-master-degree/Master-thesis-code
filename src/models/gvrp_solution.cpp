@@ -3,8 +3,6 @@
 #include "models/vertex.hpp"
 
 #include <list>
-#include <string>
-#include <sstream>
 
 using namespace models;
 using namespace std;

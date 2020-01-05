@@ -204,6 +204,33 @@ src/models/gvrp_solution.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/gvrp_solution.cpp.s
 .PHONY : src/models/gvrp_solution.cpp.s
 
+src/models/mip_solution_models.o: src/models/mip_solution_models.cpp.o
+
+.PHONY : src/models/mip_solution_models.o
+
+# target to build an object file
+src/models/mip_solution_models.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/mip_solution_models.cpp.o
+.PHONY : src/models/mip_solution_models.cpp.o
+
+src/models/mip_solution_models.i: src/models/mip_solution_models.cpp.i
+
+.PHONY : src/models/mip_solution_models.i
+
+# target to preprocess a source file
+src/models/mip_solution_models.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/mip_solution_models.cpp.i
+.PHONY : src/models/mip_solution_models.cpp.i
+
+src/models/mip_solution_models.s: src/models/mip_solution_models.cpp.s
+
+.PHONY : src/models/mip_solution_models.s
+
+# target to generate assembly for a file
+src/models/mip_solution_models.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/models/mip_solution_models.cpp.s
+.PHONY : src/models/mip_solution_models.cpp.s
+
 src/models/vertex.o: src/models/vertex.cpp.o
 
 .PHONY : src/models/vertex.o
@@ -303,6 +330,9 @@ help:
 	@echo "... src/models/gvrp_solution.o"
 	@echo "... src/models/gvrp_solution.i"
 	@echo "... src/models/gvrp_solution.s"
+	@echo "... src/models/mip_solution_models.o"
+	@echo "... src/models/mip_solution_models.i"
+	@echo "... src/models/mip_solution_models.s"
 	@echo "... src/models/vertex.o"
 	@echo "... src/models/vertex.i"
 	@echo "... src/models/vertex.s"
