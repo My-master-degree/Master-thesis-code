@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <exception>
 #include <sstream>
+#include <time.h>
 
 ILOSTLBEGIN
 
@@ -22,61 +23,61 @@ using namespace models;
 using namespace utils::cplex;
 
 //separation algorithm
-ILOLAZYCONSTRAINTCALLBACK4(Subcycle_constraint, Matrix3DVar&, x, Gvrp_instance&, gvrp_instance, IDVertex&, all, int, ub_edge_visit) {
-  int depot = gvrp_instance.depot.id;
-  IloEnv env = getEnv();
-  IloExpr expr(env);
-  Matrix3DVal x_vals (env, gvrp_instance.customers.size());
-  for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++) {
-    x_vals[k] = IloArray<IloNumArray> (env, all.size());
-    for (pair<int, Vertex> p : all) {
-      int i = p.first;
-      x_vals[k][i] = IloNumArray (env, all.size(), 0, ub_edge_visit, IloNumVar::Int);
-      getValues(x_vals[k][i], x[k][i]);
-    }
-  }
-  //for each route
-  for (int k = 0; k < int(gvrp_instance.customers.size()); k++){
-    set<int> vertexes;
-    for (pair<int, Vertex> p : all){
-      int i = p.first;
-      for (pair<int, Vertex> p1 : all){
-        int j = p1.first;
-        if (x_vals[k][i][j] > 0){
-          vertexes.insert(i);
-          vertexes.insert(j);
-        }
-      }
-    }
-    //subcycle found
-    if (vertexes.size() > 0 && vertexes.find(depot) == vertexes.end()){
-      for (pair<int, Vertex> p : all){
-        int i = p.first;
-        for (int j : vertexes)
-          if (vertexes.find(i) == vertexes.end())
-            expr += x[k][i][j];
-      }       
-      expr -= 1;
-      try {
-        add(expr >= 0).end();
-      } catch(IloException& e) {
-        std::cerr << "Exception while adding lazy constraint" << e.getMessage() << "\n";
-        throw;
-      } 
-      expr.end();
-      expr = IloExpr(env);
-    }
-    for (pair<int, Vertex> p : all){
-      int i = p.first;
-      x_vals[k][i].end();
-    }
-  }
-  x_vals.end();
-}
+//ILOLAZYCONSTRAINTCALLBACK4(Subcycle_constraint, Matrix3DVar&, x, Gvrp_instance&, gvrp_instance, IDVertex&, all, int, ub_edge_visit) {
+// int depot = gvrp_instance.depot.id;
+// IloEnv env = getEnv();
+// IloExpr expr(env);
+// Matrix3DVal x_vals (env, gvrp_instance.customers.size());
+// for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++) {
+//   x_vals[k] = IloArray<IloNumArray> (env, all.size());
+//   for (pair<int, Vertex> p : all) {
+//     int i = p.first;
+//     x_vals[k][i] = IloNumArray (env, all.size(), 0, ub_edge_visit, IloNumVar::Int);
+//     getValues(x_vals[k][i], x[k][i]);
+//   }
+// }
+// //for each route
+// for (int k = 0; k < int(gvrp_instance.customers.size()); k++){
+//   set<int> vertexes;
+//   for (pair<int, Vertex> p : all){
+//     int i = p.first;
+//     for (pair<int, Vertex> p1 : all){
+//       int j = p1.first;
+//       if (x_vals[k][i][j] > 0){
+//         vertexes.insert(i);
+//         vertexes.insert(j);
+//       }
+//     }
+//   }
+//   //subcycle found
+//   if (vertexes.size() > 0 && vertexes.find(depot) == vertexes.end()){
+//     for (pair<int, Vertex> p : all){
+//       int i = p.first;
+//       for (int j : vertexes)
+//         if (vertexes.find(i) == vertexes.end())
+//           expr += x[k][i][j];
+//     }       
+//     expr -= 1;
+//     try {
+//       add(expr >= 0).end();
+//     } catch(IloException& e) {
+//       std::cerr << "Exception while adding lazy constraint" << e.getMessage() << "\n";
+//       throw;
+//     } 
+//     expr.end();
+//     expr = IloExpr(env);
+//   }
+//   for (pair<int, Vertex> p : all){
+//     int i = p.first;
+//     x_vals[k][i].end();
+//   }
+// }
+// x_vals.end();
+//}
 
 
 Compact_model::Compact_model(Gvrp_instance& _gvrp_instance, unsigned int _time_limit): 
-  gvrp_instance(_gvrp_instance), time_limit(_time_limit), max_num_feasible_integer_sol(2100000000) {
+  gvrp_instance(_gvrp_instance), time_limit(_time_limit), max_num_feasible_integer_sol(2100000000), VERBOSE(true) {
   ub_edge_visit = gvrp_instance.distances_enum == SYMMETRIC || gvrp_instance.distances_enum == METRIC ? 1 : gvrp_instance.customers.size() + 1; 
   //fill all
   for (Vertex customer : gvrp_instance.customers)
@@ -86,14 +87,10 @@ Compact_model::Compact_model(Gvrp_instance& _gvrp_instance, unsigned int _time_l
   all[gvrp_instance.depot.id] = gvrp_instance.depot;
 }
 
-Compact_model::Compact_model(Gvrp_instance& gvrp_instance, unsigned int time_limit, unsigned int _max_num_feasible_integer_sol): 
-  Compact_model(gvrp_instance, time_limit) {
-  max_num_feasible_integer_sol = _max_num_feasible_integer_sol;
-
-}
-
 pair<Gvrp_solution, Mip_solution_info> Compact_model::run(){
   //setup
+  stringstream output_exception;
+  Mip_solution_info mipSolInfo;
   try {
 //    cout<<"Creating variables"<<endl;
     createVariables();
@@ -104,32 +101,30 @@ pair<Gvrp_solution, Mip_solution_info> Compact_model::run(){
 //    cout<<"Setting parameters"<<endl;
     setCustomParameters();
 //    cout<<"Solving model"<<endl;
+    time_t start = clock();
     if ( !cplex.solve() ) {
 //      env.error() << "Failed to optimize LP." << endl;
+      mipSolInfo = Mip_solution_info(-1, cplex.getStatus(), -1, -1);
       env.end();
-      throw "Failed to optimize LP";
-    }else{
-      cplex.exportModel("cplexcpp.lp");
-//      env.out() << "Solution status = " << cplex.getStatus() << endl;
-//      env.out() << "Solution value = " << cplex.getObjValue() << endl;
-//      cout<<"Getting x values"<<endl;
-      fillX_vals();
-//      cout<<"Creating GVRP solution"<<endl;
-      createGvrp_solution();
-//      cplex.getStatus()
-      //auto mip_solution_info = 
-      auto returnPair = make_pair(*gvrp_solution, Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus()));
-      env.end();
-      return returnPair;
+      throw mipSolInfo;
     }
+    double total_time =  (double) (clock() - start) / (double) CLOCKS_PER_SEC;
+//    cplex.exportModel("cplexcpp.lp");
+//    env.out() << "Solution value = " << cplex.getObjValue() << endl;
+//    cout<<"Getting x values"<<endl;
+    fillX_vals();
+//    cout<<"Creating GVRP solution"<<endl;
+    createGvrp_solution();
+    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), total_time, cplex.getObjValue());
+    env.end();
+    return make_pair(*gvrp_solution, mipSolInfo);
   }catch (IloException& e) {
-    stringstream output;
-    output<<"Concert exception caught: " << e;
-    throw output.str();
-  }
-  catch (const char * s) {
+    output_exception<<"Concert exception caught: " << e<<endl;
+    throw output_exception.str();
+  } catch (string s) {
     throw s;
   }
+  
 }
 
 void Compact_model::createVariables(){
@@ -166,7 +161,7 @@ void Compact_model::createVariables(){
   }catch (IloException& e) {
     throw e;
   } catch(...){
-    throw "Error in creating variables";
+    throw string("Error in creating variables");
   }
 }
 
@@ -187,7 +182,7 @@ void Compact_model::createObjectiveFunction() {
   }catch (IloException& e) {
     throw e;
   } catch(...){
-    throw "Error in creating the objective function";
+    throw string("Error in creating the objective function");
   }
 }
 
@@ -325,6 +320,8 @@ void Compact_model::createModel() {
 
 void Compact_model::setCustomParameters(){
   try{
+    if (!VERBOSE)
+      cplex.setOut(env.getNullStream());
     //DOUBTS:
       // Turn off the presolve reductions and set the CPLEX optimizer
       // to solve the worker LP with primal simplex method.
@@ -357,7 +354,7 @@ void Compact_model::setCustomParameters(){
   } catch (IloException& e) {
     throw e;
   } catch (...) {
-    throw "Error in setting parameters";
+    throw string("Error in setting parameters");
   }
 }
 
@@ -376,7 +373,7 @@ void Compact_model::fillX_vals(){
   } catch (IloException& e) {
     throw e;
   } catch (...) {
-    throw "Error in getting solution";
+    throw string("Error in getting solution");
   }
 }
 
@@ -414,7 +411,7 @@ void Compact_model::createGvrp_solution(){
   } catch (IloException& e) {
     throw e;
   } catch (...) {
-    throw "Error in getting routes";
+    throw string("Error in getting routes");
   }
 }
 

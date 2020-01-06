@@ -5,7 +5,6 @@
 #include "utils/cplex/compact_model.hpp"
 #include "SampleConfig.h"
 
-
 #include <string>
 #include <set>
 #include <queue>
@@ -18,7 +17,15 @@ using namespace utils::cplex;
 
 int main (int argc, char **argv)
 { 
-
+  unsigned int execution_time = 120;
+  bool VERBOSE = false;  
+  //getting params
+  for (int i = 0; i < argc; i++)
+    if (strcmp(argv[i], "-time") == 0)
+      execution_time = stoi(argv[++i]);
+    else if (strcmp(argv[i], "-verbose") == 0)
+      if (strcmp(argv[++i], "true") == 0 ||  strcmp(argv[i], "1") == 0)
+        VERBOSE = true; 
   string instances[] = {
     "S1_20c3sU10.txt",
     "S1_20c3sU1.txt",
@@ -73,8 +80,9 @@ int main (int argc, char **argv)
     "Large_VA_Input_500c_21s.txt",
   };
 
-
-
+  ofstream resultsFile;
+  resultsFile.open ("results.csv");
+  resultsFile<<"Instance, GAP, Cost, Time,Status"<<endl;
   for (auto instance : instances){
 //    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_PATH + string("instances/") + instance);
 //  create new instance
@@ -173,17 +181,26 @@ int main (int argc, char **argv)
 // for (auto it = gvrp_instance.customers.begin(); it != gvrp_instance.customers.end(); it++){
 //   it->id = id++; 
 // }
+    cout<<instance<<endl;
+    //read instance
     Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_PATH + string("instances/") + instance);
-    unsigned int time_limit = 360;
-    cout<<gvrp_instance<<endl;
-    Compact_model compact_model(gvrp_instance, time_limit, 1);
+    //settings
+    Compact_model compact_model(gvrp_instance, execution_time);
+    compact_model.VERBOSE = VERBOSE;
+    //run model
+    Mip_solution_info mipSolInfo;
     try{
-    pair<Gvrp_solution, Mip_solution_info > sol = compact_model.run();    
-    cout<<sol.first;
-    }catch (const char * s){
+      pair<Gvrp_solution, Mip_solution_info > sol = compact_model.run();    
+      sol.first.write_in_file(string("solutions/") + instance + string(".sol"));
+      mipSolInfo = sol.second;
+    } catch (string s){
       cout<<s;
+    } catch (Mip_solution_info excSolInfo){
+      mipSolInfo = excSolInfo;
     }
-    break;
+    resultsFile<<instance<<","<<mipSolInfo.gap<<","<<mipSolInfo.cost<<","<<mipSolInfo.elapsed_time<<","<<mipSolInfo.status<<endl;
   }
+  //write csv
+  resultsFile.close(); 
   return 0;
 }

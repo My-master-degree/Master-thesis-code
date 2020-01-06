@@ -5,10 +5,13 @@
 
 namespace models {
   class Mip_solution_info{
-    double gap;
-    IloAlgorithm::Status status;
     public:
-      explicit Mip_solution_info (double gap_, IloAlgorithm::Status status_);
+      double gap;
+      IloAlgorithm::Status status;
+      double elapsed_time;
+      double cost;
+      explicit Mip_solution_info ();
+      explicit Mip_solution_info (double gap_, IloAlgorithm::Status status_, double elapsed_time, double cost);
   };
 }
 #endif

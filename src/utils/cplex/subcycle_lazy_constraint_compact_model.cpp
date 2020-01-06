@@ -11,7 +11,7 @@ using namespace utils::cplex;
 Subcycle_lazy_constraint_compact_model::Subcycle_lazy_constraint_compact_model (Compact_model& compact_model_) : LazyConstraintCallbackI (compact_model_.env), compact_model(compact_model_)  {}
 
 IloCplex::CallbackI* Subcycle_lazy_constraint_compact_model::duplicateCallback() const {
-  return new(getEnv()) Subcycle_lazy_constraint_compact_model {*this};
+  return new(getEnv()) Subcycle_lazy_constraint_compact_model (*this);
 }
 
 void Subcycle_lazy_constraint_compact_model::main() {
