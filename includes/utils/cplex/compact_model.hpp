@@ -4,6 +4,7 @@
 #include "models/gvrp_instance.hpp"
 #include "models/gvrp_solution.hpp"
 #include "models/mip_solution_info.hpp"
+#include "utils/cplex/subcycle_lazy_constraint_compact_model.hpp"
 
 #include <map>
 #include <list>
@@ -31,6 +32,7 @@ namespace utils {
         Gvrp_solution* gvrp_solution;
         unsigned int time_limit;//seconds
         unsigned int max_num_feasible_integer_sol;//0 to 2100000000
+        friend class Subcycle_lazy_constraint_compact_model; 
       private:
         IloModel model;
         IloEnv env;

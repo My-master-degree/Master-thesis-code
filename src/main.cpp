@@ -76,7 +76,7 @@ int main (int argc, char **argv)
 
 
   for (auto instance : instances){
-    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_PATH + string("instances/") + instance);
+//    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_PATH + string("instances/") + instance);
 //  create new instance
 //   int numCustomersAtDepot = 2,
 //     numCustomersAtAfs = 2;
@@ -173,7 +173,8 @@ int main (int argc, char **argv)
 // for (auto it = gvrp_instance.customers.begin(); it != gvrp_instance.customers.end(); it++){
 //   it->id = id++; 
 // }
-    unsigned int time_limit = -1;
+    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_PATH + string("instances/") + instance);
+    unsigned int time_limit = 360;
     cout<<gvrp_instance<<endl;
     Compact_model compact_model(gvrp_instance, time_limit, 1);
     try{

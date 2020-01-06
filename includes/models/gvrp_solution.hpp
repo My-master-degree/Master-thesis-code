@@ -45,7 +45,7 @@ namespace models{
           output<<curr;
           double currFuelCapacity = afss.count(curr) || curr == depot ? beta : 0,
                  cost = 0,
-                 time = 0;
+                 time = it->serviceTime;
           if (curr != depot)
             infeasibilities<<"Route "<<i<<": Does not start at depot"<<endl;
           else if (customers.count(curr))
@@ -60,7 +60,7 @@ namespace models{
             output<<" "<<next;
             double edgeCost = gvrp_solution.gvrp_instance.distances[curr][next],
                     edgeFuel = edgeCost * gvrp_solution.gvrp_instance.vehicleFuelConsumptionRate;
-            time += edgeCost / gvrp_solution.gvrp_instance.vehicleAverageSpeed;
+            time += (edgeCost / gvrp_solution.gvrp_instance.vehicleAverageSpeed) + it->serviceTime;
             cost += edgeCost;
             currFuelCapacity -= edgeFuel;
             if (currFuelCapacity < 0)
@@ -81,7 +81,7 @@ namespace models{
           if (time > gvrp_solution.gvrp_instance.timeLimit)
             infeasibilities<<"Route "<<i<<": Does not respect the time constraint"<<endl;
           i++;
-          output<<" (cost: "<<cost<<")"<<endl;
+          output<<" (cost: "<<cost<<")"<<" (time: "<<time<<")"<<endl;
           costs += cost;
         }
         output<<"Total cost: "<<costs<<endl;

@@ -1,4 +1,5 @@
 #include "utils/cplex/compact_model.hpp"
+#include "utils/cplex/subcycle_lazy_constraint_compact_model.hpp"
 #include "models/vertex.hpp"
 #include "models/gvrp_instance.hpp"
 #include "models/gvrp_solution.hpp"
@@ -104,18 +105,20 @@ pair<Gvrp_solution, Mip_solution_info> Compact_model::run(){
     setCustomParameters();
 //    cout<<"Solving model"<<endl;
     if ( !cplex.solve() ) {
-//      cplex.exportModel("cplexcpp.lp");
 //      env.error() << "Failed to optimize LP." << endl;
       env.end();
       throw "Failed to optimize LP";
     }else{
+      cplex.exportModel("cplexcpp.lp");
 //      env.out() << "Solution status = " << cplex.getStatus() << endl;
 //      env.out() << "Solution value = " << cplex.getObjValue() << endl;
 //      cout<<"Getting x values"<<endl;
       fillX_vals();
 //      cout<<"Creating GVRP solution"<<endl;
       createGvrp_solution();
-      auto returnPair = make_pair(*gvrp_solution, Mip_solution_info(cplex.getMIPRelativeGap()));
+//      cplex.getStatus()
+      //auto mip_solution_info = 
+      auto returnPair = make_pair(*gvrp_solution, Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus()));
       env.end();
       return returnPair;
     }
@@ -300,7 +303,7 @@ void Compact_model::createModel() {
         int i = p.first;
         for (pair<int, Vertex> p1 : all){
           int j = p1.first;
-          expr = gvrp_instance.distances[i][j] * x[k][i][j] * gvrp_instance.vehicleAverageSpeed + p.second.serviceTime;
+          expr += x[k][i][j] * ((gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed) + p.second.serviceTime);
         }
       }
       c = IloConstraint (expr <= T);
@@ -311,7 +314,8 @@ void Compact_model::createModel() {
     }
     cplex = IloCplex(model);
     //\sum_{(v_i, v_j) \in \delta(S)} x_{ij}^k \geq 2, \forall k \in M, \forall S \subseteq V \backlash \{v_0\} : |C \wedge S| \geq 1 \wedge |S \wedge F| \geq 1
-    cplex.use(Subcycle_constraint(env, x, gvrp_instance, all, ub_edge_visit)); 
+    //cplex.use(Subcycle_constraint(env, x, gvrp_instance, all, ub_edge_visit));
+    cplex.use(new Subcycle_lazy_constraint_compact_model(*this)); 
   } catch (IloException& e) {
     throw e;
   } catch (runtime_error& e) {

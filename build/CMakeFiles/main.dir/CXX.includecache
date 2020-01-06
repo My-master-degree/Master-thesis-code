@@ -47,6 +47,8 @@ set
 -
 
 ../includes/models/mip_solution_info.hpp
+ilcplex/ilocplex.h
+-
 
 ../includes/models/vertex.hpp
 string
@@ -63,6 +65,8 @@ models/gvrp_solution.hpp
 ../includes/utils/cplex/models/gvrp_solution.hpp
 models/mip_solution_info.hpp
 ../includes/utils/cplex/models/mip_solution_info.hpp
+utils/cplex/subcycle_lazy_constraint_compact_model.hpp
+../includes/utils/cplex/utils/cplex/subcycle_lazy_constraint_compact_model.hpp
 map
 -
 list
@@ -70,34 +74,38 @@ list
 ilcplex/ilocplex.h
 -
 
-/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/compact_model.cpp
+../includes/utils/cplex/subcycle_lazy_constraint_compact_model.hpp
 utils/cplex/compact_model.hpp
-/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/utils/cplex/compact_model.hpp
-models/vertex.hpp
-/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/models/vertex.hpp
+../includes/utils/cplex/utils/cplex/compact_model.hpp
+ilcplex/ilocplex.h
+-
+
+../includes/utils/util.hpp
+string
+-
 models/gvrp_instance.hpp
-/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/models/gvrp_instance.hpp
+../includes/utils/models/gvrp_instance.hpp
+
+/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/main.cpp
+models/gvrp_instance.hpp
+/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/models/gvrp_instance.hpp
 models/gvrp_solution.hpp
-/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/models/gvrp_solution.hpp
-models/distances_enum.hpp
-/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/models/distances_enum.hpp
+/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/models/gvrp_solution.hpp
 models/mip_solution_info.hpp
-/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/models/mip_solution_info.hpp
-list
+/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/models/mip_solution_info.hpp
+utils/util.hpp
+/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/util.hpp
+utils/cplex/compact_model.hpp
+/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/compact_model.hpp
+SampleConfig.h
+/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/SampleConfig.h
+string
 -
 set
 -
-vector
--
 queue
 -
-ilcplex/ilocplex.h
--
-stdlib.h
--
-exception
--
-sstream
+map
 -
 
 /opt/ibm/ILOG/CPLEX_Studio1210/concert/include/ilconcert/iloalg.h
@@ -539,4 +547,6 @@ ilcplex/ilocplexi.h
 /opt/ibm/ILOG/CPLEX_Studio1210/cplex/include/ilcplex/ilomodelasst.h
 
 /opt/ibm/ILOG/CPLEX_Studio1210/cplex/include/ilcplex/iloparam.h
+
+SampleConfig.h
 
