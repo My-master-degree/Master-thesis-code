@@ -135,9 +135,100 @@ CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.s"
 	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/compact_model.cpp -o CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.s
 
+CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.o: ../src/utils/cplex/extra_constraint_compact_model.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.o"
+	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/extra_constraint_compact_model.cpp
+
+CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.i"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/extra_constraint_compact_model.cpp > CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.i
+
+CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.s"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/extra_constraint_compact_model.cpp -o CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.s
+
+CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.o: ../src/utils/cplex/improved_compact_model.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.o"
+	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/improved_compact_model.cpp
+
+CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.i"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/improved_compact_model.cpp > CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.i
+
+CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.s"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/improved_compact_model.cpp -o CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.s
+
+CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.o: ../src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.o"
+	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp
+
+CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.i"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp > CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.i
+
+CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.s"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp -o CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.s
+
+CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.o: ../src/utils/cplex/invalid_edge_preprocessing.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.o"
+	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/invalid_edge_preprocessing.cpp
+
+CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.i"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/invalid_edge_preprocessing.cpp > CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.i
+
+CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.s"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/invalid_edge_preprocessing.cpp -o CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.s
+
+CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.o: ../src/utils/cplex/lazy_constraint_compact_model.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.o"
+	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/lazy_constraint_compact_model.cpp
+
+CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.i"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/lazy_constraint_compact_model.cpp > CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.i
+
+CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.s"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/lazy_constraint_compact_model.cpp -o CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.s
+
+CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.o: ../src/utils/cplex/max_afs_visit_constraint.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.o"
+	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/max_afs_visit_constraint.cpp
+
+CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.i"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/max_afs_visit_constraint.cpp > CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.i
+
+CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.s"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/max_afs_visit_constraint.cpp -o CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.s
+
+CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.o: ../src/utils/cplex/preprocessing_compact_model.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.o"
+	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/preprocessing_compact_model.cpp
+
+CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.i"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/preprocessing_compact_model.cpp > CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.i
+
+CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.s"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/preprocessing_compact_model.cpp -o CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.s
+
 CMakeFiles/main.dir/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.o: ../src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.o"
 	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp
 
 CMakeFiles/main.dir/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.i: cmake_force
@@ -148,9 +239,35 @@ CMakeFiles/main.dir/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.s
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.s"
 	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp -o CMakeFiles/main.dir/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.s
 
+CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.o: ../src/utils/cplex/subcycle_user_constraint_compact_model.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.o"
+	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/subcycle_user_constraint_compact_model.cpp
+
+CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.i"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/subcycle_user_constraint_compact_model.cpp > CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.i
+
+CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.s"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/subcycle_user_constraint_compact_model.cpp -o CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.s
+
+CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.o: ../src/utils/cplex/user_constraint_compact_model.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.o"
+	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/user_constraint_compact_model.cpp
+
+CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.i"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/user_constraint_compact_model.cpp > CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.i
+
+CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.s"
+	g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/user_constraint_compact_model.cpp -o CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.s
+
 CMakeFiles/main.dir/src/utils/util.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/utils/util.cpp.o: ../src/utils/util.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/main.dir/src/utils/util.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/main.dir/src/utils/util.cpp.o"
 	g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/utils/util.cpp.o -c /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/util.cpp
 
 CMakeFiles/main.dir/src/utils/util.cpp.i: cmake_force
@@ -169,7 +286,16 @@ main_OBJECTS = \
 "CMakeFiles/main.dir/src/models/mip_solution_models.cpp.o" \
 "CMakeFiles/main.dir/src/models/vertex.cpp.o" \
 "CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.o" \
+"CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.o" \
+"CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.o" \
+"CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.o" \
+"CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.o" \
+"CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.o" \
+"CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.o" \
+"CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.o" \
 "CMakeFiles/main.dir/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.o" \
+"CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.o" \
+"CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.o" \
 "CMakeFiles/main.dir/src/utils/util.cpp.o"
 
 # External object files for target main
@@ -181,14 +307,23 @@ main: CMakeFiles/main.dir/src/models/gvrp_solution.cpp.o
 main: CMakeFiles/main.dir/src/models/mip_solution_models.cpp.o
 main: CMakeFiles/main.dir/src/models/vertex.cpp.o
 main: CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.o
+main: CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.o
+main: CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.o
+main: CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.o
+main: CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.o
+main: CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.o
+main: CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.o
+main: CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.o
 main: CMakeFiles/main.dir/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.o
+main: CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.o
+main: CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.o
 main: CMakeFiles/main.dir/src/utils/util.cpp.o
 main: CMakeFiles/main.dir/build.make
 main: /opt/ibm/ILOG/CPLEX_Studio1210/concert/lib/x86-64_linux/static_pic/libconcert.a
 main: /opt/ibm/ILOG/CPLEX_Studio1210/cplex/lib/x86-64_linux/static_pic/libilocplex.a
 main: /opt/ibm/ILOG/CPLEX_Studio1210/cplex/lib/x86-64_linux/static_pic/libcplex.a
 main: CMakeFiles/main.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Linking CXX executable main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

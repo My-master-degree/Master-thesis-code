@@ -1,31 +1,25 @@
-#include "utils/cplex/subcycle_lazy_constraint_compact_model.hpp"
+#include "utils/cplex/lazy_constraint_compact_model.hpp"
 #include "utils/cplex/compact_model.hpp"
+#include "utils/cplex/subcycle_lazy_constraint_compact_model.hpp"
 
 #include <set>
+#include <queue>
+#include <list>
 #include <ilcplex/ilocplex.h>
-//ILOSTLBEGIN
 
 using namespace std;
 using namespace utils::cplex;
 
-Subcycle_lazy_constraint_compact_model::Subcycle_lazy_constraint_compact_model (Compact_model& compact_model_) : LazyConstraintCallbackI (compact_model_.env), compact_model(compact_model_)  {}
+Subcycle_lazy_constraint_compact_model::Subcycle_lazy_constraint_compact_model (Compact_model& compact_model_) : Lazy_constraint_compact_model (compact_model_) {}
 
 IloCplex::CallbackI* Subcycle_lazy_constraint_compact_model::duplicateCallback() const {
   return new(getEnv()) Subcycle_lazy_constraint_compact_model (*this);
 }
 
 void Subcycle_lazy_constraint_compact_model::main() {
-//  const auto x_value = getValue(x);
-// if(x_value < 2.0) {
-//   try {
-//     add(x >= 2.0);
-//   } catch(IloException& e) {
-//     std::cerr << "Exception while adding lazy constraint for x = " << x_value << ": " << e.getMessage() << "\n";
-//     throw;
-//   }
   int depot = compact_model.gvrp_instance.depot.id;
   IloEnv env = getEnv();
-  IloExpr expr(env);
+  IloExpr lhs(env);
   //get values
   Matrix3DVal x_vals (env, compact_model.gvrp_instance.customers.size());
   for (unsigned int k = 0; k < compact_model.gvrp_instance.customers.size(); k++) {
@@ -36,42 +30,88 @@ void Subcycle_lazy_constraint_compact_model::main() {
       getValues(x_vals[k][i], compact_model.x[k][i]);
     }
   }
-  //for each route
-  for (int k = 0; k < int(compact_model.gvrp_instance.customers.size()); k++){
-    set<int> vertexes;
-    for (pair<int, Vertex> p : compact_model.all){
-      int i = p.first;
-      for (pair<int, Vertex> p1 : compact_model.all){
-        int j = p1.first;
-        if (x_vals[k][i][j] > 0){
-          vertexes.insert(i);
-          vertexes.insert(j);
+  //setup
+  set<int> customers;
+  for (Vertex customer : compact_model.gvrp_instance.customers)
+    customers.insert(customer.id);
+  //get subcycles
+  for (int k = 0; k < int(compact_model.gvrp_instance.customers.size()); k++) {
+//    cout<<"Route "<<k<<": ";
+    //bfs to remove all edges connected to the depot
+    queue<int> q;
+    q.push(depot);
+//    cout<<"(";
+    while (!q.empty()) {
+      int curr = q.front();
+//      cout<<curr<<" ";
+      q.pop();
+      for (pair<int, Vertex> p : compact_model.all)
+        if (x_vals[k][curr][p.first] > 0){
+          x_vals[k][curr][p.first] = 0;
+          q.push(p.first);
+        }        
+    }
+//    cout<<")";
+    //bfs to remove all edges not connected to the depot
+    for (auto customer : compact_model.gvrp_instance.customers) {
+      set<int> component, customersComponent;
+      //checking for neighboring
+      bool hasNeighboring = false;
+      for (pair<int, Vertex> p : compact_model.all)
+        if (x_vals[k][customer.id][p.first] > 0){
+          hasNeighboring = true;
+          break; 
         }
+      //checking if bfs is needed
+      if (!hasNeighboring)
+        continue;
+      q.push(customer.id);
+      while (!q.empty()) {
+        int curr = q.front();
+        q.pop();
+        component.insert(curr);
+        //is it is a customer
+        if (customers.count(curr))
+          customersComponent.insert(curr);
+        for (pair<int, Vertex> p : compact_model.all)
+          if (x_vals[k][curr][p.first] > 0){
+            x_vals[k][curr][p.first] = 0;
+            q.push(p.first);
+          }
+      }
+//      cout<<"(";
+//      for (int b : component) 
+//        cout<<b<<" ";
+//      cout<<")";
+      for (int k_ = 0; k_ < int(compact_model.gvrp_instance.customers.size()); k_++) { 
+        for (int customer_ : customersComponent) {
+          //getting lhs
+          for (pair<int, Vertex> p2 : compact_model.all) {
+            int a = p2.first;
+            if (!component.count(a))
+              for (int b : component) 
+                lhs += compact_model.x[k_][a][b];
+          }
+          //getting rhs
+          for (int b : component)
+            lhs -= compact_model.x[k_][b][customer_];
+          try {
+            //              cout<<lhs<<endl;
+            add(lhs >= 0).end();
+          } catch(IloException& e) {
+            cerr << "Exception while adding lazy constraint" << e.getMessage() << "\n";
+            throw;
+          }
+          lhs.end();
+          lhs = IloExpr(env);
+        } 
       }
     }
-    //subcycle found
-    if (vertexes.size() > 0 && vertexes.find(depot) == vertexes.end()){
-      for (pair<int, Vertex> p : compact_model.all){
-        int i = p.first;
-        for (int j : vertexes)
-          if (vertexes.find(i) == vertexes.end())
-            expr += compact_model.x[k][i][j];
-      }       
-      expr -= 1;
-      try {
-        add(expr >= 0).end();
-      } catch(IloException& e) {
-        cerr << "Exception while adding lazy constraint" << e.getMessage() << "\n";
-        throw;
-      } 
-      expr.end();
-      expr = IloExpr(env);
-    }
+//    cout<<endl;
     for (pair<int, Vertex> p : compact_model.all){
       int i = p.first;
       x_vals[k][i].end();
     }
   }
   x_vals.end();
-
 }

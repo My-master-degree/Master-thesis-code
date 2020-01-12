@@ -1,6 +1,7 @@
 #ifndef SUBCYCLE_LAZY_CONSTRAINT_COMPACT_MODEL_HPP_
 #define SUBCYCLE_LAZY_CONSTRAINT_COMPACT_MODEL_HPP_
 
+#include "utils/cplex/lazy_constraint_compact_model.hpp" 
 #include "utils/cplex/compact_model.hpp" 
 
 #include <ilcplex/ilocplex.h>
@@ -12,10 +13,7 @@ using namespace models;
 
 namespace utils {
   namespace cplex {
-    class Compact_model;
-    class Subcycle_lazy_constraint_compact_model : public IloCplex::LazyConstraintCallbackI {
-      private:
-        Compact_model& compact_model;
+    class Subcycle_lazy_constraint_compact_model : public Lazy_constraint_compact_model {
       public:
          Subcycle_lazy_constraint_compact_model (Compact_model& compact_model);
          [[nodiscard]] IloCplex::CallbackI* duplicateCallback() const override;

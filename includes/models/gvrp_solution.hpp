@@ -27,8 +27,8 @@ namespace models{
                           customers;
         for (auto afs : gvrp_solution.gvrp_instance.afss)
           afss[afs.id] = afs;
-        for (auto afs : gvrp_solution.gvrp_instance.customers)
-          afss[afs.id] = afs;
+        for (auto customer : gvrp_solution.gvrp_instance.customers)
+          customers[customer.id] = customer;
         set<int> servedCustomers;
          //streams
         stringstream output, 
@@ -85,6 +85,10 @@ namespace models{
           output<<" (cost: "<<cost<<")"<<" (time: "<<time<<")"<<endl;
           costs += cost;
         }
+        if (servedCustomers.size() < gvrp_solution.gvrp_instance.customers.size())
+          for (auto customer : gvrp_solution.gvrp_instance.customers)
+            if (!servedCustomers.count(customer.id))
+              infeasibilities<<"Customer "<<customer.id<<"is missing"<<endl;
         output<<"Total cost: "<<costs<<endl;
         if (infeasibilities.rdbuf()->in_avail())
           output<<"Infeasibilities found:"<<endl<<infeasibilities.str();

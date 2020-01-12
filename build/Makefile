@@ -285,6 +285,195 @@ src/utils/cplex/compact_model.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.s
 .PHONY : src/utils/cplex/compact_model.cpp.s
 
+src/utils/cplex/extra_constraint_compact_model.o: src/utils/cplex/extra_constraint_compact_model.cpp.o
+
+.PHONY : src/utils/cplex/extra_constraint_compact_model.o
+
+# target to build an object file
+src/utils/cplex/extra_constraint_compact_model.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.o
+.PHONY : src/utils/cplex/extra_constraint_compact_model.cpp.o
+
+src/utils/cplex/extra_constraint_compact_model.i: src/utils/cplex/extra_constraint_compact_model.cpp.i
+
+.PHONY : src/utils/cplex/extra_constraint_compact_model.i
+
+# target to preprocess a source file
+src/utils/cplex/extra_constraint_compact_model.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.i
+.PHONY : src/utils/cplex/extra_constraint_compact_model.cpp.i
+
+src/utils/cplex/extra_constraint_compact_model.s: src/utils/cplex/extra_constraint_compact_model.cpp.s
+
+.PHONY : src/utils/cplex/extra_constraint_compact_model.s
+
+# target to generate assembly for a file
+src/utils/cplex/extra_constraint_compact_model.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/extra_constraint_compact_model.cpp.s
+.PHONY : src/utils/cplex/extra_constraint_compact_model.cpp.s
+
+src/utils/cplex/improved_compact_model.o: src/utils/cplex/improved_compact_model.cpp.o
+
+.PHONY : src/utils/cplex/improved_compact_model.o
+
+# target to build an object file
+src/utils/cplex/improved_compact_model.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.o
+.PHONY : src/utils/cplex/improved_compact_model.cpp.o
+
+src/utils/cplex/improved_compact_model.i: src/utils/cplex/improved_compact_model.cpp.i
+
+.PHONY : src/utils/cplex/improved_compact_model.i
+
+# target to preprocess a source file
+src/utils/cplex/improved_compact_model.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.i
+.PHONY : src/utils/cplex/improved_compact_model.cpp.i
+
+src/utils/cplex/improved_compact_model.s: src/utils/cplex/improved_compact_model.cpp.s
+
+.PHONY : src/utils/cplex/improved_compact_model.s
+
+# target to generate assembly for a file
+src/utils/cplex/improved_compact_model.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/improved_compact_model.cpp.s
+.PHONY : src/utils/cplex/improved_compact_model.cpp.s
+
+src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.o: src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.o
+
+.PHONY : src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.o
+
+# target to build an object file
+src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.o
+.PHONY : src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.o
+
+src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.i: src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.i
+
+.PHONY : src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.i
+
+# target to preprocess a source file
+src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.i
+.PHONY : src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.i
+
+src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.s: src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.s
+
+.PHONY : src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.s
+
+# target to generate assembly for a file
+src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.s
+.PHONY : src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.cpp.s
+
+src/utils/cplex/invalid_edge_preprocessing.o: src/utils/cplex/invalid_edge_preprocessing.cpp.o
+
+.PHONY : src/utils/cplex/invalid_edge_preprocessing.o
+
+# target to build an object file
+src/utils/cplex/invalid_edge_preprocessing.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.o
+.PHONY : src/utils/cplex/invalid_edge_preprocessing.cpp.o
+
+src/utils/cplex/invalid_edge_preprocessing.i: src/utils/cplex/invalid_edge_preprocessing.cpp.i
+
+.PHONY : src/utils/cplex/invalid_edge_preprocessing.i
+
+# target to preprocess a source file
+src/utils/cplex/invalid_edge_preprocessing.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.i
+.PHONY : src/utils/cplex/invalid_edge_preprocessing.cpp.i
+
+src/utils/cplex/invalid_edge_preprocessing.s: src/utils/cplex/invalid_edge_preprocessing.cpp.s
+
+.PHONY : src/utils/cplex/invalid_edge_preprocessing.s
+
+# target to generate assembly for a file
+src/utils/cplex/invalid_edge_preprocessing.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/invalid_edge_preprocessing.cpp.s
+.PHONY : src/utils/cplex/invalid_edge_preprocessing.cpp.s
+
+src/utils/cplex/lazy_constraint_compact_model.o: src/utils/cplex/lazy_constraint_compact_model.cpp.o
+
+.PHONY : src/utils/cplex/lazy_constraint_compact_model.o
+
+# target to build an object file
+src/utils/cplex/lazy_constraint_compact_model.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.o
+.PHONY : src/utils/cplex/lazy_constraint_compact_model.cpp.o
+
+src/utils/cplex/lazy_constraint_compact_model.i: src/utils/cplex/lazy_constraint_compact_model.cpp.i
+
+.PHONY : src/utils/cplex/lazy_constraint_compact_model.i
+
+# target to preprocess a source file
+src/utils/cplex/lazy_constraint_compact_model.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.i
+.PHONY : src/utils/cplex/lazy_constraint_compact_model.cpp.i
+
+src/utils/cplex/lazy_constraint_compact_model.s: src/utils/cplex/lazy_constraint_compact_model.cpp.s
+
+.PHONY : src/utils/cplex/lazy_constraint_compact_model.s
+
+# target to generate assembly for a file
+src/utils/cplex/lazy_constraint_compact_model.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/lazy_constraint_compact_model.cpp.s
+.PHONY : src/utils/cplex/lazy_constraint_compact_model.cpp.s
+
+src/utils/cplex/max_afs_visit_constraint.o: src/utils/cplex/max_afs_visit_constraint.cpp.o
+
+.PHONY : src/utils/cplex/max_afs_visit_constraint.o
+
+# target to build an object file
+src/utils/cplex/max_afs_visit_constraint.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.o
+.PHONY : src/utils/cplex/max_afs_visit_constraint.cpp.o
+
+src/utils/cplex/max_afs_visit_constraint.i: src/utils/cplex/max_afs_visit_constraint.cpp.i
+
+.PHONY : src/utils/cplex/max_afs_visit_constraint.i
+
+# target to preprocess a source file
+src/utils/cplex/max_afs_visit_constraint.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.i
+.PHONY : src/utils/cplex/max_afs_visit_constraint.cpp.i
+
+src/utils/cplex/max_afs_visit_constraint.s: src/utils/cplex/max_afs_visit_constraint.cpp.s
+
+.PHONY : src/utils/cplex/max_afs_visit_constraint.s
+
+# target to generate assembly for a file
+src/utils/cplex/max_afs_visit_constraint.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.s
+.PHONY : src/utils/cplex/max_afs_visit_constraint.cpp.s
+
+src/utils/cplex/preprocessing_compact_model.o: src/utils/cplex/preprocessing_compact_model.cpp.o
+
+.PHONY : src/utils/cplex/preprocessing_compact_model.o
+
+# target to build an object file
+src/utils/cplex/preprocessing_compact_model.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.o
+.PHONY : src/utils/cplex/preprocessing_compact_model.cpp.o
+
+src/utils/cplex/preprocessing_compact_model.i: src/utils/cplex/preprocessing_compact_model.cpp.i
+
+.PHONY : src/utils/cplex/preprocessing_compact_model.i
+
+# target to preprocess a source file
+src/utils/cplex/preprocessing_compact_model.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.i
+.PHONY : src/utils/cplex/preprocessing_compact_model.cpp.i
+
+src/utils/cplex/preprocessing_compact_model.s: src/utils/cplex/preprocessing_compact_model.cpp.s
+
+.PHONY : src/utils/cplex/preprocessing_compact_model.s
+
+# target to generate assembly for a file
+src/utils/cplex/preprocessing_compact_model.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/preprocessing_compact_model.cpp.s
+.PHONY : src/utils/cplex/preprocessing_compact_model.cpp.s
+
 src/utils/cplex/subcycle_lazy_constraint_compact_model.o: src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.o
 
 .PHONY : src/utils/cplex/subcycle_lazy_constraint_compact_model.o
@@ -311,6 +500,60 @@ src/utils/cplex/subcycle_lazy_constraint_compact_model.s: src/utils/cplex/subcyc
 src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.s
 .PHONY : src/utils/cplex/subcycle_lazy_constraint_compact_model.cpp.s
+
+src/utils/cplex/subcycle_user_constraint_compact_model.o: src/utils/cplex/subcycle_user_constraint_compact_model.cpp.o
+
+.PHONY : src/utils/cplex/subcycle_user_constraint_compact_model.o
+
+# target to build an object file
+src/utils/cplex/subcycle_user_constraint_compact_model.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.o
+.PHONY : src/utils/cplex/subcycle_user_constraint_compact_model.cpp.o
+
+src/utils/cplex/subcycle_user_constraint_compact_model.i: src/utils/cplex/subcycle_user_constraint_compact_model.cpp.i
+
+.PHONY : src/utils/cplex/subcycle_user_constraint_compact_model.i
+
+# target to preprocess a source file
+src/utils/cplex/subcycle_user_constraint_compact_model.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.i
+.PHONY : src/utils/cplex/subcycle_user_constraint_compact_model.cpp.i
+
+src/utils/cplex/subcycle_user_constraint_compact_model.s: src/utils/cplex/subcycle_user_constraint_compact_model.cpp.s
+
+.PHONY : src/utils/cplex/subcycle_user_constraint_compact_model.s
+
+# target to generate assembly for a file
+src/utils/cplex/subcycle_user_constraint_compact_model.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/subcycle_user_constraint_compact_model.cpp.s
+.PHONY : src/utils/cplex/subcycle_user_constraint_compact_model.cpp.s
+
+src/utils/cplex/user_constraint_compact_model.o: src/utils/cplex/user_constraint_compact_model.cpp.o
+
+.PHONY : src/utils/cplex/user_constraint_compact_model.o
+
+# target to build an object file
+src/utils/cplex/user_constraint_compact_model.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.o
+.PHONY : src/utils/cplex/user_constraint_compact_model.cpp.o
+
+src/utils/cplex/user_constraint_compact_model.i: src/utils/cplex/user_constraint_compact_model.cpp.i
+
+.PHONY : src/utils/cplex/user_constraint_compact_model.i
+
+# target to preprocess a source file
+src/utils/cplex/user_constraint_compact_model.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.i
+.PHONY : src/utils/cplex/user_constraint_compact_model.cpp.i
+
+src/utils/cplex/user_constraint_compact_model.s: src/utils/cplex/user_constraint_compact_model.cpp.s
+
+.PHONY : src/utils/cplex/user_constraint_compact_model.s
+
+# target to generate assembly for a file
+src/utils/cplex/user_constraint_compact_model.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/user_constraint_compact_model.cpp.s
+.PHONY : src/utils/cplex/user_constraint_compact_model.cpp.s
 
 src/utils/util.o: src/utils/util.cpp.o
 
@@ -366,9 +609,36 @@ help:
 	@echo "... src/utils/cplex/compact_model.o"
 	@echo "... src/utils/cplex/compact_model.i"
 	@echo "... src/utils/cplex/compact_model.s"
+	@echo "... src/utils/cplex/extra_constraint_compact_model.o"
+	@echo "... src/utils/cplex/extra_constraint_compact_model.i"
+	@echo "... src/utils/cplex/extra_constraint_compact_model.s"
+	@echo "... src/utils/cplex/improved_compact_model.o"
+	@echo "... src/utils/cplex/improved_compact_model.i"
+	@echo "... src/utils/cplex/improved_compact_model.s"
+	@echo "... src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.o"
+	@echo "... src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.i"
+	@echo "... src/utils/cplex/improved_subcycle_lazy_constraint_compact_model.s"
+	@echo "... src/utils/cplex/invalid_edge_preprocessing.o"
+	@echo "... src/utils/cplex/invalid_edge_preprocessing.i"
+	@echo "... src/utils/cplex/invalid_edge_preprocessing.s"
+	@echo "... src/utils/cplex/lazy_constraint_compact_model.o"
+	@echo "... src/utils/cplex/lazy_constraint_compact_model.i"
+	@echo "... src/utils/cplex/lazy_constraint_compact_model.s"
+	@echo "... src/utils/cplex/max_afs_visit_constraint.o"
+	@echo "... src/utils/cplex/max_afs_visit_constraint.i"
+	@echo "... src/utils/cplex/max_afs_visit_constraint.s"
+	@echo "... src/utils/cplex/preprocessing_compact_model.o"
+	@echo "... src/utils/cplex/preprocessing_compact_model.i"
+	@echo "... src/utils/cplex/preprocessing_compact_model.s"
 	@echo "... src/utils/cplex/subcycle_lazy_constraint_compact_model.o"
 	@echo "... src/utils/cplex/subcycle_lazy_constraint_compact_model.i"
 	@echo "... src/utils/cplex/subcycle_lazy_constraint_compact_model.s"
+	@echo "... src/utils/cplex/subcycle_user_constraint_compact_model.o"
+	@echo "... src/utils/cplex/subcycle_user_constraint_compact_model.i"
+	@echo "... src/utils/cplex/subcycle_user_constraint_compact_model.s"
+	@echo "... src/utils/cplex/user_constraint_compact_model.o"
+	@echo "... src/utils/cplex/user_constraint_compact_model.i"
+	@echo "... src/utils/cplex/user_constraint_compact_model.s"
 	@echo "... src/utils/util.o"
 	@echo "... src/utils/util.i"
 	@echo "... src/utils/util.s"

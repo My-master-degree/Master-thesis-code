@@ -1,80 +1,30 @@
-#include "utils/cplex/compact_model.hpp"
-#include "utils/cplex/subcycle_lazy_constraint_compact_model.hpp"
 #include "models/vertex.hpp"
 #include "models/gvrp_instance.hpp"
 #include "models/gvrp_solution.hpp"
 #include "models/distances_enum.hpp"
 #include "models/mip_solution_info.hpp"
+#include "utils/cplex/compact_model.hpp"
+#include "utils/cplex/subcycle_lazy_constraint_compact_model.hpp"
+#include "utils/cplex/lazy_constraint_compact_model.hpp"
+#include "utils/cplex/user_constraint_compact_model.hpp"
+#include "utils/cplex/extra_constraint_compact_model.hpp"
+#include "utils/cplex/preprocessing_compact_model.hpp"
 
 #include <list>
 #include <set>
 #include <vector>
 #include <queue>
-#include <ilcplex/ilocplex.h>
 #include <stdlib.h>
 #include <exception>
 #include <sstream>
 #include <time.h>
+#include <ilcplex/ilocplex.h>
 
 ILOSTLBEGIN
 
 using namespace std;
 using namespace models;
 using namespace utils::cplex;
-
-//separation algorithm
-//ILOLAZYCONSTRAINTCALLBACK4(Subcycle_constraint, Matrix3DVar&, x, Gvrp_instance&, gvrp_instance, IDVertex&, all, int, ub_edge_visit) {
-// int depot = gvrp_instance.depot.id;
-// IloEnv env = getEnv();
-// IloExpr expr(env);
-// Matrix3DVal x_vals (env, gvrp_instance.customers.size());
-// for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++) {
-//   x_vals[k] = IloArray<IloNumArray> (env, all.size());
-//   for (pair<int, Vertex> p : all) {
-//     int i = p.first;
-//     x_vals[k][i] = IloNumArray (env, all.size(), 0, ub_edge_visit, IloNumVar::Int);
-//     getValues(x_vals[k][i], x[k][i]);
-//   }
-// }
-// //for each route
-// for (int k = 0; k < int(gvrp_instance.customers.size()); k++){
-//   set<int> vertexes;
-//   for (pair<int, Vertex> p : all){
-//     int i = p.first;
-//     for (pair<int, Vertex> p1 : all){
-//       int j = p1.first;
-//       if (x_vals[k][i][j] > 0){
-//         vertexes.insert(i);
-//         vertexes.insert(j);
-//       }
-//     }
-//   }
-//   //subcycle found
-//   if (vertexes.size() > 0 && vertexes.find(depot) == vertexes.end()){
-//     for (pair<int, Vertex> p : all){
-//       int i = p.first;
-//       for (int j : vertexes)
-//         if (vertexes.find(i) == vertexes.end())
-//           expr += x[k][i][j];
-//     }       
-//     expr -= 1;
-//     try {
-//       add(expr >= 0).end();
-//     } catch(IloException& e) {
-//       std::cerr << "Exception while adding lazy constraint" << e.getMessage() << "\n";
-//       throw;
-//     } 
-//     expr.end();
-//     expr = IloExpr(env);
-//   }
-//   for (pair<int, Vertex> p : all){
-//     int i = p.first;
-//     x_vals[k][i].end();
-//   }
-// }
-// x_vals.end();
-//}
-
 
 Compact_model::Compact_model(Gvrp_instance& _gvrp_instance, unsigned int _time_limit): 
   gvrp_instance(_gvrp_instance), time_limit(_time_limit), max_num_feasible_integer_sol(2100000000), VERBOSE(true) {
@@ -188,11 +138,16 @@ void Compact_model::createObjectiveFunction() {
 
 void Compact_model::createModel() {
   try{
+    //preprocessing conditions
+    for (Preprocessing_compact_model* preprocessing : preprocessings)
+      preprocessing->add();
+    //setup
     int depot = gvrp_instance.depot.id;
     double beta = gvrp_instance.vehicleFuelCapacity;
     double T = gvrp_instance.timeLimit;
     //constraints
-    IloExpr expr(env), expr1(env);    
+    IloExpr expr(env),
+            expr1(env);    
     IloConstraint c;
     stringstream constraintName;
     //\sum_{v_j \in V} x_{ij}^k = \sum_{v_j \in V} x_{ji}^k, \forall v_i \in V, \forall k \in M
@@ -307,10 +262,17 @@ void Compact_model::createModel() {
       expr.end();
       expr = IloExpr(env);
     }
+    //extra constraints
+    for (Extra_constraint_compact_model* extra_constraint : extra_constraints)
+      extra_constraint->add();
+    //init
     cplex = IloCplex(model);
     //\sum_{(v_i, v_j) \in \delta(S)} x_{ij}^k \geq 2, \forall k \in M, \forall S \subseteq V \backlash \{v_0\} : |C \wedge S| \geq 1 \wedge |S \wedge F| \geq 1
     //cplex.use(Subcycle_constraint(env, x, gvrp_instance, all, ub_edge_visit));
-    cplex.use(new Subcycle_lazy_constraint_compact_model(*this)); 
+    cplex.use(separation_algorithm()); 
+    //user cuts
+    for (User_constraint_compact_model* user_constraint : user_constraints)
+      cplex.use(user_constraint);
   } catch (IloException& e) {
     throw e;
   } catch (runtime_error& e) {
@@ -318,35 +280,39 @@ void Compact_model::createModel() {
   }
 }
 
+Lazy_constraint_compact_model* Compact_model::separation_algorithm(){
+  return new Subcycle_lazy_constraint_compact_model(*this);
+}
+
 void Compact_model::setCustomParameters(){
   try{
     if (!VERBOSE)
       cplex.setOut(env.getNullStream());
     //DOUBTS:
-      // Turn off the presolve reductions and set the CPLEX optimizer
-      // to solve the worker LP with primal simplex method.
-      cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 0);
+    // Turn off the presolve reductions and set the CPLEX optimizer
+    // to solve the worker LP with primal simplex method.
+    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 0);
     cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal); 
     //preprocesing setting
     cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
     // Turn on traditional search for use with control callbacks
     cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
-  //:DOUBTS
-  //LAZY CONSTRAINTS
-  //thread safe setting
-  cplex.setParam(IloCplex::Param::Threads, 1);
-  // Tweak some CPLEX parameters so that CPLEX has a harder time to
-  // solve the model and our cut separators can actually kick in.
-  cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq, -1);
-  cplex.setParam(IloCplex::Param::MIP::Cuts::MIRCut, -1);
-  cplex.setParam(IloCplex::Param::MIP::Cuts::Implied, -1);
-  cplex.setParam(IloCplex::Param::MIP::Cuts::Gomory, -1);
-  cplex.setParam(IloCplex::Param::MIP::Cuts::FlowCovers, -1);
-  cplex.setParam(IloCplex::Param::MIP::Cuts::PathCut, -1);
-  cplex.setParam(IloCplex::Param::MIP::Cuts::LiftProj, -1);
-  cplex.setParam(IloCplex::Param::MIP::Cuts::ZeroHalfCut, -1);
-  cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques, -1);
-  cplex.setParam(IloCplex::Param::MIP::Cuts::Covers, -1);
+    //:DOUBTS
+    //LAZY CONSTRAINTS
+    //thread safe setting
+    cplex.setParam(IloCplex::Param::Threads, 1);
+    // Tweak some CPLEX parameters so that CPLEX has a harder time to
+    // solve the model and our cut separators can actually kick in.
+    cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::MIRCut, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::Implied, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::Gomory, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::FlowCovers, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::PathCut, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::LiftProj, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::ZeroHalfCut, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::Covers, -1);
     //time out
     cplex.setParam(IloCplex::Param::TimeLimit, time_limit);
     //num of feasible integers solution allowed
@@ -378,6 +344,28 @@ void Compact_model::fillX_vals(){
 }
 
 void Compact_model::createGvrp_solution(){
+
+  //print x vals
+//  for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++){
+//    //columns
+//    cout<<" ";
+//   for (auto p : all){
+//     if (p.first <= 9)
+//       cout<<" ";
+//     cout<<" "<<p.first;
+//   }
+//   cout<<endl;
+//   //content
+//   for (auto p : all){
+//     cout<<p.first;
+//     if (p.first <= 9)
+//       cout<<" ";
+//     for (auto p1 : all){
+//       cout<<" "<<int(x_vals[k][p.first][p1.first])<<" ";
+//     }
+//     cout<<endl;
+//   }
+// }
   try{
     list<list<Vertex> > routes;
     //dfs
