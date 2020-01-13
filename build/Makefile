@@ -285,6 +285,60 @@ src/utils/cplex/compact_model.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/compact_model.cpp.s
 .PHONY : src/utils/cplex/compact_model.cpp.s
 
+src/utils/cplex/energy_lb_constraint.o: src/utils/cplex/energy_lb_constraint.cpp.o
+
+.PHONY : src/utils/cplex/energy_lb_constraint.o
+
+# target to build an object file
+src/utils/cplex/energy_lb_constraint.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/energy_lb_constraint.cpp.o
+.PHONY : src/utils/cplex/energy_lb_constraint.cpp.o
+
+src/utils/cplex/energy_lb_constraint.i: src/utils/cplex/energy_lb_constraint.cpp.i
+
+.PHONY : src/utils/cplex/energy_lb_constraint.i
+
+# target to preprocess a source file
+src/utils/cplex/energy_lb_constraint.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/energy_lb_constraint.cpp.i
+.PHONY : src/utils/cplex/energy_lb_constraint.cpp.i
+
+src/utils/cplex/energy_lb_constraint.s: src/utils/cplex/energy_lb_constraint.cpp.s
+
+.PHONY : src/utils/cplex/energy_lb_constraint.s
+
+# target to generate assembly for a file
+src/utils/cplex/energy_lb_constraint.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/energy_lb_constraint.cpp.s
+.PHONY : src/utils/cplex/energy_lb_constraint.cpp.s
+
+src/utils/cplex/energy_ub_constraint.o: src/utils/cplex/energy_ub_constraint.cpp.o
+
+.PHONY : src/utils/cplex/energy_ub_constraint.o
+
+# target to build an object file
+src/utils/cplex/energy_ub_constraint.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/energy_ub_constraint.cpp.o
+.PHONY : src/utils/cplex/energy_ub_constraint.cpp.o
+
+src/utils/cplex/energy_ub_constraint.i: src/utils/cplex/energy_ub_constraint.cpp.i
+
+.PHONY : src/utils/cplex/energy_ub_constraint.i
+
+# target to preprocess a source file
+src/utils/cplex/energy_ub_constraint.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/energy_ub_constraint.cpp.i
+.PHONY : src/utils/cplex/energy_ub_constraint.cpp.i
+
+src/utils/cplex/energy_ub_constraint.s: src/utils/cplex/energy_ub_constraint.cpp.s
+
+.PHONY : src/utils/cplex/energy_ub_constraint.s
+
+# target to generate assembly for a file
+src/utils/cplex/energy_ub_constraint.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/energy_ub_constraint.cpp.s
+.PHONY : src/utils/cplex/energy_ub_constraint.cpp.s
+
 src/utils/cplex/extra_constraint_compact_model.o: src/utils/cplex/extra_constraint_compact_model.cpp.o
 
 .PHONY : src/utils/cplex/extra_constraint_compact_model.o
@@ -446,6 +500,60 @@ src/utils/cplex/max_afs_visit_constraint.s: src/utils/cplex/max_afs_visit_constr
 src/utils/cplex/max_afs_visit_constraint.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/max_afs_visit_constraint.cpp.s
 .PHONY : src/utils/cplex/max_afs_visit_constraint.cpp.s
+
+src/utils/cplex/max_distance_route_constraint.o: src/utils/cplex/max_distance_route_constraint.cpp.o
+
+.PHONY : src/utils/cplex/max_distance_route_constraint.o
+
+# target to build an object file
+src/utils/cplex/max_distance_route_constraint.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/max_distance_route_constraint.cpp.o
+.PHONY : src/utils/cplex/max_distance_route_constraint.cpp.o
+
+src/utils/cplex/max_distance_route_constraint.i: src/utils/cplex/max_distance_route_constraint.cpp.i
+
+.PHONY : src/utils/cplex/max_distance_route_constraint.i
+
+# target to preprocess a source file
+src/utils/cplex/max_distance_route_constraint.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/max_distance_route_constraint.cpp.i
+.PHONY : src/utils/cplex/max_distance_route_constraint.cpp.i
+
+src/utils/cplex/max_distance_route_constraint.s: src/utils/cplex/max_distance_route_constraint.cpp.s
+
+.PHONY : src/utils/cplex/max_distance_route_constraint.s
+
+# target to generate assembly for a file
+src/utils/cplex/max_distance_route_constraint.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/max_distance_route_constraint.cpp.s
+.PHONY : src/utils/cplex/max_distance_route_constraint.cpp.s
+
+src/utils/cplex/min_distance_route_constraint.o: src/utils/cplex/min_distance_route_constraint.cpp.o
+
+.PHONY : src/utils/cplex/min_distance_route_constraint.o
+
+# target to build an object file
+src/utils/cplex/min_distance_route_constraint.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/min_distance_route_constraint.cpp.o
+.PHONY : src/utils/cplex/min_distance_route_constraint.cpp.o
+
+src/utils/cplex/min_distance_route_constraint.i: src/utils/cplex/min_distance_route_constraint.cpp.i
+
+.PHONY : src/utils/cplex/min_distance_route_constraint.i
+
+# target to preprocess a source file
+src/utils/cplex/min_distance_route_constraint.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/min_distance_route_constraint.cpp.i
+.PHONY : src/utils/cplex/min_distance_route_constraint.cpp.i
+
+src/utils/cplex/min_distance_route_constraint.s: src/utils/cplex/min_distance_route_constraint.cpp.s
+
+.PHONY : src/utils/cplex/min_distance_route_constraint.s
+
+# target to generate assembly for a file
+src/utils/cplex/min_distance_route_constraint.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utils/cplex/min_distance_route_constraint.cpp.s
+.PHONY : src/utils/cplex/min_distance_route_constraint.cpp.s
 
 src/utils/cplex/preprocessing_compact_model.o: src/utils/cplex/preprocessing_compact_model.cpp.o
 
@@ -609,6 +717,12 @@ help:
 	@echo "... src/utils/cplex/compact_model.o"
 	@echo "... src/utils/cplex/compact_model.i"
 	@echo "... src/utils/cplex/compact_model.s"
+	@echo "... src/utils/cplex/energy_lb_constraint.o"
+	@echo "... src/utils/cplex/energy_lb_constraint.i"
+	@echo "... src/utils/cplex/energy_lb_constraint.s"
+	@echo "... src/utils/cplex/energy_ub_constraint.o"
+	@echo "... src/utils/cplex/energy_ub_constraint.i"
+	@echo "... src/utils/cplex/energy_ub_constraint.s"
 	@echo "... src/utils/cplex/extra_constraint_compact_model.o"
 	@echo "... src/utils/cplex/extra_constraint_compact_model.i"
 	@echo "... src/utils/cplex/extra_constraint_compact_model.s"
@@ -627,6 +741,12 @@ help:
 	@echo "... src/utils/cplex/max_afs_visit_constraint.o"
 	@echo "... src/utils/cplex/max_afs_visit_constraint.i"
 	@echo "... src/utils/cplex/max_afs_visit_constraint.s"
+	@echo "... src/utils/cplex/max_distance_route_constraint.o"
+	@echo "... src/utils/cplex/max_distance_route_constraint.i"
+	@echo "... src/utils/cplex/max_distance_route_constraint.s"
+	@echo "... src/utils/cplex/min_distance_route_constraint.o"
+	@echo "... src/utils/cplex/min_distance_route_constraint.i"
+	@echo "... src/utils/cplex/min_distance_route_constraint.s"
 	@echo "... src/utils/cplex/preprocessing_compact_model.o"
 	@echo "... src/utils/cplex/preprocessing_compact_model.i"
 	@echo "... src/utils/cplex/preprocessing_compact_model.s"

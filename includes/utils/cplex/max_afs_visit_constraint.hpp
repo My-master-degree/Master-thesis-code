@@ -1,6 +1,7 @@
 #ifndef MAX_AFS_VISIT_CONSTRAINT_HPP_
 #define MAX_AFS_VISIT_CONSTRAINT_HPP_
 
+#include "utils/cplex/compact_model.hpp"
 #include "utils/cplex/extra_constraint_compact_model.hpp"
 
 namespace utils {

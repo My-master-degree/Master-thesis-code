@@ -2,6 +2,7 @@
 #include "models/distances_enum.hpp"
 #include "utils/util.hpp"
 
+#include <float.h>
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -183,4 +184,24 @@ void utils::remove_infeasible_customers(Gvrp_instance& gvrp_instance){
     }
   }else
     throw "It is not possible to remove infeasible customers from a non-metric instance.";
+}
+
+double utils::calculateGvrpInstanceLambdaFactor (const Gvrp_instance& gvrp_instance) {
+  //calculate lambda
+  double lambda;
+  if (gvrp_instance.afss.size() > 0){
+    lambda = DBL_MAX;
+    //F_0
+    set<int> afssAndDepot;
+    for (Vertex afs : gvrp_instance.afss)
+      afssAndDepot.insert(afs.id);
+    afssAndDepot.insert(gvrp_instance.depot.id);
+    //min_{(f, r) \in F_0 : r \neq f} c_{fr} . C
+    for (int f : afssAndDepot)
+      for (int r : afssAndDepot)
+        if (f != r)
+          lambda = min(gvrp_instance.distances[f][r] * gvrp_instance.vehicleFuelConsumptionRate, lambda);
+    return lambda;
+  }
+  return 0.0;  
 }

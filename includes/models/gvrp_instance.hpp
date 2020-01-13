@@ -1,8 +1,8 @@
 #ifndef GVRP_INSTANCE_HPP_
 #define GVRP_INSTANCE_HPP_
 
-#include "vertex.hpp"
-#include "distances_enum.hpp"
+#include "models/vertex.hpp"
+#include "models/distances_enum.hpp"
 
 #include <list>
 #include <vector>

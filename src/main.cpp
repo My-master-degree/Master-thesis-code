@@ -8,6 +8,9 @@
 #include "utils/cplex/invalid_edge_preprocessing.hpp"
 #include "utils/cplex/max_afs_visit_constraint.hpp"
 #include "utils/cplex/max_distance_route_constraint.hpp"
+#include "utils/cplex/min_distance_route_constraint.hpp"
+#include "utils/cplex/energy_lb_constraint.hpp"
+#include "utils/cplex/energy_ub_constraint.hpp"
 #include "SampleConfig.h"
 
 #include <string>
@@ -149,38 +152,38 @@ int main (int argc, char **argv)
     set<int> all = usedCustomers;
     all.insert(usedAfss.begin(), usedAfss.end());
     all.insert(gvrp_instance.depot.id);
-    for (auto id : all)
-      cout<<"  "<<id<<" ";
-    cout<<endl;
+//    for (auto id : all)
+//      cout<<"  "<<id<<" ";
+//    cout<<endl;
     for (auto id : all){
-      cout<<id;
+//      cout<<id;
       for (auto id1 : all){
         double fuel = gvrp_instance.distances[id][id1] * gvrp_instance.vehicleFuelConsumptionRate;
         fuel = int(fuel * 100.0)/100.0;
-        cout<<" "<<fuel;
+//        cout<<" "<<fuel;
       }
-      cout<<endl;
+//      cout<<endl;
     }
     //update distance matrix
-    for (int j = gvrp_instance.distances.size() - 1; j >= 0; j--)
+    for (int j = int(gvrp_instance.distances.size()) - 1; j >= 0; j--)
       if (j != gvrp_instance.depot.id && !usedAfss.count(j) && !usedCustomers.count(j))
         gvrp_instance.distances.erase(gvrp_instance.distances.begin() + j);    
       else
-        for (int k = gvrp_instance.distances[j].size() - 1; k >= 0; k--)
+        for (int k = int(gvrp_instance.distances[j].size()) - 1; k >= 0; k--)
           if (k != gvrp_instance.depot.id && !usedAfss.count(k) && !usedCustomers.count(k))
             gvrp_instance.distances[j].erase(gvrp_instance.distances[j].begin() + k);
     //print distances
-    for (int i = 0; i < gvrp_instance.distances.size(); i++)
-      cout<<"  "<<i<<" ";
-    cout<<endl;
-    for (int i = 0; i < gvrp_instance.distances.size(); i++){
-      cout<<i;
-      for (int j = 0; j < gvrp_instance.distances[i].size(); j++){
+//    for (int i = 0; i < int(gvrp_instance.distances.size()); i++)
+//      cout<<"  "<<i<<" ";
+//    cout<<endl;
+    for (int i = 0; i < int(gvrp_instance.distances.size()); i++){
+//      cout<<i;
+      for (int j = 0; j < int(gvrp_instance.distances[i].size()); j++){
         double fuel = gvrp_instance.distances[i][j] * gvrp_instance.vehicleFuelConsumptionRate;
         fuel = int(fuel * 100.0)/100.0;
-        cout<<" "<<fuel;
+//        cout<<" "<<fuel;
       }
-      cout<<endl;
+//      cout<<endl;
     }
     //update ids
     int id = 1;
@@ -193,9 +196,10 @@ int main (int argc, char **argv)
     //HERE ENDS A NEW TEST INSTANCE
 //*/
     cout<<instance<<endl;
-    cout<<gvrp_instance<<endl;
+//    cout<<gvrp_instance<<endl;
     //settings
     Compact_model compact_model(gvrp_instance, execution_time);
+    double lambda = calculateGvrpInstanceLambdaFactor (gvrp_instance);
 //    Improved_compact_model compact_model(gvrp_instance, execution_time);    
     //custom settings
       //user cuts
@@ -205,8 +209,11 @@ int main (int argc, char **argv)
       //extra constraints
     compact_model.extra_constraints.push_back(new Max_distance_route_constraint(compact_model));
     compact_model.extra_constraints.push_back(new Max_afs_visit_constraint(compact_model));
+    compact_model.extra_constraints.push_back(new Min_distance_route_constraint(compact_model, lambda));
+    compact_model.extra_constraints.push_back(new Energy_lb_constraint(compact_model));
+    compact_model.extra_constraints.push_back(new Energy_ub_constraint(compact_model));
     //custom settings
-    compact_model.max_num_feasible_integer_sol = 1;
+ //   compact_model.max_num_feasible_integer_sol = 1;
     compact_model.VERBOSE = VERBOSE;
     //run model
     Mip_solution_info mipSolInfo;
@@ -219,9 +226,9 @@ int main (int argc, char **argv)
     } catch (Mip_solution_info excSolInfo){
       mipSolInfo = excSolInfo;
     }
-      cout<<mipSolInfo;
+    cout<<mipSolInfo;
     resultsFile<<instance<<","<<mipSolInfo.gap<<","<<mipSolInfo.cost<<","<<mipSolInfo.elapsed_time<<","<<mipSolInfo.status<<endl;
-    break;
+//    break;
   }
   //write csv
   resultsFile.close(); 

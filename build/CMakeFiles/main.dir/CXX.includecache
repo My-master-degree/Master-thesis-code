@@ -15,10 +15,10 @@ ilcplex/ilocplex.h
 -
 
 ../includes/models/gvrp_instance.hpp
-vertex.hpp
-../includes/models/vertex.hpp
-distances_enum.hpp
-../includes/models/distances_enum.hpp
+models/vertex.hpp
+../includes/models/models/vertex.hpp
+models/distances_enum.hpp
+../includes/models/models/distances_enum.hpp
 list
 -
 vector
@@ -86,6 +86,18 @@ list
 ilcplex/ilocplex.h
 -
 
+../includes/utils/cplex/energy_lb_constraint.hpp
+utils/cplex/compact_model.hpp
+../includes/utils/cplex/utils/cplex/compact_model.hpp
+utils/cplex/extra_constraint_compact_model.hpp
+../includes/utils/cplex/utils/cplex/extra_constraint_compact_model.hpp
+
+../includes/utils/cplex/energy_ub_constraint.hpp
+utils/cplex/compact_model.hpp
+../includes/utils/cplex/utils/cplex/compact_model.hpp
+utils/cplex/extra_constraint_compact_model.hpp
+../includes/utils/cplex/utils/cplex/extra_constraint_compact_model.hpp
+
 ../includes/utils/cplex/extra_constraint_compact_model.hpp
 utils/cplex/compact_model.hpp
 ../includes/utils/cplex/utils/cplex/compact_model.hpp
@@ -109,10 +121,18 @@ ilcplex/ilocplex.h
 -
 
 ../includes/utils/cplex/max_afs_visit_constraint.hpp
+utils/cplex/compact_model.hpp
+../includes/utils/cplex/utils/cplex/compact_model.hpp
 utils/cplex/extra_constraint_compact_model.hpp
 ../includes/utils/cplex/utils/cplex/extra_constraint_compact_model.hpp
 
 ../includes/utils/cplex/max_distance_route_constraint.hpp
+utils/cplex/compact_model.hpp
+../includes/utils/cplex/utils/cplex/compact_model.hpp
+utils/cplex/extra_constraint_compact_model.hpp
+../includes/utils/cplex/utils/cplex/extra_constraint_compact_model.hpp
+
+../includes/utils/cplex/min_distance_route_constraint.hpp
 utils/cplex/compact_model.hpp
 ../includes/utils/cplex/utils/cplex/compact_model.hpp
 utils/cplex/extra_constraint_compact_model.hpp
@@ -161,6 +181,12 @@ utils/cplex/max_afs_visit_constraint.hpp
 /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/max_afs_visit_constraint.hpp
 utils/cplex/max_distance_route_constraint.hpp
 /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/max_distance_route_constraint.hpp
+utils/cplex/min_distance_route_constraint.hpp
+/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/min_distance_route_constraint.hpp
+utils/cplex/energy_lb_constraint.hpp
+/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/energy_lb_constraint.hpp
+utils/cplex/energy_ub_constraint.hpp
+/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/energy_ub_constraint.hpp
 SampleConfig.h
 /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/SampleConfig.h
 string
@@ -170,14 +196,6 @@ set
 queue
 -
 map
--
-
-/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/max_afs_visit_constraint.cpp
-utils/cplex/max_afs_visit_constraint.hpp
-/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/utils/cplex/max_afs_visit_constraint.hpp
-utils/cplex/extra_constraint_compact_model.hpp
-/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/utils/cplex/extra_constraint_compact_model.hpp
-ilcplex/ilocplex.h
 -
 
 /opt/ibm/ILOG/CPLEX_Studio1210/concert/include/ilconcert/iloalg.h

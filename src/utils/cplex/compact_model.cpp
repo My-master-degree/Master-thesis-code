@@ -129,7 +129,7 @@ void Compact_model::createObjectiveFunction() {
       }  
     model = IloModel (env);
     model.add(IloMinimize(env, fo));
-  }catch (IloException& e) {
+  } catch (IloException& e) {
     throw e;
   } catch(...){
     throw string("Error in creating the objective function");
@@ -275,8 +275,8 @@ void Compact_model::createModel() {
       cplex.use(user_constraint);
   } catch (IloException& e) {
     throw e;
-  } catch (runtime_error& e) {
-    throw e;
+  } catch (string s) {
+    throw s;
   }
 }
 

@@ -41,13 +41,13 @@ namespace utils {
         IloModel model;
         IDVertex all;
         Matrix3DVar x;
+        IloNumVarArray e;
         int ub_edge_visit;
         list<User_constraint_compact_model*> user_constraints;
         list<Preprocessing_compact_model*> preprocessings;
         list<Extra_constraint_compact_model*> extra_constraints;
     private:
         IloCplex cplex;
-        IloNumVarArray e;
         Matrix3DVal x_vals;
         Lazy_constraint_compact_model* separation_algorithm();
         void createVariables();
