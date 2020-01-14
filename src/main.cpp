@@ -11,9 +11,11 @@
 #include "utils/cplex/min_distance_route_constraint.hpp"
 #include "utils/cplex/energy_lb_constraint.hpp"
 #include "utils/cplex/energy_ub_constraint.hpp"
+#include "utils/cplex/energy_lifting_constraint.hpp"
 #include "SampleConfig.h"
 
 #include <string>
+#include <iomanip>
 #include <set>
 #include <queue>
 #include <map>
@@ -97,6 +99,8 @@ int main (int argc, char **argv)
     Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_PATH + string("instances/") + instance);
 //*/
     //HERE BEGINS A NEW TEST INSTANCE
+    cout<<fixed;
+    cout<<setprecision(2);
     //  create new instance
     int numCustomersAtDepot = 2,
         numCustomersAtAfs = 2;
@@ -149,21 +153,21 @@ int main (int argc, char **argv)
         it++;
     }
     //print distances
-    set<int> all = usedCustomers;
-    all.insert(usedAfss.begin(), usedAfss.end());
-    all.insert(gvrp_instance.depot.id);
-//    for (auto id : all)
-//      cout<<"  "<<id<<" ";
-//    cout<<endl;
-    for (auto id : all){
-//      cout<<id;
-      for (auto id1 : all){
-        double fuel = gvrp_instance.distances[id][id1] * gvrp_instance.vehicleFuelConsumptionRate;
-        fuel = int(fuel * 100.0)/100.0;
-//        cout<<" "<<fuel;
-      }
-//      cout<<endl;
-    }
+//    set<int> all = usedCustomers;
+//   all.insert(usedAfss.begin(), usedAfss.end());
+//   all.insert(gvrp_instance.depot.id);
+//   for (auto id : all)
+//     cout<<"    "<<id<<" ";
+//   cout<<endl;
+//   for (auto id : all){
+//     cout<<id;
+//     for (auto id1 : all){
+//       double fuel = gvrp_instance.distances[id][id1] * gvrp_instance.vehicleFuelConsumptionRate;
+///        fuel = int(fuel * 100.0)/100.0;
+//       cout<<" "<<(fuel < 10 ? "0" : "")<<fuel;
+//     }
+//     cout<<endl;
+//   }
     //update distance matrix
     for (int j = int(gvrp_instance.distances.size()) - 1; j >= 0; j--)
       if (j != gvrp_instance.depot.id && !usedAfss.count(j) && !usedCustomers.count(j))
@@ -174,14 +178,27 @@ int main (int argc, char **argv)
             gvrp_instance.distances[j].erase(gvrp_instance.distances[j].begin() + k);
     //print distances
 //    for (int i = 0; i < int(gvrp_instance.distances.size()); i++)
-//      cout<<"  "<<i<<" ";
+//      cout<<"    "<<i<<" ";
 //    cout<<endl;
     for (int i = 0; i < int(gvrp_instance.distances.size()); i++){
 //      cout<<i;
       for (int j = 0; j < int(gvrp_instance.distances[i].size()); j++){
-        double fuel = gvrp_instance.distances[i][j] * gvrp_instance.vehicleFuelConsumptionRate;
-        fuel = int(fuel * 100.0)/100.0;
-//        cout<<" "<<fuel;
+//        double fuel = gvrp_instance.distances[i][j] * gvrp_instance.vehicleFuelConsumptionRate;
+//        fuel = int(fuel * 100.0)/100.0;
+//        cout<<" "<<(fuel < 10 ? "0" : "")<<fuel;
+      }
+//      cout<<endl;
+    }
+    //print times
+//    for (int i = 0; i < int(gvrp_instance.distances.size()); i++)
+//      cout<<"    "<<i<<" ";
+//    cout<<endl;
+    for (int i = 0; i < int(gvrp_instance.distances.size()); i++){
+//      cout<<i;
+      for (int j = 0; j < int(gvrp_instance.distances[i].size()); j++){
+//        double time = gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed;
+//        fuel = int(fuel * 100.0)/100.0;
+//        cout<<" "<<(time < 10 ? "0" : "")<<time;
       }
 //      cout<<endl;
     }
@@ -204,14 +221,15 @@ int main (int argc, char **argv)
     //custom settings
       //user cuts
     compact_model.user_constraints.push_back(new Subcycle_user_constraint_compact_model(compact_model));
-      //preprocessings
-    compact_model.preprocessings.push_back(new Invalid_edge_preprocessing(compact_model));
-      //extra constraints
-    compact_model.extra_constraints.push_back(new Max_distance_route_constraint(compact_model));
-    compact_model.extra_constraints.push_back(new Max_afs_visit_constraint(compact_model));
-    compact_model.extra_constraints.push_back(new Min_distance_route_constraint(compact_model, lambda));
-    compact_model.extra_constraints.push_back(new Energy_lb_constraint(compact_model));
-    compact_model.extra_constraints.push_back(new Energy_ub_constraint(compact_model));
+     //preprocessings
+   compact_model.preprocessings.push_back(new Invalid_edge_preprocessing(compact_model));
+     //extra constraints
+   compact_model.extra_constraints.push_back(new Max_distance_route_constraint(compact_model));
+   compact_model.extra_constraints.push_back(new Max_afs_visit_constraint(compact_model));
+   compact_model.extra_constraints.push_back(new Min_distance_route_constraint(compact_model, lambda));
+   compact_model.extra_constraints.push_back(new Energy_lb_constraint(compact_model));
+   compact_model.extra_constraints.push_back(new Energy_ub_constraint(compact_model));
+//   compact_model.extra_constraints.push_back(new Energy_lifting_constraint(compact_model));
     //custom settings
  //   compact_model.max_num_feasible_integer_sol = 1;
     compact_model.VERBOSE = VERBOSE;
@@ -227,7 +245,7 @@ int main (int argc, char **argv)
       mipSolInfo = excSolInfo;
     }
     cout<<mipSolInfo;
-    resultsFile<<instance<<","<<mipSolInfo.gap<<","<<mipSolInfo.cost<<","<<mipSolInfo.elapsed_time<<","<<mipSolInfo.status<<endl;
+    resultsFile<<instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
 //    break;
   }
   //write csv

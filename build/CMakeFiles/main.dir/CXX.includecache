@@ -92,6 +92,12 @@ utils/cplex/compact_model.hpp
 utils/cplex/extra_constraint_compact_model.hpp
 ../includes/utils/cplex/utils/cplex/extra_constraint_compact_model.hpp
 
+../includes/utils/cplex/energy_lifting_constraint.hpp
+utils/cplex/compact_model.hpp
+../includes/utils/cplex/utils/cplex/compact_model.hpp
+utils/cplex/extra_constraint_compact_model.hpp
+../includes/utils/cplex/utils/cplex/extra_constraint_compact_model.hpp
+
 ../includes/utils/cplex/energy_ub_constraint.hpp
 utils/cplex/compact_model.hpp
 ../includes/utils/cplex/utils/cplex/compact_model.hpp
@@ -187,9 +193,13 @@ utils/cplex/energy_lb_constraint.hpp
 /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/energy_lb_constraint.hpp
 utils/cplex/energy_ub_constraint.hpp
 /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/energy_ub_constraint.hpp
+utils/cplex/energy_lifting_constraint.hpp
+/home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/utils/cplex/energy_lifting_constraint.hpp
 SampleConfig.h
 /home/matheus/Dropbox/Mestrado/Tese/Master-thesis-code/src/SampleConfig.h
 string
+-
+iomanip
 -
 set
 -
