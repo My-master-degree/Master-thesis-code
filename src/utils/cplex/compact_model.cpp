@@ -263,7 +263,7 @@ void Compact_model::createModel() {
       expr = IloExpr(env);
     }
     //extra constraints
-    for (Extra_constraint_compact_model* extra_constraint : extra_constraints)
+    for (Extra_constraint_compact_model* extra_constraint : extra_constraints) 
       extra_constraint->add();
     //init
     cplex = IloCplex(model);

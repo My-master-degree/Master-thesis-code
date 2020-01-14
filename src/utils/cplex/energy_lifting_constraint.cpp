@@ -12,10 +12,10 @@ void Energy_lifting_constraint::add () {
   IloExpr rhs (compact_model.env);
   IloConstraint c;
   //e_j \leq e_i - c_{ij} x_{ij}^k + \beta (1 - x_{ij}^k), \forall v_j \in C,\forall v_i \in V, \forall k \in M
-  for (unsigned int k = 0; k < compact_model.gvrp_instance.customers.size(); k++)
+  for (unsigned int k = 0; k < compact_model.gvrp_instance.customers.size(); k++) {
     for (Vertex customer : compact_model.gvrp_instance.customers) {
       int j = customer.id;
-      for (pair<int, Vertex> p :compact_model.all){
+      for (pair<int, Vertex> p :compact_model.all) {
         int i =  p.first;
         rhs = compact_model.e[i] - compact_model.x[k][i][j] * compact_model.gvrp_instance.distances[i][j] * compact_model.gvrp_instance.vehicleFuelConsumptionRate + compact_model.gvrp_instance.vehicleFuelCapacity * (1 - compact_model.x[k][i][j]) - (compact_model.gvrp_instance.vehicleFuelCapacity - compact_model.gvrp_instance.distances[j][i]) * compact_model.x[k][j][i];
         c = IloConstraint (compact_model.e[j] <= rhs);
@@ -26,4 +26,5 @@ void Energy_lifting_constraint::add () {
         rhs = IloExpr (compact_model.env);
       }
     }
+  }
 }

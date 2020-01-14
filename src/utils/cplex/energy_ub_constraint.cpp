@@ -14,16 +14,15 @@ void Energy_ub_constraint::add () {
   IloConstraint c;
   for (Vertex customer : compact_model.gvrp_instance.customers){
     int i = customer.id;
-    //min_{(j, i) \in E} c_{ji} = minFuel
-    double minFuel = DBL_MAX;
+    //min_{(j, i) \in E} c_{ji} = minEdge
+    double minEdge = DBL_MAX;
     for (pair <int, Vertex> p : compact_model.all) {
       int j = p.first;
       if (i != j)
-        minFuel = min (minFuel, compact_model.gvrp_instance.distances[i][j]);
+        minEdge = min (minEdge, compact_model.gvrp_instance.distances[i][j]);
     }
-    minFuel *= compact_model.gvrp_instance.vehicleFuelConsumptionRate;
-    //e_i \leqslant minFuel
-    c = IloConstraint (compact_model.e[i] <= minFuel);
+    //e_i \leqslant minEdge
+    c = IloConstraint (compact_model.e[i] <= compact_model.gvrp_instance.vehicleFuelCapacity - minEdge * compact_model.gvrp_instance.vehicleFuelConsumptionRate);
     c.setName("Eneergy level UB");
     compact_model.model.add(c);
     //clean

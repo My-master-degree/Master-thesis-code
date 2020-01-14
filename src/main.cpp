@@ -12,6 +12,7 @@
 #include "utils/cplex/energy_lb_constraint.hpp"
 #include "utils/cplex/energy_ub_constraint.hpp"
 #include "utils/cplex/energy_lifting_constraint.hpp"
+#include "utils/cplex/routes_order_constraint.hpp"
 #include "SampleConfig.h"
 
 #include <string>
@@ -27,15 +28,19 @@ using namespace utils::cplex;
 
 int main (int argc, char **argv)
 { 
-  unsigned int execution_time = 120;
+  unsigned int execution_time = 120,
+               nIntSol = -1;
   bool VERBOSE = false;  
   //getting params
   for (int i = 0; i < argc; i++)
     if (strcmp(argv[i], "-time") == 0)
       execution_time = stoi(argv[++i]);
-    else if (strcmp(argv[i], "-verbose") == 0)
-      if (strcmp(argv[++i], "true") == 0 ||  strcmp(argv[i], "1") == 0)
+    else if (strcmp(argv[i], "-verbose") == 0) {
+      if (strcmp(argv[++i], "true") == 0 ||  strcmp(argv[i], "1") == 0) {
         VERBOSE = true; 
+      }
+    } else if (strcmp(argv[i], "-nIntSol") == 0)
+      nIntSol = stoi(argv[++i]);
   //instance list
   string instances[] = {
     "S1_20c3sU1.txt",
@@ -97,12 +102,12 @@ int main (int argc, char **argv)
   for (auto instance : instances){
     //read instance
     Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_PATH + string("instances/") + instance);
-//*/
+/*
     //HERE BEGINS A NEW TEST INSTANCE
     cout<<fixed;
     cout<<setprecision(2);
     //  create new instance
-    int numCustomersAtDepot = 2,
+//    int numCustomersAtDepot = 2,
         numCustomersAtAfs = 2;
     set<int> firstLevelAfss;
     set<int> usedCustomers;
@@ -211,7 +216,7 @@ int main (int argc, char **argv)
       it->id = id++; 
     }
     //HERE ENDS A NEW TEST INSTANCE
-//*/
+*/
     cout<<instance<<endl;
 //    cout<<gvrp_instance<<endl;
     //settings
@@ -221,17 +226,19 @@ int main (int argc, char **argv)
     //custom settings
       //user cuts
     compact_model.user_constraints.push_back(new Subcycle_user_constraint_compact_model(compact_model));
-     //preprocessings
-   compact_model.preprocessings.push_back(new Invalid_edge_preprocessing(compact_model));
-     //extra constraints
-   compact_model.extra_constraints.push_back(new Max_distance_route_constraint(compact_model));
-   compact_model.extra_constraints.push_back(new Max_afs_visit_constraint(compact_model));
-   compact_model.extra_constraints.push_back(new Min_distance_route_constraint(compact_model, lambda));
-   compact_model.extra_constraints.push_back(new Energy_lb_constraint(compact_model));
-   compact_model.extra_constraints.push_back(new Energy_ub_constraint(compact_model));
-//   compact_model.extra_constraints.push_back(new Energy_lifting_constraint(compact_model));
+    //preprocessings
+    compact_model.preprocessings.push_back(new Invalid_edge_preprocessing(compact_model));
+    //extra constraints
+    compact_model.extra_constraints.push_back(new Max_distance_route_constraint(compact_model));
+    compact_model.extra_constraints.push_back(new Max_afs_visit_constraint(compact_model));
+    compact_model.extra_constraints.push_back(new Min_distance_route_constraint(compact_model, lambda));
+    compact_model.extra_constraints.push_back(new Energy_lb_constraint(compact_model));
+    compact_model.extra_constraints.push_back(new Energy_ub_constraint(compact_model));
+    compact_model.extra_constraints.push_back(new Energy_lifting_constraint(compact_model));
+    compact_model.extra_constraints.push_back(new Routes_order_constraint(compact_model));
     //custom settings
- //   compact_model.max_num_feasible_integer_sol = 1;
+    if (nIntSol > 0)
+      compact_model.max_num_feasible_integer_sol = nIntSol;
     compact_model.VERBOSE = VERBOSE;
     //run model
     Mip_solution_info mipSolInfo;
@@ -246,7 +253,7 @@ int main (int argc, char **argv)
     }
     cout<<mipSolInfo;
     resultsFile<<instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
-//    break;
+    break;
   }
   //write csv
   resultsFile.close(); 

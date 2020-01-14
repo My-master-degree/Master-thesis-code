@@ -187,10 +187,9 @@ void utils::remove_infeasible_customers(Gvrp_instance& gvrp_instance){
 }
 
 double utils::calculateGvrpInstanceLambdaFactor (const Gvrp_instance& gvrp_instance) {
-  //calculate lambda
-  double lambda;
   if (gvrp_instance.afss.size() > 0){
-    lambda = DBL_MAX;
+    //calculate lambda
+    double lambda = DBL_MAX;
     //F_0
     set<int> afssAndDepot;
     for (Vertex afs : gvrp_instance.afss)
