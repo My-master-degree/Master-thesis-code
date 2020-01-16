@@ -37,7 +37,7 @@ void Min_distance_route_constraint::add (){
     //rhs * \beta/2 + \lambda
     rhs = (rhs * compact_model.gvrp_instance.vehicleFuelCapacity / 2) + lambda;
     //lhs > rhs
-    c = IloConstraint (lhs >= rhs);
+    c = IloConstraint (lhs >= rhs + 1e-3);
     c.setName("route min distance");
     compact_model.model.add(c);
     //clean
