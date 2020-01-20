@@ -41,67 +41,16 @@ int main (int argc, char **argv)
       }
     } else if (strcmp(argv[i], "-nIntSol") == 0)
       nIntSol = stoi(argv[++i]);
-  //instance list
-  string instances[] = {
-    "S1_20c3sU1.txt",
-    "S1_20c3sU2.txt",
-    "S1_20c3sU3.txt",
-    "S1_20c3sU4.txt",
-    "S1_20c3sU5.txt",
-    "S1_20c3sU6.txt",
-    "S1_20c3sU7.txt",
-    "S1_20c3sU8.txt",
-    "S1_20c3sU9.txt",
-    "S1_20c3sU10.txt",
-    "S2_20c3sC1.txt",
-    "S2_20c3sC2.txt",
-    "S2_20c3sC3.txt",
-    "S2_20c3sC4.txt",
-    "S2_20c3sC5.txt",
-    "S2_20c3sC6.txt",
-    "S2_20c3sC7.txt",
-    "S2_20c3sC8.txt",
-    "S2_20c3sC9.txt",
-    "S2_20c3sC10.txt",
-    "S3_S1_2i6s.txt",
-    "S3_S1_4i6s.txt",
-    "S3_S1_6i6s.txt",
-    "S3_S1_8i6s.txt",
-    "S3_S2_10i6s.txt", 
-    "S3_S2_2i6s.txt",
-    "S3_S2_4i6s.txt",
-    "S3_S2_6i6s.txt",
-    "S3_S2_8i6s.txt",
-    "S3_S1_10i6s.txt",
-    "S4_S1_4i2s.txt",
-    "S4_S1_4i4s.txt",
-    "S4_S1_4i6s.txt",
-    "S4_S1_4i8s.txt",
-    "S4_S1_4i10s.txt",
-    "S4_S2_4i2s.txt",
-    "S4_S2_4i4s.txt",
-    "S4_S2_4i6s.txt",
-    "S4_S2_4i8s.txt",
-    "S4_S2_4i10s.txt",
-    "Large_VA_Input_111c_21s.txt",
-    "Large_VA_Input_111c_22s.txt",
-    "Large_VA_Input_111c_24s.txt",
-    "Large_VA_Input_111c_26s.txt",
-    "Large_VA_Input_111c_28s.txt",
-    "Large_VA_Input_200c_21s.txt",
-    "Large_VA_Input_300c_21s.txt",
-    "Large_VA_Input_350c_21s.txt",
-    "Large_VA_Input_400c_21s.txt",
-    "Large_VA_Input_450c_21s.txt",
-    "Large_VA_Input_500c_21s.txt",
-  };
 
+generate_new_gvrp_instances();
+  //instance list
+  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
   ofstream resultsFile;
   resultsFile.open ("results.csv");
   resultsFile<<"Instance, GAP, Cost, Time,Status"<<endl;
   for (auto instance : instances){
     //read instance
-    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_PATH + string("instances/") + instance);
+    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
 /*
     //HERE BEGINS A NEW TEST INSTANCE
     cout<<fixed;
@@ -244,7 +193,7 @@ int main (int argc, char **argv)
     Mip_solution_info mipSolInfo;
     try{
       pair<Gvrp_solution, Mip_solution_info > sol = compact_model.run();    
-      sol.first.write_in_file(PROJECT_PATH + string("solutions/") + instance + string(".sol"));
+      sol.first.write_in_file(PROJECT_INSTANCES_PATH + string("solutions/EMH/") + instance);
       mipSolInfo = sol.second;
     } catch (string s){
       cout<<"Error here:"<<s;

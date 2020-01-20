@@ -1,17 +1,25 @@
+#include "models/vertex.hpp"
+#include "models/vrp_instance.hpp"
 #include "models/gvrp_instance.hpp"
 #include "models/distances_enum.hpp"
 #include "utils/util.hpp"
 
 #include <float.h>
+#include <climits>
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
 #include <sstream>
 #include <string>
+#include <string.h>
 #include <cmath>
 #include <map>
 #include <set>
 #include <queue>
+#include <dirent.h>
+#include <sys/types.h>
+#include <list>
+#include "SampleConfig.h"
 
 using namespace models;
 
@@ -38,10 +46,8 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
          vehicleAverageSpeed;
   //read file
   inFile.open(file_path);
-  if (!inFile) {
-    cerr << "Unable to open file "<<file_path;
-    exit(1);   // call system to stop
-  }  
+  if (!inFile)
+    throw string("Unable to open file ") + string(file_path);
   //ignore header
   getline(inFile, line);
   //get depot
@@ -141,49 +147,10 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
       double a = pow(sin(dLat / 2), 2) + pow(sin(dLon / 2), 2) * cos(vertexes[i].y * M_PI / 180.0) * cos(vertexes[j].y * M_PI / 180.0); 
       double c = 2* atan2(sqrt(a), sqrt(1-a));
       distances[vertexes[i].id][vertexes[j].id] = radiusOfEarth * c;
+      //      distances[vertexes[i].id][vertexes[j].id] = sqrt(pow(vertexes[i].x - vertexes[j].x, 2) + pow(vertexes[i].y - vertexes[j].y, 2)); 
     }
   }
   return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
-}
-
-void utils::remove_infeasible_customers(Gvrp_instance& gvrp_instance){
-  if (gvrp_instance.distances_enum == METRIC){
-    //setup vars
-    map<int, Vertex> afss;
-    for (auto afs: gvrp_instance.afss)
-      afss[afs.id] = afs;
-    set<int> coveredAfss;
-    queue<int> q;
-    //bfs
-    q.push(gvrp_instance.depot.id);
-    while (!q.empty()){
-      int curr = q.front();
-      q.pop();
-      coveredAfss.insert(curr);
-      for (auto afs: gvrp_instance.afss)
-        //if afs is a valid afs
-        if (gvrp_instance.distances[curr][afs.id] * gvrp_instance.vehicleFuelConsumptionRate <= gvrp_instance.vehicleFuelCapacity && !coveredAfss.count(afs.id))
-          q.push(afs.id);          
-    }
-    //check feasible customers
-    for (auto it = gvrp_instance.customers.begin(); it != gvrp_instance.customers.end();){
-      Vertex* customer = &(*it);
-//      cout<<"Iterating over customer "<<customer->id<<endl;
-      bool feasibleCustomer = false;
-      for (auto coveredAfs : coveredAfss)
-        if (gvrp_instance.distances[customer->id][coveredAfs] * gvrp_instance.vehicleFuelConsumptionRate <= gvrp_instance.vehicleFuelCapacity / 2.0){
-          feasibleCustomer = true;
-          break;
-        }
-      if (gvrp_instance.distances[customer->id][gvrp_instance.depot.id] * gvrp_instance.vehicleFuelConsumptionRate > gvrp_instance.vehicleFuelCapacity / 2.0 && !feasibleCustomer){
-        
-//        cout<<"Customer "<<customer->id<<" removed"<<endl;
-        it = gvrp_instance.customers.erase(it);
-      }else
-        ++it;
-    }
-  }else
-    throw "It is not possible to remove infeasible customers from a non-metric instance.";
 }
 
 double utils::calculateGvrpInstanceLambdaFactor (const Gvrp_instance& gvrp_instance) {
@@ -203,4 +170,92 @@ double utils::calculateGvrpInstanceLambdaFactor (const Gvrp_instance& gvrp_insta
     return lambda;
   }
   return 0.0;  
+}
+
+list<string> utils::listFilesFromDir(string path) {
+  list<string> files;
+  struct dirent *entry;
+  DIR *dir = opendir(path.c_str());
+  if (dir == NULL) 
+    throw string("Error in accessing ") + path;
+  while ((entry = readdir(dir)) != NULL) 
+    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+      files.push_back (entry->d_name);
+  closedir(dir);
+  files.sort();
+  return files; 
+}
+
+void utils::generate_new_gvrp_instances () {
+  //
+  string uchoaInstancesDir = PROJECT_INSTANCES_PATH + string("UchoaEtAl/");
+  list<string> instances = utils::listFilesFromDir(uchoaInstancesDir);
+  for (string instance : instances) {
+    Vrp_instance vrp_instance = utils::read_uchoa_vrp_instance (uchoaInstancesDir + instance);
+
+  }
+}
+
+Vrp_instance utils::read_uchoa_vrp_instance (const string& file_path) {
+  int id = 0,
+      nVertexes;
+  string buff, 
+         x, 
+         y,
+         line;
+  ifstream inFile;
+  list<Vertex> vertexes;
+  stringstream ss;
+  //read file
+  inFile.open(file_path);
+  if (!inFile)
+    throw string("Unable to open file ") + string(file_path);
+  //ignore header
+  for (int i = 0; i < 4; i++)
+    getline(inFile, line);
+  //get # vertexes
+  ss.str(line);
+  //ignore text 
+  ss>>buff;
+  ss>>buff;
+  //get #
+  ss>>nVertexes;
+  ss.clear();
+  //ignore header
+  for (int i = 0; i < 3; i++)
+    getline(inFile, line);
+  //get vertexes 
+  for (int i = 0; i < nVertexes; i++) {
+    getline(inFile, line);
+    ss.str(line);
+    //ignore id
+    ss>>buff;
+    //get axis
+    ss>>x;
+    ss>>y;
+    vertexes.push_back(Vertex(id++, stod(x, NULL), stod(y, NULL)));
+  } 
+  //calculate distances
+  vector<vector<double> > distances(nVertexes);
+  int i = 0, j;
+  for (Vertex a : vertexes) {
+    distances[i] = vector<double> (nVertexes);
+    j = 0;
+    for (Vertex b : vertexes) {
+      distances[a.id][b.id] = distances[a.id][b.id] = sqrt (pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
+      j++;
+    }
+    i++;
+  }
+  //get depot
+  Vertex depot = Vertex(*vertexes.begin());
+  //    Vertex depot = Vertex (vertexes.begin()->id, vertexes.begin()->x, vertexes.begin()->y);
+  //remove header
+  vertexes.erase (vertexes.begin());
+  return Vrp_instance (vertexes, depot, distances, METRIC);
+} 
+
+list<list<Vertex*> > utils::getGvrpConnectedComponents (const Gvrp_instance& gvrp_instance) {
+  list<list<Vertex*>> components; 
+  return components;
 }

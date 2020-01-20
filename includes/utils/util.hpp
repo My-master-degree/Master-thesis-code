@@ -1,14 +1,21 @@
 #ifndef UTIL_HPP_
 #define UTIL_HPP_
 
-#include <string>
+#include "models/vertex.hpp"
+#include "models/vrp_instance.hpp"
 #include "models/gvrp_instance.hpp"
+
+#include <string>
+#include <list>
 
 using namespace models;
 
 namespace utils {
+  Vrp_instance read_uchoa_vrp_instance (const string &file_path);    
   Gvrp_instance erdogan_instance_reader(string file_path);
-  void remove_infeasible_customers(Gvrp_instance& gvrp_instance);
+  list<string> listFilesFromDir(string path);
+  void generate_new_gvrp_instances (); 
   double calculateGvrpInstanceLambdaFactor (const Gvrp_instance& gvrp_instance);
+  list<list<Vertex*> > getGvrpConnectedComponents (const Gvrp_instance& gvrp_instance);
 } 
 #endif

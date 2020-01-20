@@ -11,6 +11,7 @@
 
 #include <map>
 #include <list>
+#include <set>
 #include <ilcplex/ilocplex.h>
 
 ILOSTLBEGIN
@@ -40,6 +41,7 @@ namespace utils {
         IloEnv env;
         IloModel model;
         IDVertex all;
+        set<int> customers;
         Matrix3DVar x;
         IloNumVarArray e;
         int ub_edge_visit;

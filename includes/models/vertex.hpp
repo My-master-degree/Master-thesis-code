@@ -1,7 +1,6 @@
 #ifndef VERTEX_HPP_
 #define VERTEX_HPP_
 
-#include <string>
 #include <sstream>
 #include <iomanip>
 

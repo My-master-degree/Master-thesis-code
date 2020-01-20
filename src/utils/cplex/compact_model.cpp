@@ -29,9 +29,11 @@ using namespace utils::cplex;
 Compact_model::Compact_model(Gvrp_instance& _gvrp_instance, unsigned int _time_limit): 
   gvrp_instance(_gvrp_instance), time_limit(_time_limit), max_num_feasible_integer_sol(2100000000), VERBOSE(true) {
   ub_edge_visit = gvrp_instance.distances_enum == SYMMETRIC || gvrp_instance.distances_enum == METRIC ? 1 : gvrp_instance.customers.size() + 1; 
-  //fill all
-  for (Vertex customer : gvrp_instance.customers)
+  //fill all and customers
+  for (Vertex customer : gvrp_instance.customers) {
     all[customer.id] = customer;
+    customers.insert(customer.id);
+  }
   for (Vertex afs : gvrp_instance.afss) 
     all[afs.id] = afs;
   all[gvrp_instance.depot.id] = gvrp_instance.depot;
