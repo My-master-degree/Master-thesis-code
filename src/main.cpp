@@ -167,24 +167,29 @@ generate_new_gvrp_instances();
     //HERE ENDS A NEW TEST INSTANCE
 */
     cout<<instance<<endl;
+//    string csv_name = instance + string(".csv");
+//    gvrp_instance.write_in_csv (csv_name);
+//    cout<<gvrp_instance.distances[0][1]<<endl;
+//    cout<<getGvrpConnectedComponents (gvrp_instance).size()<<endl;
+
 //    cout<<gvrp_instance<<endl;
     //settings
     Compact_model compact_model(gvrp_instance, execution_time);
-    double lambda = calculateGvrpInstanceLambdaFactor (gvrp_instance);
+//    double lambda = calculateGvrpInstanceLambdaFactor (gvrp_instance);
 //    Improved_compact_model compact_model(gvrp_instance, execution_time);    
     //custom settings
       //user cuts
-    compact_model.user_constraints.push_back(new Subcycle_user_constraint_compact_model(compact_model));
+//    compact_model.user_constraints.push_back(new Subcycle_user_constraint_compact_model(compact_model));
     //preprocessings
-    compact_model.preprocessings.push_back(new Invalid_edge_preprocessing(compact_model));
-    //extra constraints
-    compact_model.extra_constraints.push_back(new Max_distance_route_constraint(compact_model));
-    compact_model.extra_constraints.push_back(new Max_afs_visit_constraint(compact_model));
-    compact_model.extra_constraints.push_back(new Min_distance_route_constraint(compact_model, lambda));
-    compact_model.extra_constraints.push_back(new Energy_lb_constraint(compact_model));
-    compact_model.extra_constraints.push_back(new Energy_ub_constraint(compact_model));
-    compact_model.extra_constraints.push_back(new Energy_lifting_constraint(compact_model));
-    compact_model.extra_constraints.push_back(new Routes_order_constraint(compact_model));
+//   compact_model.preprocessings.push_back(new Invalid_edge_preprocessing(compact_model));
+//   //extra constraints
+//   compact_model.extra_constraints.push_back(new Max_distance_route_constraint(compact_model));
+//   compact_model.extra_constraints.push_back(new Max_afs_visit_constraint(compact_model));
+//   compact_model.extra_constraints.push_back(new Min_distance_route_constraint(compact_model, lambda));
+//   compact_model.extra_constraints.push_back(new Energy_lb_constraint(compact_model));
+//   compact_model.extra_constraints.push_back(new Energy_ub_constraint(compact_model));
+//   compact_model.extra_constraints.push_back(new Energy_lifting_constraint(compact_model));
+//   compact_model.extra_constraints.push_back(new Routes_order_constraint(compact_model));
     //custom settings
     if (nIntSol > 0)
       compact_model.max_num_feasible_integer_sol = nIntSol;
@@ -202,7 +207,6 @@ generate_new_gvrp_instances();
     }
     cout<<mipSolInfo;
     resultsFile<<instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
-    break;
   }
   //write csv
   resultsFile.close(); 

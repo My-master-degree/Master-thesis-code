@@ -14,7 +14,7 @@ Gvrp_solution::Gvrp_solution(list<list<Vertex> > _routes, Gvrp_instance _gvrp_in
   routes(_routes), gvrp_instance(_gvrp_instance) {
 }
 
-void Gvrp_solution::write_in_file(string file_path){
+void Gvrp_solution::write_in_file(const string& file_path){
   ofstream solutionFile;
   solutionFile.open (file_path);
   solutionFile <<*this;

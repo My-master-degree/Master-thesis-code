@@ -16,6 +16,6 @@ namespace utils {
   list<string> listFilesFromDir(string path);
   void generate_new_gvrp_instances (); 
   double calculateGvrpInstanceLambdaFactor (const Gvrp_instance& gvrp_instance);
-  list<list<Vertex*> > getGvrpConnectedComponents (const Gvrp_instance& gvrp_instance);
+  list<list<Vertex> > getGvrpConnectedComponents (const Gvrp_instance& gvrp_instance);
 } 
 #endif

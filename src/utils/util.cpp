@@ -139,13 +139,20 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
     vertexes[j++] = *i;
   vector<vector<double> > distances(total_size);
   double radiusOfEarth = 4182.44949; // miles, 6371km; 
+//  double radiusOfEarth = 6373.0; // miles, 6371km; 
   for (int i = 0; i < total_size; i++){
     distances[i] = vector<double> (total_size);
     for (int j = 0; j < total_size; j++){
-      double dLat = (vertexes[j].y - vertexes[i].y) * M_PI / 180; 
-      double dLon = (vertexes[j].x - vertexes[i].x) * M_PI / 180; 
-      double a = pow(sin(dLat / 2), 2) + pow(sin(dLon / 2), 2) * cos(vertexes[i].y * M_PI / 180.0) * cos(vertexes[j].y * M_PI / 180.0); 
-      double c = 2* atan2(sqrt(a), sqrt(1-a));
+//      double PI = 4.0*atan(1.0);
+      double dLat1 = vertexes[i].y * (M_PI/180);
+      double dLat2 = vertexes[j].y * (M_PI/180);
+      double dLon1 = vertexes[i].x * (M_PI/180);
+      double dLon2 = vertexes[j].x * (M_PI/180);
+
+      double dLat = dLat1 - dLat2; 
+      double dLon = dLon1 - dLon2; 
+      double a = pow(sin(dLat / 2.0), 2.0) + pow(sin(dLon / 2.0), 2.0) * cos(dLat1) * cos(dLat2); 
+      double c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
       distances[vertexes[i].id][vertexes[j].id] = radiusOfEarth * c;
       //      distances[vertexes[i].id][vertexes[j].id] = sqrt(pow(vertexes[i].x - vertexes[j].x, 2) + pow(vertexes[i].y - vertexes[j].y, 2)); 
     }
@@ -255,48 +262,53 @@ Vrp_instance utils::read_uchoa_vrp_instance (const string& file_path) {
   return Vrp_instance (vertexes, depot, distances, METRIC);
 } 
 
-list<list<Vertex*> > utils::getGvrpConnectedComponents (const Gvrp_instance& gvrp_instance) {
+list<list<Vertex> > utils::getGvrpConnectedComponents (const Gvrp_instance& gvrp_instance) {
   //setup
-  list<list<Vertex*>> components; 
-//  set<int> visited,
-//           customers;
-// list<Vertex*> component;
-// queue<int> q;
-// map<int, double> phis;
-// double phi;
-// int curr,
-//     i;
-// vertex<double> fuels (gvrp_instance.customers.size() + gvrp_instance.afss.size() + 1, 0);
-// //get phi(i) = \beta - min_{(j, i) \in V} c_{ji}
-// for (const Vertex customer : gvrp_instance.customers){
-//  phi = INT_MAX; 
-//  i = customer.id;
-//  customers.insert(i);
-//  for (int j = 0; i < gvrp_instance.distances.size(); i++)
-//    if (i != j)
-//     phi = min (phi, gvrp_instance.distances[j][i]);
-//   phis[i] = phi * gvrp_instance.vehicleVehicleConsumptionRate;
-// }
-// //bfs
-// for (const Vertex customer : gvrp_instance.customers)
-//   if (!visited.count(customer.id)) {
-//     visited.insert(customer.id); 
-//     q.push(customer.id); 
-//     while (!q.empty()) {
-//       curr = q.front();
-//       q.pop();
-//       if (customers.count(curr)) {
-//         phi = phis[curr];
-//         for (int i = 0; i < gvrp_instance.distances.size(); i++) 
-//           if (i != gvrp_instance.depot.id)
-//             if (customers.count(i) && phi >= gvrp_instance.distances[curr][i] * gvrp_instance.vehicleVehicleConsumptionRate)
-//             if (phi >= gvrp_instance.distances[curr][i] * gvrp_instance.vehicleVehicleConsumptionRate)
-//             q.push(i);
-//       } else 
-//         for (int i = 0; i < gvrp_instance.distances.size(); i++) 
-//           if (i != gvrp_instance.depot.id && gvrp_instance.distances[curr][i] * gvrp_instance.vehicleVehicleConsumptionRate)
-//             q.push(i);
-//     }
-//   }
+  list<list<Vertex>> components; 
+  int nNodes = gvrp_instance.distances.size();
+  vector<bool> visited (nNodes, false);
+  vector<Vertex> all (nNodes);
+  set<int> customers;
+  list<Vertex> component;
+  queue<int> q;
+  double phi;
+  int curr,
+      j;
+  for (const Vertex& customer : gvrp_instance.customers) {
+    customers.insert(customer.id);
+    all[customer.id] = customer;
+  }
+  for (const Vertex& afs : gvrp_instance.afss)
+    all[afs.id] = afs;
+  //bfs
+  for (const Vertex& customer : gvrp_instance.customers) {
+    if (!visited[customer.id]) {
+      q.push(customer.id); 
+      visited[customer.id] = true;
+      while (!q.empty()) {
+        curr = q.front();
+        q.pop();
+        //get phi
+        if (customers.count(curr)) {
+          phi = DBL_MAX; 
+          for (j = 0; j < int(gvrp_instance.distances.size()); j++) 
+            if (curr != j)
+              phi = min (phi, gvrp_instance.distances[j][curr]);
+          phi = gvrp_instance.vehicleFuelCapacity - phi * gvrp_instance.vehicleFuelConsumptionRate;
+        } else 
+          phi = gvrp_instance.vehicleFuelCapacity;
+        //seve in the list
+        component.push_back(all[curr]);
+        //get neighboring
+        for (j = 0; j < int(gvrp_instance.distances.size()); j++) 
+          if (!visited[j] && j != gvrp_instance.depot.id && phi >= gvrp_instance.distances[curr][j] * gvrp_instance.vehicleFuelConsumptionRate) {
+            visited[j] = true;
+            q.push(j);
+          }
+      }
+      components.push_back(component);
+      component = list<Vertex> ();
+    }
+  }
   return components;
 }
