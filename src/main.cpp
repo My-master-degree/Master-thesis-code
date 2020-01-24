@@ -1,5 +1,6 @@
 #include "models/gvrp_instance.hpp"
 #include "models/gvrp_solution.hpp"
+#include "models/gvrp_feasible_solution_heuristic.hpp"
 #include "models/mip_solution_info.hpp"
 #include "utils/util.hpp"
 #include "utils/cplex/compact_model.hpp"
@@ -173,6 +174,8 @@ generate_new_gvrp_instances();
 //    cout<<getGvrpConnectedComponents (gvrp_instance).size()<<endl;
 
 //    cout<<gvrp_instance<<endl;
+//    Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (gvrp_instance);
+//    cout<<gvrp_feasible_solution_heuristic.run();
     //settings
     Compact_model compact_model(gvrp_instance, execution_time);
 //    double lambda = calculateGvrpInstanceLambdaFactor (gvrp_instance);
@@ -205,7 +208,7 @@ generate_new_gvrp_instances();
     } catch (Mip_solution_info excSolInfo){
       mipSolInfo = excSolInfo;
     }
-    cout<<mipSolInfo;
+   cout<<mipSolInfo;
     resultsFile<<instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
   }
   //write csv

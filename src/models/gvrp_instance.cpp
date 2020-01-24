@@ -38,6 +38,17 @@ void Gvrp_instance::write_in_csv(const string& file_path){
   instanceFile <<"ID;X;Y;Service Time"<<endl;
   for (const Vertex& afs: this->afss)
     instanceFile<<afs.id<<";"<<afs.x<<";"<<afs.y<<";"<<afs.serviceTime<<endl;
+  //distances matrix
+  instanceFile <<"Distance matrix:"<<endl;
+  for (int i = 0; i < int(this->distances.size()); i++)
+    instanceFile <<";"<<i;
+  instanceFile <<endl;
+  for (int i = 0; i < int(this->distances.size()); i++) {
+    instanceFile <<i;
+    for (int j = 0; j < int(this->distances.size()); j++) 
+      instanceFile <<";"<< int(this->distances[i][j]) << "."<<int(this->distances[i][j] * 100)%100;
+    instanceFile <<endl;
+  }
   //fuel matrix
   instanceFile <<"Fuel matrix:"<<endl;
   for (int i = 0; i < int(this->distances.size()); i++)
