@@ -57,6 +57,7 @@ pair<Gvrp_solution, Mip_solution_info> Compact_model::run(){
     if ( !cplex.solve() ) {
 //      env.error() << "Failed to optimize LP." << endl;
       mipSolInfo = Mip_solution_info(-1, cplex.getStatus(), -1, -1);
+      endVars();
       env.end();
       throw mipSolInfo;
     }
@@ -68,9 +69,10 @@ pair<Gvrp_solution, Mip_solution_info> Compact_model::run(){
 //    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
     mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), total_time, cplex.getObjValue());
+    endVars();
     env.end();
     return make_pair(*gvrp_solution, mipSolInfo);
-  }catch (IloException& e) {
+  } catch (IloException& e) {
     output_exception<<"Concert exception caught: " << e<<endl;
     throw output_exception.str();
   } catch (string s) {
@@ -139,7 +141,7 @@ void Compact_model::createObjectiveFunction() {
 }
 
 void Compact_model::createModel() {
-  try{
+  try {
     //preprocessing conditions
     for (Preprocessing_compact_model* preprocessing : preprocessings)
       preprocessing->add();
@@ -250,20 +252,20 @@ void Compact_model::createModel() {
         }
       }
     //\sum_{(i, j) \in E} x_{ij}^k ((c_{ij} / S) + time(v_i) )\leq T, \forall k \in M
-    for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++){
-      for (pair<int, Vertex> p : all){
-        int i = p.first;
-        for (pair<int, Vertex> p1 : all){
-          int j = p1.first;
-          expr += x[k][i][j] * ((gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed) + p.second.serviceTime);
-        }
-      }
-      c = IloConstraint (expr <= T);
-      c.setName("time limit constraint");
-      model.add(c);
-      expr.end();
-      expr = IloExpr(env);
-    }
+//    for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++){
+//     for (pair<int, Vertex> p : all){
+//       int i = p.first;
+//       for (pair<int, Vertex> p1 : all){
+//         int j = p1.first;
+//         expr += x[k][i][j] * ((gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed) + p.second.serviceTime);
+//       }
+//     }
+//     c = IloConstraint (expr <= T);
+//     c.setName("time limit constraint");
+//     model.add(c);
+//     expr.end();
+//     expr = IloExpr(env);
+//   }
     //extra constraints
     for (Extra_constraint_compact_model* extra_constraint : extra_constraints) 
       extra_constraint->add();
@@ -275,11 +277,17 @@ void Compact_model::createModel() {
     //user cuts
     for (User_constraint_compact_model* user_constraint : user_constraints)
       cplex.use(user_constraint);
+    //extra steps
+    extraStepsAfterModelCreation();
   } catch (IloException& e) {
     throw e;
   } catch (string s) {
     throw s;
   }
+}
+
+void Compact_model::extraStepsAfterModelCreation() {
+  //
 }
 
 Lazy_constraint_compact_model* Compact_model::separation_algorithm(){
@@ -405,3 +413,11 @@ void Compact_model::createGvrp_solution(){
   }
 }
 
+void Compact_model::endVars(){
+  for (int k = 0; k < int(gvrp_instance.customers.size()); k++) {
+    for (pair<int, Vertex> p : all)
+      x[k][p.first].end();
+    x[k].end();
+  }
+  e.end(); 
+}

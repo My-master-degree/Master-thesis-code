@@ -4,6 +4,7 @@
 #include "models/mip_solution_info.hpp"
 #include "utils/util.hpp"
 #include "utils/cplex/compact_model.hpp"
+#include "utils/cplex/mip_start_compact_model.hpp"
 #include "utils/cplex/improved_compact_model.hpp"
 #include "utils/cplex/subcycle_user_constraint_compact_model.hpp"
 #include "utils/cplex/invalid_edge_preprocessing.hpp"
@@ -21,6 +22,7 @@
 #include <set>
 #include <queue>
 #include <map>
+#include <typeinfo>
 
 using namespace std;
 using namespace models;
@@ -42,13 +44,13 @@ int main (int argc, char **argv)
       }
     } else if (strcmp(argv[i], "-nIntSol") == 0)
       nIntSol = stoi(argv[++i]);
-
-generate_new_gvrp_instances();
   //instance list
   list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
   ofstream resultsFile;
   resultsFile.open ("results.csv");
   resultsFile<<"Instance, GAP, Cost, Time,Status"<<endl;
+  Compact_model *complete_compact_model;
+  double lambda; 
   for (auto instance : instances){
     //read instance
     Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
@@ -167,22 +169,27 @@ generate_new_gvrp_instances();
     }
     //HERE ENDS A NEW TEST INSTANCE
 */
-    cout<<instance<<endl;
-//    string csv_name = instance + string(".csv");
-//    gvrp_instance.write_in_csv (csv_name);
-//    cout<<gvrp_instance.distances[0][1]<<endl;
-//    cout<<getGvrpConnectedComponents (gvrp_instance).size()<<endl;
-
-//    cout<<gvrp_instance<<endl;
-//    Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (gvrp_instance);
-//    cout<<gvrp_feasible_solution_heuristic.run();
     //settings
-    Compact_model compact_model(gvrp_instance, execution_time);
-//    double lambda = calculateGvrpInstanceLambdaFactor (gvrp_instance);
-//    Improved_compact_model compact_model(gvrp_instance, execution_time);    
-    //custom settings
-      //user cuts
-//    compact_model.user_constraints.push_back(new Subcycle_user_constraint_compact_model(compact_model));
+    lambda = calculateGvrpInstanceLambdaFactor (gvrp_instance);
+    Preprocessing_compact_model* preprocessings[] = {new Invalid_edge_preprocessing(compact_model)};
+    Extra_constraint_compact_model* extra_constraints[] = {
+      new Max_distance_route_constraint(compact_model),
+      new Max_afs_visit_constraint(compact_model),
+      new Min_distance_route_constraint(compact_model, lambda),
+      new Energy_lb_constraint(compact_model),
+      new Energy_ub_constraint(compact_model),
+      new Energy_lifting_constraint(compact_model),
+      new Routes_order_constraint(compact_model)
+    };
+    //user constraints
+    User_constraint_compact_model* user_constraints[] = {new Subcycle_user_constraint_compact_model(compact_model)};
+    for (const User_constraint_compact_model* user_constraint : user_constraints) {
+      Compact_model compact_model = Compact_model (gvrp_instance, execution_time);  
+      compact_model.user_constraints.push_back(user_constraint);
+    }
+    //extra constraints
+    //user cuts
+//    compact_model.user_constraints.push_back();
     //preprocessings
 //   compact_model.preprocessings.push_back(new Invalid_edge_preprocessing(compact_model));
 //   //extra constraints
@@ -194,6 +201,7 @@ generate_new_gvrp_instances();
 //   compact_model.extra_constraints.push_back(new Energy_lifting_constraint(compact_model));
 //   compact_model.extra_constraints.push_back(new Routes_order_constraint(compact_model));
     //custom settings
+    /*
     if (nIntSol > 0)
       compact_model.max_num_feasible_integer_sol = nIntSol;
     compact_model.VERBOSE = VERBOSE;
@@ -210,6 +218,7 @@ generate_new_gvrp_instances();
     }
    cout<<mipSolInfo;
     resultsFile<<instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
+    */
   }
   //write csv
   resultsFile.close(); 

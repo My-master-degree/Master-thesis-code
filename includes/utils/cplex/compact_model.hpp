@@ -48,16 +48,18 @@ namespace utils {
         list<User_constraint_compact_model*> user_constraints;
         list<Preprocessing_compact_model*> preprocessings;
         list<Extra_constraint_compact_model*> extra_constraints;
-    private:
+    protected:
         IloCplex cplex;
         Matrix3DVal x_vals;
         Lazy_constraint_compact_model* separation_algorithm();
         void createVariables();
         void createObjectiveFunction();
         void createModel();
+        virtual void extraStepsAfterModelCreation();
         void setCustomParameters();
         void fillX_vals();
         void createGvrp_solution();
+        void endVars();
     };
 
   } 
