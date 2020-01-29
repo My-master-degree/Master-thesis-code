@@ -70,6 +70,19 @@ int main (int argc, char **argv)
     i++;
   }
     //executions
+      //model only
+  solution_name = "model_only_";
+  i = 0;
+  auto gvrp_instance = gvrp_instances.begin();
+  for (const string& instance : instances) {
+    cout<<instance<<endl;
+    Compact_model compact_model (*gvrp_instance, execution_time);  
+    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
+    gvrp_instance++;
+    i++;
+  }
+  /*
       //user constraints
   solution_name = "subcycle_user_constraint_";
   i = 0;
@@ -200,6 +213,7 @@ int main (int argc, char **argv)
     gvrp_instance++;
     i++;
   }
+  */
   //write csv
   resultsFile.close(); 
   return 0;
@@ -210,7 +224,7 @@ void execute_model(Compact_model& compact_model, const string& instance_name, st
     compact_model.max_num_feasible_integer_sol = nIntSol;
     compact_model.VERBOSE = VERBOSE;
     pair<Gvrp_solution, Mip_solution_info > sol = compact_model.run();    
-    sol.first.write_in_file(PROJECT_INSTANCES_PATH + string("solutions/EMH/") + string(prefix_solution_files)  + instance_name);
+    sol.first.write_in_file(PROJECT_SOLUTIONS_PATH + string("EMH/") + string(prefix_solution_files)  + instance_name);
     mipSolInfo = sol.second;
   } catch (string s){
     cout<<"Error:"<<s;

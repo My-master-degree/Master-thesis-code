@@ -1,0 +1,8 @@
+Route 1: 0 8 14 10 3 12 6 5 0 (cost: 340.345) (time: 11.7586)
+Route 2: 0 3 13 15 11 0 (cost: 350.954) (time: 10.5238)
+Total cost: 691.299
+Infeasibilities found:
+Route 1: Does not respect the time constraint
+Customer 4is missing
+Customer 7is missing
+Customer 9is missing

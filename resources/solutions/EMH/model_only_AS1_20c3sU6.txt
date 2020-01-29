@@ -1,0 +1,12 @@
+Route 1: 0 7 15 20 1 0 (cost: 368.748) (time: 10.9687)
+Route 2: 0 11 2 22 2 0 (cost: 615.527) (time: 16.8882)
+Route 3: 0 21 10 3 19 23 18 1 9 5 3 8 12 6 0 (cost: 1121.37) (time: 33.7843)
+Route 4: 0 14 0 (cost: 51.9264) (time: 1.79816)
+Route 5: 0 13 16 1 2 0 (cost: 551.909) (time: 15.2977)
+Route 6: 0 1 2 4 17 1 0 (cost: 630.969) (time: 17.5242)
+Total cost: 3340.45
+Infeasibilities found:
+Route 2: Does not respect the time constraint
+Route 3: Does not respect the time constraint
+Route 5: Does not respect the time constraint
+Route 6: Does not respect the time constraint
