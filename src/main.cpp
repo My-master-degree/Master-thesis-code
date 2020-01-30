@@ -59,7 +59,10 @@ int main (int argc, char **argv)
   resultsFile.open ("results.csv");
   resultsFile<<"Instance,Solution,GAP,Cost,Time,Status"<<endl;
     //instance list
-  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
+//  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
+  list<string> instances;
+//  instances.push_back(string("AS2_20c3sC3.txt"));
+  instances.push_back(string("AS1_20c3sU1.txt"));
   list<Gvrp_instance> gvrp_instances;
   vector<double> lambdas (instances.size());
   int i = 0;

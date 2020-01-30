@@ -354,28 +354,27 @@ void Compact_model::fillX_vals(){
 }
 
 void Compact_model::createGvrp_solution(){
-
   //print x vals
-//  for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++){
-//    //columns
-//    cout<<" ";
-//   for (auto p : all){
-//     if (p.first <= 9)
-//       cout<<" ";
-//     cout<<" "<<p.first;
-//   }
-//   cout<<endl;
-//   //content
-//   for (auto p : all){
-//     cout<<p.first;
-//     if (p.first <= 9)
-//       cout<<" ";
-//     for (auto p1 : all){
-//       cout<<" "<<int(x_vals[k][p.first][p1.first])<<" ";
-//     }
-//     cout<<endl;
-//   }
-// }
+  for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++) {
+    //columns
+    cout<<" ";
+    for (auto p : all){
+      if (p.first <= 9)
+        cout<<" ";
+      cout<<" "<<p.first;
+    }
+    cout<<endl;
+    //content
+    for (auto p : all){
+      cout<<p.first;
+      if (p.first <= 9)
+        cout<<" ";
+      for (auto p1 : all){
+        cout<<" "<<int(x_vals[k][p.first][p1.first])<<" ";
+      }
+      cout<<endl;
+    }
+  }
   try{
     list<list<Vertex> > routes;
     //dfs
@@ -387,6 +386,8 @@ void Compact_model::createGvrp_solution(){
       next = depot;
       //checking if the route is used
       //get remaining nodes (if exists)
+      set<int> routeAfssSet;
+      queue<int> routeAfss;
       list<Vertex> route;
       route.push_back(all[curr]);
       do {
@@ -394,6 +395,10 @@ void Compact_model::createGvrp_solution(){
         for (auto it  = all.rbegin(); it != all.rend(); ++it){
           int i = it->first;
           if (x_vals[k][curr][i] > 0){
+            if (!customers.count(i) && i != depot && !routeAfssSet.count(i)) {
+              routeAfssSet.insert(i);
+              routeAfss.push(i);
+            }
             next = i;    
             break;
           }
@@ -402,6 +407,45 @@ void Compact_model::createGvrp_solution(){
         x_vals[k][curr][next]--;
         curr = next;
       } while (curr != depot);
+      //get remainig neighboring in AFSs
+      //use queue here
+      while (!routeAfss.empty()) {
+        int afs = routeAfss.front();
+        routeAfss.pop();
+        //while has path
+        cout<<"trying to get paths from "<<afs<<endl;
+        while (true) {
+          bool hasPath = false;
+          //dfs
+          list<Vertex> partial_route;
+          curr = afs;
+          next = afs;
+          do {
+            //get new neighborhood
+            for (auto it = all.rbegin(); it != all.rend(); ++it) {
+              int i = it->first;
+              if (x_vals[k][curr][i] > 0) {
+                //check if i is an afs
+                if (!customers.count(i) && i != depot)
+                  routeAfss.push(i);
+                hasPath = true;
+                next = i;    
+                break;
+              }
+            }
+            partial_route.push_back(all[next]);
+            x_vals[k][curr][next]--;
+            curr = next;
+          } while (curr != afs);
+          if (!hasPath)
+            break;
+          //find pointer
+          auto it = route.begin();
+          for (; it->id != afs; it++);
+          it--;
+          route.splice(it, partial_route);
+        }
+      }
       if (route.size() > 2)
         routes.push_back(route);
     }
