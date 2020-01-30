@@ -354,6 +354,7 @@ void Compact_model::fillX_vals(){
 }
 
 void Compact_model::createGvrp_solution(){
+  /*
   //print x vals
   for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++) {
     //columns
@@ -375,6 +376,7 @@ void Compact_model::createGvrp_solution(){
       cout<<endl;
     }
   }
+  */
   try{
     list<list<Vertex> > routes;
     //dfs
@@ -413,7 +415,6 @@ void Compact_model::createGvrp_solution(){
         int afs = routeAfss.front();
         routeAfss.pop();
         //while has path
-        cout<<"trying to get paths from "<<afs<<endl;
         while (true) {
           bool hasPath = false;
           //dfs
