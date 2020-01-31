@@ -421,7 +421,8 @@ void Compact_model::createGvrp_solution(){
           list<Vertex> partial_route;
           curr = afs;
           next = afs;
-          do {
+          partial_route.push_back(all[curr]);
+          while (true) {
             //get new neighborhood
             for (auto it = all.rbegin(); it != all.rend(); ++it) {
               int i = it->first;
@@ -434,16 +435,17 @@ void Compact_model::createGvrp_solution(){
                 break;
               }
             }
-            partial_route.push_back(all[next]);
             x_vals[k][curr][next]--;
+            if (next == afs)
+              break;
+            partial_route.push_back(all[next]);
             curr = next;
-          } while (curr != afs);
+          }
           if (!hasPath)
             break;
           //find pointer
           auto it = route.begin();
           for (; it->id != afs; it++);
-          it--;
           route.splice(it, partial_route);
         }
       }
