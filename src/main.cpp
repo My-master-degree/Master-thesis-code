@@ -72,6 +72,7 @@ int main (int argc, char **argv)
     //executions
       //model only
   solution_name = "model_only_";
+  cout<<solution_name<<endl;
   i = 0;
   auto gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {

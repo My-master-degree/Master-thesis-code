@@ -466,5 +466,6 @@ void Compact_model::endVars(){
       x[k][p.first].end();
     x[k].end();
   }
+  x.end();
   e.end(); 
 }
