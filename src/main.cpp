@@ -8,6 +8,7 @@
 #include "utils/cplex/improved_compact_model.hpp"
 #include "utils/cplex/subcycle_user_constraint_compact_model.hpp"
 #include "utils/cplex/invalid_edge_preprocessing.hpp"
+#include "utils/cplex/invalid_edge_preprocessing_2.hpp"
 #include "utils/cplex/max_afs_visit_constraint.hpp"
 #include "utils/cplex/max_distance_route_constraint.hpp"
 #include "utils/cplex/min_distance_route_constraint.hpp"
@@ -32,6 +33,9 @@ using namespace utils::cplex;
 
 void execute_model(Compact_model& compact_model, const string& instance_name, string& prefix_solution_files, unsigned int nIntSol, bool VERBOSE, Mip_solution_info& mipSolInfo);
 
+void openResultFile (ofstream& file, string fileName);
+void closeResultFile (ofstream& file);
+
 int main (int argc, char **argv)
 { 
   unsigned int execution_time = 120,
@@ -54,10 +58,6 @@ int main (int argc, char **argv)
     //setup
   string solution_name;
   Mip_solution_info mipSolInfo;
-    //end results file
-  ofstream resultsFile;
-  resultsFile.open ("results.csv");
-  resultsFile<<"Instance,Solution,GAP,Cost,Time,Status"<<endl;
     //instance list
   list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
   list<Gvrp_instance> gvrp_instances;
@@ -70,24 +70,25 @@ int main (int argc, char **argv)
     i++;
   }
     //executions
+  auto gvrp_instance = gvrp_instances.begin();
+  ofstream resultsFile;
       //model only
   solution_name = "model_only_";
-  cout<<solution_name<<endl;
+  openResultFile(resultsFile, solution_name);
   i = 0;
-  auto gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
-    cout<<instance<<endl;
     Compact_model compact_model (*gvrp_instance, execution_time);  
     execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
   }
-  /*
+  closeResultFile(resultsFile);
       //user constraints
   solution_name = "subcycle_user_constraint_";
+  openResultFile(resultsFile, solution_name);
   i = 0;
-  auto gvrp_instance = gvrp_instances.begin();
+  gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
     Compact_model compact_model (*gvrp_instance, execution_time);  
     compact_model.user_constraints.push_back(new Subcycle_user_constraint_compact_model(compact_model));
@@ -96,8 +97,11 @@ int main (int argc, char **argv)
     gvrp_instance++;
     i++;
   }
+  closeResultFile(resultsFile);
     //preprocessings
+      //invalid edge preprocessing 
   solution_name = "invalid_edge_preprocesing_";
+  openResultFile(resultsFile, solution_name);
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
@@ -109,8 +113,26 @@ int main (int argc, char **argv)
     gvrp_instance++;
     i++;
   }
+  closeResultFile(resultsFile);
+      //invalid edge preprocessing 2
+  solution_name = "invalid_edge_preprocesing_2";
+  openResultFile(resultsFile, solution_name);
+  i = 0;
+  gvrp_instance = gvrp_instances.begin();
+  for (const string& instance : instances) {
+    Compact_model compact_model (*gvrp_instance, execution_time);  
+    compact_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(compact_model));
+;
+    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
+    gvrp_instance++;
+    i++;
+    break;
+  }
+  closeResultFile(resultsFile);
     //extra constraints
   solution_name = "max_distance_route_constraint_";
+  openResultFile(resultsFile, solution_name);
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
@@ -122,7 +144,9 @@ int main (int argc, char **argv)
     gvrp_instance++;
     i++;
   }
+  closeResultFile(resultsFile);
   solution_name = "max_afs_visit_constraint_";
+  openResultFile(resultsFile, solution_name);
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
@@ -134,7 +158,9 @@ int main (int argc, char **argv)
     gvrp_instance++;
     i++;
   }
+  closeResultFile(resultsFile);
   solution_name = "min_distance_route_constraint_";
+  openResultFile(resultsFile, solution_name);
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
@@ -146,7 +172,9 @@ int main (int argc, char **argv)
     gvrp_instance++;
     i++;
   }
+  closeResultFile(resultsFile);
   solution_name = "energy_lb_constraint_";
+  openResultFile(resultsFile, solution_name);
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
@@ -158,7 +186,9 @@ int main (int argc, char **argv)
     gvrp_instance++;
     i++;
   }
+  closeResultFile(resultsFile);
   solution_name = "energy_ub_constraint_";
+  openResultFile(resultsFile, solution_name);
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
@@ -170,7 +200,9 @@ int main (int argc, char **argv)
     gvrp_instance++;
     i++;
   }
+  closeResultFile(resultsFile);
   solution_name = "energy_lifting_constraint_";
+  openResultFile(resultsFile, solution_name);
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
@@ -182,7 +214,9 @@ int main (int argc, char **argv)
     gvrp_instance++;
     i++;
   }
+  closeResultFile(resultsFile);
   solution_name = "routes_order_constraint_";
+  openResultFile(resultsFile, solution_name);
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
@@ -194,7 +228,9 @@ int main (int argc, char **argv)
     gvrp_instance++;
     i++;
   }
+  closeResultFile(resultsFile);
   solution_name = "all_";
+  openResultFile(resultsFile, solution_name);
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
@@ -214,9 +250,7 @@ int main (int argc, char **argv)
     gvrp_instance++;
     i++;
   }
-  */
-  //write csv
-  resultsFile.close(); 
+  closeResultFile(resultsFile);
   return 0;
 }
 
@@ -232,4 +266,14 @@ void execute_model(Compact_model& compact_model, const string& instance_name, st
   } catch (const Mip_solution_info& excSolInfo){
     mipSolInfo = excSolInfo;
   }
+}
+
+void openResultFile (ofstream& resultsFile, string fileName) {
+  resultsFile.open (fileName + string("results.csv"));
+  resultsFile<<"Instance,Solution,GAP,Cost,Time,Status"<<endl;
+}
+
+void closeResultFile (ofstream& resultsFile) {
+  resultsFile.close();
+  resultsFile.clear();
 }

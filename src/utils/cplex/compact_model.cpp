@@ -253,19 +253,19 @@ void Compact_model::createModel() {
       }
     //\sum_{(i, j) \in E} x_{ij}^k ((c_{ij} / S) + time(v_i) )\leq T, \forall k \in M
 //    for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++){
-//     for (pair<int, Vertex> p : all){
-//       int i = p.first;
-//       for (pair<int, Vertex> p1 : all){
-//         int j = p1.first;
-//         expr += x[k][i][j] * ((gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed) + p.second.serviceTime);
-//       }
-//     }
-//     c = IloConstraint (expr <= T);
-//     c.setName("time limit constraint");
-//     model.add(c);
-//     expr.end();
-//     expr = IloExpr(env);
-//   }
+//    for (pair<int, Vertex> p : all){
+//      int i = p.first;
+//      for (pair<int, Vertex> p1 : all){
+//        int j = p1.first;
+//        expr += x[k][i][j] * ((gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed) + p.second.serviceTime);
+//      }
+//    }
+//    c = IloConstraint (expr <= T);
+//    c.setName("time limit constraint");
+//    model.add(c);
+//    expr.end();
+//    expr = IloExpr(env);
+//  }
     //extra constraints
     for (Extra_constraint_compact_model* extra_constraint : extra_constraints) 
       extra_constraint->add();
@@ -301,12 +301,12 @@ void Compact_model::setCustomParameters(){
     //DOUBTS:
     // Turn off the presolve reductions and set the CPLEX optimizer
     // to solve the worker LP with primal simplex method.
-    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 0);
-    cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal); 
+//    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 0);
+//    cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal); 
     //preprocesing setting
-    cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
+//    cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
     // Turn on traditional search for use with control callbacks
-    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
+//    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
     //:DOUBTS
     //LAZY CONSTRAINTS
     //thread safe setting
