@@ -38,6 +38,7 @@ namespace utils {
         unsigned int time_limit;//seconds
         unsigned int max_num_feasible_integer_sol;//0 to 2100000000
         bool VERBOSE;
+        bool ALLOW_SUBCYCLE_USER_CUT;
         IloEnv env;
         IloModel model;
         IDVertex all;

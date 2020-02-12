@@ -49,11 +49,12 @@ namespace models{
                  time = it->serviceTime;
           if (curr != depot)
             infeasibilities<<"Route "<<i<<": Does not start at depot"<<endl;
-          else if (customers.count(curr))
+          else if (customers.count(curr)) {
             if (servedCustomers.count(curr))
               infeasibilities<<"Route "<<i<<": Repeats the customer "<<curr<<endl;
             else
               servedCustomers.insert(curr);
+          }
           //for each vertex
           for (int i = 0; i < route.size() - 1; i++){
             it++;

@@ -330,3 +330,40 @@ map<int, double> utils::calculateCustomersEnergyUB (Compact_model& compact_model
   }
   return customersEnergyUBs;
 }
+
+void utils::gvrpDijkstra (vector<Vertex>& f0, vector<int>& pred, vector<double>& costs, Gvrp_instance& gvrp_instance) {
+  if (gvrp_instance.distances_enum != METRIC)
+    throw string("The algorithm 'Gvrp Dijkstra' only works for METRIC instances.");
+  size_t size = f0.size();
+  if (pred.size() < size) {
+    stringstream ss;
+    ss<<"The pred vector requires at least "<<size<<" of length";
+    throw ss.str();
+  }
+  if (costs.size() < size) {
+    stringstream ss;
+    ss<<"The costs vector requires at least "<<size<<" of length";
+    throw ss.str();
+  }
+  int curr,
+      f;
+  double cost;
+  for (f = 0; f < size; f++) 
+    pred[f] = f;
+  costs.assign(size, DBL_MAX);
+  queue<int> q;
+  q.push(0);
+  costs[0] = 0.0;
+  while (!q.empty()) {
+    curr = q.front();
+    q.pop();
+    for (f = 0; f < size; f++) {
+      cost = gvrp_instance.distances[f0[curr].id][f0[f].id];
+      if (cost * gvrp_instance.vehicleFuelConsumptionRate <= gvrp_instance.vehicleFuelCapacity && costs[curr] + cost < costs[f]) {
+        costs[f] = costs[curr] + cost;
+        pred[f] = curr;
+        q.push(f);
+      }
+    }
+  }
+}

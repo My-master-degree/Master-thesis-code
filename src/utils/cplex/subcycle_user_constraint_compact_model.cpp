@@ -17,9 +17,12 @@ IloCplex::CallbackI* Subcycle_user_constraint_compact_model::duplicateCallback()
 }
 
 void Subcycle_user_constraint_compact_model::main() {
+  if (!compact_model.ALLOW_SUBCYCLE_USER_CUT)
+    return;
   int depot = compact_model.gvrp_instance.depot.id;
   IloEnv env = getEnv();
   IloExpr lhs(env);
+  bool infeasibilityFound = false;
   //get values
   Matrix3DVal x_vals (env, compact_model.gvrp_instance.customers.size());
   for (unsigned int k = 0; k < compact_model.gvrp_instance.customers.size(); k++) {
@@ -57,6 +60,7 @@ void Subcycle_user_constraint_compact_model::main() {
       //checking if bfs is needed
       if (!hasNeighboring)
         continue;
+      infeasibilityFound = true;
       q.push(customer.id);
       while (!q.empty()) {
         int curr = q.front();
@@ -98,4 +102,5 @@ void Subcycle_user_constraint_compact_model::main() {
     }
   }
   x_vals.end();
+  compact_model.ALLOW_SUBCYCLE_USER_CUT = infeasibilityFound;
 }

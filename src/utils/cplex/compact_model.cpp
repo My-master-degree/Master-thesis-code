@@ -27,8 +27,9 @@ using namespace models;
 using namespace utils::cplex;
 
 Compact_model::Compact_model(Gvrp_instance& _gvrp_instance, unsigned int _time_limit): 
-  gvrp_instance(_gvrp_instance), time_limit(_time_limit), max_num_feasible_integer_sol(2100000000), VERBOSE(true) {
-  ub_edge_visit = gvrp_instance.distances_enum == SYMMETRIC || gvrp_instance.distances_enum == METRIC ? 1 : gvrp_instance.customers.size() + 1; 
+  gvrp_instance(_gvrp_instance), time_limit(_time_limit), max_num_feasible_integer_sol(2100000000), VERBOSE(true), ALLOW_SUBCYCLE_USER_CUT(true), ub_edge_visit(1) {
+  if (gvrp_instance.distances_enum != SYMMETRIC && gvrp_instance.distances_enum != METRIC)
+    throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
   //fill all and customers
   for (Vertex customer : gvrp_instance.customers) {
     all[customer.id] = customer;
@@ -40,6 +41,8 @@ Compact_model::Compact_model(Gvrp_instance& _gvrp_instance, unsigned int _time_l
 }
 
 pair<Gvrp_solution, Mip_solution_info> Compact_model::run(){
+  if (gvrp_instance.distances_enum != SYMMETRIC && gvrp_instance.distances_enum != METRIC)
+    throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
   //setup
   stringstream output_exception;
   Mip_solution_info mipSolInfo;
@@ -213,7 +216,7 @@ void Compact_model::createModel() {
     for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
       for (Vertex customer : gvrp_instance.customers) {
         int j = customer.id;
-        for (pair<int, Vertex> p :all){
+        for (pair<int, Vertex> p :all) {
           int i =  p.first;
           expr = e[i] - x[k][i][j] * gvrp_instance.distances[i][j] * gvrp_instance.vehicleFuelConsumptionRate + beta * (1 -  x[k][i][j]);
           c = IloConstraint (e[j] <= expr);
@@ -252,20 +255,20 @@ void Compact_model::createModel() {
         }
       }
     //\sum_{(i, j) \in E} x_{ij}^k ((c_{ij} / S) + time(v_i) )\leq T, \forall k \in M
-//    for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++){
-//    for (pair<int, Vertex> p : all){
-//      int i = p.first;
-//      for (pair<int, Vertex> p1 : all){
-//        int j = p1.first;
-//        expr += x[k][i][j] * ((gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed) + p.second.serviceTime);
-//      }
-//    }
-//    c = IloConstraint (expr <= T);
-//    c.setName("time limit constraint");
-//    model.add(c);
-//    expr.end();
-//    expr = IloExpr(env);
-//  }
+    for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++){
+    for (pair<int, Vertex> p : all){
+      int i = p.first;
+      for (pair<int, Vertex> p1 : all){
+        int j = p1.first;
+        expr += x[k][i][j] * ((gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed) + p.second.serviceTime);
+      }
+    }
+    c = IloConstraint (expr <= T);
+    c.setName("time limit constraint");
+    model.add(c);
+    expr.end();
+    expr = IloExpr(env);
+  }
     //extra constraints
     for (Extra_constraint_compact_model* extra_constraint : extra_constraints) 
       extra_constraint->add();
@@ -301,12 +304,13 @@ void Compact_model::setCustomParameters(){
     //DOUBTS:
     // Turn off the presolve reductions and set the CPLEX optimizer
     // to solve the worker LP with primal simplex method.
-//    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 0);
-//    cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal); 
+    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
+    cplex.setParam(IloCplex::Param::Preprocessing::Symmetry, 0);
+    cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal); 
     //preprocesing setting
-//    cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
+    cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
     // Turn on traditional search for use with control callbacks
-//    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
+    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
     //:DOUBTS
     //LAZY CONSTRAINTS
     //thread safe setting

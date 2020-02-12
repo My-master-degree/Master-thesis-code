@@ -52,7 +52,8 @@ void Mip_start_compact_model::extraStepsAfterModelCreation () {
       k++;
     }
     //mip start
-    IloCplex::MIPStartEffort effort = IloCplex::MIPStartSolveFixed;
+    IloCplex::MIPStartEffort effort = IloCplex::MIPStartRepair;
+    cplex.setParam(IloCplex::Param::MIP::Limits::RepairTries, 10000);
     cplex.addMIPStart (e, e_vals, effort);
     for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
       for (pair<int, Vertex> p : all) {
