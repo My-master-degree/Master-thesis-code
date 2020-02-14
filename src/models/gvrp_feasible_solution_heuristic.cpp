@@ -23,11 +23,7 @@ Gvrp_solution Gvrp_feasible_solution_heuristic::run () {
     throw string("The heuristic 'Feasible Solution' only works for METRIC instances.");
   //create induced graph
   int size = gvrp_instance.afss.size() + 1;
-  vector<Vertex> f0;
-  f0.reserve(size);
-  f0.push_back(gvrp_instance.depot);
-  for (const Vertex& afs : gvrp_instance.afss)
-    f0.push_back(afs);
+  vector<Vertex> f0 = utils::createF0Set (gvrp_instace);
   //dijkstra
   vector<int> pred (size);
   vector<double> costs (size);

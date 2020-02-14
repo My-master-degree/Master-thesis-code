@@ -331,6 +331,16 @@ map<int, double> utils::calculateCustomersEnergyUB (Compact_model& compact_model
   return customersEnergyUBs;
 }
 
+vector<Vertex> utils::createF0Set (Gvrp_instance& gvrp_instance) {
+  int size = gvrp_instance.afss.size() + 1;
+  vector<Vertex> f0;
+  f0.reserve(size);
+  f0.push_back(gvrp_instance.depot);
+  for (const Vertex& afs : gvrp_instance.afss)
+    f0.push_back(afs);
+  return f0;
+}
+
 void utils::gvrpDijkstra (vector<Vertex>& f0, vector<int>& pred, vector<double>& costs, Gvrp_instance& gvrp_instance) {
   if (gvrp_instance.distances_enum != METRIC)
     throw string("The algorithm 'Gvrp Dijkstra' only works for METRIC instances.");

@@ -310,7 +310,7 @@ void Compact_model::setCustomParameters(){
     //preprocesing setting
     cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
     // Turn on traditional search for use with control callbacks
-    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
+//    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
     //:DOUBTS
     //LAZY CONSTRAINTS
     //thread safe setting

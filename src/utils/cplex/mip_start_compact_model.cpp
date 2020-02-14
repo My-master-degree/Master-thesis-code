@@ -52,20 +52,31 @@ void Mip_start_compact_model::extraStepsAfterModelCreation () {
       k++;
     }
     //mip start
-    IloCplex::MIPStartEffort effort = IloCplex::MIPStartRepair;
-    cplex.setParam(IloCplex::Param::MIP::Limits::RepairTries, 10000);
-    cplex.addMIPStart (e, e_vals, effort);
+//    IloCplex::MIPStartEffort effort = IloCplex::MIPStartCheckFeas;
+    IloNumVarArray startVar(env);
+    IloNumArray startVal(env);
+    for (pair<int, Vertex> p : all) {
+      startVar.add(e[p.first]);
+      startVal.add(e_vals[p.first]);
+    }
     for (unsigned int k = 0; k < gvrp_instance.customers.size(); k++)
       for (pair<int, Vertex> p : all) {
         int i = p.first;
-        cplex.addMIPStart (x[k][i], x_vals[k][i], effort);
+        for (pair<int, Vertex> p1 : all) {
+          int j = p1.first;
+          startVar.add(x[k][i][j]);
+          startVal.add(x_vals[k][i][j]);
+        }
       }
+    cplex.addMIPStart (startVar, startVal, effort);
     //clean vals
     for (unsigned int k = 0; k < gvrp_instance.customers.size(); x_vals[k++].end()) 
       for (pair<int, Vertex> p : all)
         x_vals[k][p.first].end();
     x_vals.end();
     e_vals.end();
+    startVar.end();
+    startVal.end();
   } catch (IloException& e) {
     throw e;
   } catch (string& s) {
