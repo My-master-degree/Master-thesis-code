@@ -341,7 +341,7 @@ vector<Vertex> utils::createF0Set (Gvrp_instance& gvrp_instance) {
   return f0;
 }
 
-void utils::gvrpDijkstra (vector<Vertex>& f0, vector<int>& pred, vector<double>& costs, Gvrp_instance& gvrp_instance) {
+void utils::gvrpDijkstra (vector<Vertex>& f0, vector<size_t>& pred, vector<double>& costs, Gvrp_instance& gvrp_instance) {
   if (gvrp_instance.distances_enum != METRIC)
     throw string("The algorithm 'Gvrp Dijkstra' only works for METRIC instances.");
   size_t size = f0.size();
@@ -355,7 +355,7 @@ void utils::gvrpDijkstra (vector<Vertex>& f0, vector<int>& pred, vector<double>&
     ss<<"The costs vector requires at least "<<size<<" of length";
     throw ss.str();
   }
-  int curr,
+  size_t curr,
       f;
   double cost;
   for (f = 0; f < size; f++) 

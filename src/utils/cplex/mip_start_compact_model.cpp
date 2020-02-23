@@ -68,7 +68,7 @@ void Mip_start_compact_model::extraStepsAfterModelCreation () {
           startVal.add(x_vals[k][i][j]);
         }
       }
-    cplex.addMIPStart (startVar, startVal, effort);
+    cplex.addMIPStart (startVar, startVal);
     //clean vals
     for (unsigned int k = 0; k < gvrp_instance.customers.size(); x_vals[k++].end()) 
       for (pair<int, Vertex> p : all)

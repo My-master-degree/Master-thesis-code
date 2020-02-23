@@ -9,6 +9,8 @@
 #include "utils/cplex/subcycle_user_constraint_compact_model.hpp"
 #include "utils/cplex/invalid_edge_preprocessing.hpp"
 #include "utils/cplex/invalid_edge_preprocessing_2.hpp"
+#include "utils/cplex/invalid_edge_preprocessing_3.hpp"
+#include "utils/cplex/invalid_edge_preprocessing_4.hpp"
 #include "utils/cplex/no_consecutive_afs_visit_preprocessing.hpp"
 #include "utils/cplex/max_afs_visit_constraint.hpp"
 #include "utils/cplex/max_distance_route_constraint.hpp"
@@ -245,12 +247,13 @@ int main (int argc, char **argv)
     Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (*gvrp_instance);
     Gvrp_solution gvrp_solution = gvrp_feasible_solution_heuristic.run();
     Mip_start_compact_model compact_model (*gvrp_instance, execution_time, gvrp_solution);  
-    /*
     //frac cuts
     compact_model.user_constraints.push_back(new Subcycle_user_constraint_compact_model(compact_model));
     //preprocessings
     compact_model.preprocessings.push_back(new Invalid_edge_preprocessing(compact_model));
     compact_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(compact_model));
+    compact_model.preprocessings.push_back(new Invalid_edge_preprocessing_3(compact_model));
+    compact_model.preprocessings.push_back(new Invalid_edge_preprocessing_4(compact_model));
     compact_model.preprocessings.push_back(new No_consecutive_afs_visit_preprocessing(compact_model));
     //extra constraints
     compact_model.extra_constraints.push_back(new Max_distance_route_constraint(compact_model));
@@ -260,7 +263,6 @@ int main (int argc, char **argv)
     compact_model.extra_constraints.push_back(new Energy_ub_constraint(compact_model));
     compact_model.extra_constraints.push_back(new Energy_lifting_constraint(compact_model));
     compact_model.extra_constraints.push_back(new Routes_order_constraint(compact_model));
-    */
 ;
     execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;

@@ -12,6 +12,7 @@
 #include <queue>
 
 using namespace models;
+using namespace utils;
 
 Gvrp_feasible_solution_heuristic::Gvrp_feasible_solution_heuristic (Gvrp_instance& gvrp_instance) : Gvrp_heuristic (gvrp_instance) {
   if (gvrp_instance.distances_enum != METRIC)
@@ -22,38 +23,38 @@ Gvrp_solution Gvrp_feasible_solution_heuristic::run () {
   if (gvrp_instance.distances_enum != METRIC)
     throw string("The heuristic 'Feasible Solution' only works for METRIC instances.");
   //create induced graph
-  int size = gvrp_instance.afss.size() + 1;
-  vector<Vertex> f0 = utils::createF0Set (gvrp_instace);
+  vector<Vertex> f0 = utils::createF0Set (gvrp_instance);
+  size_t sf0 = f0.size(),
+         r,
+         f;
   //dijkstra
-  vector<int> pred (size);
-  vector<double> costs (size);
+  vector<size_t> pred (sf0);
+  vector<double> costs (sf0);
   utils::gvrpDijkstra(f0, pred, costs, gvrp_instance);
   //build spanning tree
-  int r, f;
-  double fuel,
-          bestAfssFuel;
-  Vertex * v_f, 
-          * v_r;
+  double routeCost,
+         distance,
+          bestAfssCost;
   list<list<Vertex> > routes;
   list<Vertex> route;  
   for (const Vertex& customer : gvrp_instance.customers) {
-    //arg\ min_{v_f, v_r \in F_0 : c_{fi} + c_{ir} \leqslant \beta} {\pi_f + c_{fi} + \pi_r + c_{ir}}
+    //arg\ min_{f0[f], f0[r] \in F_0 : c_{fi} + c_{ir} \leqslant \beta} {\pi_f + c_{fi} + \pi_r + c_{ir}}
     pair<int, int> bestAfss = make_pair(-1, -1);
-    bestAfssFuel = DBL_MAX;
-    for (f = 0; f < size; f++) {
-      v_f = &f0[f];
-      for (r = 0; r < size; r++) {
-        v_r = &f0[r];
-        //if the afss f and r are connected 
-        if ((v_f->id == gvrp_instance.depot.id || pred[f] != f) && (v_r->id == gvrp_instance.depot.id || pred[r] != r)) {
-          fuel = (gvrp_instance.distances[v_f->id][customer.id] + gvrp_instance.distances[customer.id][v_r->id]) * gvrp_instance.vehicleFuelConsumptionRate;
-          if (fuel <= gvrp_instance.vehicleFuelCapacity && (costs[f] + costs[r]) * gvrp_instance.vehicleFuelConsumptionRate + fuel < bestAfssFuel) {
-            bestAfssFuel = (costs[f] + costs[r]) * gvrp_instance.vehicleFuelConsumptionRate + fuel; 
-            bestAfss = make_pair(f, r);
+    bestAfssCost = DBL_MAX;
+    for (f = 0; f < sf0; f++) 
+      if (f0[f].id == gvrp_instance.depot.id || pred[f] != f)
+        for (r = 0; r < sf0; r++) 
+          //if the afss f and r are connected 
+          if (f0[r].id == gvrp_instance.depot.id || pred[r] != r) {
+            distance = gvrp_instance.distances[f0[f].id][customer.id] + gvrp_instance.distances[customer.id][f0[r].id];
+            if (distance * gvrp_instance.vehicleFuelConsumptionRate <= gvrp_instance.vehicleFuelCapacity) {
+              routeCost = costs[f] + distance + costs[r] ;
+              if (routeCost/gvrp_instance.vehicleAverageSpeed <= gvrp_instance.timeLimit && routeCost < bestAfssCost) {
+                bestAfssCost = routeCost; 
+                bestAfss = make_pair(f, r);
+              }
+            }
           }
-        }
-      }    
-    }
     //get route
     if (bestAfss.first >= 0) {
       //way

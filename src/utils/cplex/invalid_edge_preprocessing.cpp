@@ -11,7 +11,7 @@ void Invalid_edge_preprocessing::add () {
     int i = p.first;
     for (pair<int, Vertex> p1 : compact_model.all){
       int j = p1.first;
-      if (compact_model.gvrp_instance.distances[i][j] * compact_model.gvrp_instance.vehicleFuelConsumptionRate > compact_model.gvrp_instance.vehicleFuelCapacity)
+      if (compact_model.gvrp_instance.distances[i][j] * compact_model.gvrp_instance.vehicleFuelConsumptionRate > compact_model.gvrp_instance.vehicleFuelCapacity || compact_model.gvrp_instance.distances[i][j] / compact_model.gvrp_instance.vehicleAverageSpeed > compact_model.gvrp_instance.timeLimit)
         for (unsigned int k = 0; k < compact_model.gvrp_instance.customers.size(); k++)
           compact_model.model.add(compact_model.x[k][i][j] == 0);
     }

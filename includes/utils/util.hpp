@@ -24,7 +24,7 @@ namespace utils {
   double calculateGvrpInstanceLambdaFactor (const Gvrp_instance& gvrp_instance);
   list<list<Vertex> > getGvrpConnectedComponents (const Gvrp_instance& gvrp_instance);
   map<int, double> calculateCustomersEnergyUB (Compact_model& gvrp_instance);
-  void gvrpDijkstra (vector<Vertex>& f0, vector<int>& pred, vector<double>& costs, Gvrp_instance& gvrp_instance);
+  void gvrpDijkstra (vector<Vertex>& f0, vector<size_t>& pred, vector<double>& costs, Gvrp_instance& gvrp_instance);
   vector<Vertex> createF0Set (Gvrp_instance& gvrp_instance);
 } 
 #endif
