@@ -6,9 +6,18 @@
 #include <queue>
 #include <list>
 #include <ilcplex/ilocplex.h>
+/*
+#include <lemon/gomory_hu.h>
+#include <lemon/concepts/graph.h>
+#include <lemon/list_graph.h>
+*/
 
 using namespace std;
 using namespace utils::cplex;
+/*
+using namespace lemon;
+using namespace lemon::concepts;
+*/
 
 Subcycle_user_constraint_compact_model::Subcycle_user_constraint_compact_model (Compact_model& compact_model_) : User_constraint_compact_model (compact_model_) {}
 
@@ -19,22 +28,50 @@ IloCplex::CallbackI* Subcycle_user_constraint_compact_model::duplicateCallback()
 void Subcycle_user_constraint_compact_model::main() {
   if (!compact_model.ALLOW_SUBCYCLE_USER_CUT)
     return;
-  int depot = compact_model.gvrp_instance.depot.id;
+  int depot = compact_model.gvrp_instance.depot.id,
+      i,
+      j;
   IloEnv env = getEnv();
   IloExpr lhs(env);
   bool infeasibilityFound = false;
+//  vector<ListGraph::Node> nodes (all.size());
+  size_t k;
   //get values
   Matrix3DVal x_vals (env, compact_model.gvrp_instance.customers.size());
-  for (unsigned int k = 0; k < compact_model.gvrp_instance.customers.size(); k++) {
+  for (k = 0; k < compact_model.gvrp_instance.customers.size(); k++) {
     x_vals[k] = IloArray<IloNumArray> (env, compact_model.all.size());
-    for (pair<int, Vertex> p : compact_model.all) {
-      int i = p.first;
+    for (const pair<int, Vertex>& p : compact_model.all) {
+      i = p.first;
       x_vals[k][i] = IloNumArray (env, compact_model.all.size(), 0, compact_model.ub_edge_visit, IloNumVar::Float);
       getValues(x_vals[k][i], compact_model.x[k][i]);
     }
   }
   //get subcycles
-  for (int k = 0; k < int(compact_model.gvrp_instance.customers.size()); k++) {
+  for (k = 0; k < compact_model.gvrp_instance.customers.size(); k++) {
+    /*
+    //gomory hu
+    ListGraph graph;
+    ListGraph::EdgeMap<double>  weight(graph); 
+    //creating nodes
+    for (const pair<int, Vertex>& p : compact_model.all) 
+      nodes[p.first] = graph.addNode();
+    //creating edges
+    for (const pair<int, Vertex>& p : compact_model.all) {
+      i = p.first;
+      for (const pair<int, Vertex>& p1 : compact_model.all) {
+        j = p1.first;
+        weight[graph.addEdge(nodes[i], nodes[j])] = x_vals[k][i][j];
+      }
+    }
+    GomoryHu<ListGraph, ListGraph::EdgeMap<double> > gh (graph, weight);
+    gh.run();
+    //get subcycles
+    for (int i : compact_model.customers) {
+    if (gh.minCutValue(nodes[i], nodes[0]) < 2.0) {
+
+    }
+    }
+    */
     //bfs to remove all edges connected to the depot
     queue<int> q;
     q.push(depot);
