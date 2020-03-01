@@ -19,7 +19,7 @@ using namespace lemon;
 using namespace lemon::concepts;
 */
 
-Subcycle_user_constraint_compact_model::Subcycle_user_constraint_compact_model (Compact_model& compact_model_) : User_constraint_compact_model (compact_model_) {}
+Subcer_constraint_compact_model::Subcycle_user_constraint_compact_model (Compact_model& compact_model_) : User_constraint_compact_model (compact_model_) {}
 
 IloCplex::CallbackI* Subcycle_user_constraint_compact_model::duplicateCallback() const {
   return new(getEnv()) Subcycle_user_constraint_compact_model (*this);
