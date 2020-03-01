@@ -3,7 +3,7 @@
 #include "models/gvrp_instance.hpp"
 #include "models/distances_enum.hpp"
 #include "utils/util.hpp"
-#include "utils/cplex/compact_model.hpp"
+#include "models/cubic_model/cubic_model.hpp"
 
 #include <float.h>
 #include <climits>
@@ -23,7 +23,7 @@
 #include "SampleConfig.h"
 
 using namespace models;
-using namespace utils::cplex;
+using namespace models::cubic_model;
 
 Gvrp_instance utils::erdogan_instance_reader(string file_path){
   double time_customer = 0.5,
@@ -315,18 +315,18 @@ list<list<Vertex> > utils::getGvrpConnectedComponents (const Gvrp_instance& gvrp
   return components;
 }
 
-map<int, double> utils::calculateCustomersEnergyUB (Compact_model& compact_model) {
+map<int, double> utils::calculateCustomersEnergyUB (Cubic_model& cubic_model) {
   map<int, double> customersEnergyUBs;
-  for (Vertex customer : compact_model.gvrp_instance.customers){
+  for (Vertex customer : cubic_model.gvrp_instance.customers){
     int i = customer.id;
     //min_{(j, i) \in E} c_{ji} = minEdge
     double minEdge = DBL_MAX;
-    for (pair <int, Vertex> p : compact_model.all) {
+    for (pair <int, Vertex> p : cubic_model.all) {
       int j = p.first;
       if (i != j)
-        minEdge = min (minEdge, compact_model.gvrp_instance.distances[i][j]);
+        minEdge = min (minEdge, cubic_model.gvrp_instance.distances[i][j]);
     }
-    customersEnergyUBs[i] = compact_model.gvrp_instance.vehicleFuelCapacity - minEdge * compact_model.gvrp_instance.vehicleFuelConsumptionRate;
+    customersEnergyUBs[i] = cubic_model.gvrp_instance.vehicleFuelCapacity - minEdge * cubic_model.gvrp_instance.vehicleFuelConsumptionRate;
   }
   return customersEnergyUBs;
 }

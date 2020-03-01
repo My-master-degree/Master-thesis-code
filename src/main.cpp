@@ -3,23 +3,23 @@
 #include "models/gvrp_feasible_solution_heuristic.hpp"
 #include "models/mip_solution_info.hpp"
 #include "utils/util.hpp"
-#include "utils/cplex/compact_model.hpp"
-#include "utils/cplex/mip_start_compact_model.hpp"
-#include "utils/cplex/improved_compact_model.hpp"
-#include "utils/cplex/subcycle_user_constraint_compact_model.hpp"
-#include "utils/cplex/invalid_edge_preprocessing.hpp"
-#include "utils/cplex/invalid_edge_preprocessing_2.hpp"
-#include "utils/cplex/invalid_edge_preprocessing_3.hpp"
-#include "utils/cplex/invalid_edge_preprocessing_4.hpp"
-#include "utils/cplex/no_consecutive_afs_visit_preprocessing.hpp"
-#include "utils/cplex/max_afs_visit_constraint.hpp"
-#include "utils/cplex/max_distance_route_constraint.hpp"
-#include "utils/cplex/min_distance_route_constraint.hpp"
-#include "utils/cplex/energy_lb_constraint.hpp"
-#include "utils/cplex/energy_ub_constraint.hpp"
-#include "utils/cplex/energy_lifting_constraint.hpp"
-#include "utils/cplex/routes_order_constraint.hpp"
-#include "utils/cplex/custom_test_constraint.hpp"
+#include "models/cubic_model/cubic_model.hpp"
+#include "models/cubic_model/mip_start_cubic_model.hpp"
+#include "models/cubic_model/improved_cubic_model.hpp"
+#include "models/cubic_model/subcycle_user_constraint_cubic_model.hpp"
+#include "models/cubic_model/invalid_edge_preprocessing.hpp"
+#include "models/cubic_model/invalid_edge_preprocessing_2.hpp"
+#include "models/cubic_model/invalid_edge_preprocessing_3.hpp"
+#include "models/cubic_model/invalid_edge_preprocessing_4.hpp"
+#include "models/cubic_model/no_consecutive_afs_visit_preprocessing.hpp"
+#include "models/cubic_model/max_afs_visit_constraint.hpp"
+#include "models/cubic_model/max_distance_route_constraint.hpp"
+#include "models/cubic_model/min_distance_route_constraint.hpp"
+#include "models/cubic_model/energy_lb_constraint.hpp"
+#include "models/cubic_model/energy_ub_constraint.hpp"
+#include "models/cubic_model/energy_lifting_constraint.hpp"
+#include "models/cubic_model/routes_order_constraint.hpp"
+#include "models/cubic_model/custom_test_constraint.hpp"
 #include "SampleConfig.h"
 
 #include <string>
@@ -32,10 +32,10 @@
 using namespace std;
 using namespace models;
 using namespace utils;
-using namespace utils::cplex;
+using namespace models::cubic_model;
 
 
-void execute_model(Compact_model& compact_model, const string& instance_name, string& prefix_solution_files, unsigned int nIntSol, bool VERBOSE, Mip_solution_info& mipSolInfo);
+void execute_model(Cubic_model& cubic_model, const string& instance_name, string& prefix_solution_files, unsigned int nIntSol, bool VERBOSE, Mip_solution_info& mipSolInfo);
 
 void openResultFile (ofstream& file, string fileName);
 void closeResultFile (ofstream& file);
@@ -82,8 +82,8 @@ int main (int argc, char **argv)
   openResultFile(resultsFile, solution_name);
   i = 0;
   for (const string& instance : instances) {
-    Compact_model compact_model (*gvrp_instance, execution_time);  
-    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    Cubic_model cubic_model (*gvrp_instance, execution_time);  
+    execute_model(cubic_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
@@ -97,9 +97,9 @@ int main (int argc, char **argv)
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
     cout<<instance<<endl;
-    Compact_model compact_model (*gvrp_instance, execution_time);  
-    compact_model.user_constraints.push_back(new Subcycle_user_constraint_compact_model(compact_model));
-    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    Cubic_model cubic_model (*gvrp_instance, execution_time);  
+    cubic_model.user_constraints.push_back(new Subcycle_user_constraint_cubic_model(cubic_model));
+    execute_model(cubic_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
@@ -112,10 +112,10 @@ int main (int argc, char **argv)
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
-    Compact_model compact_model (*gvrp_instance, execution_time);  
-    compact_model.preprocessings.push_back(new Invalid_edge_preprocessing(compact_model));
+    Cubic_model cubic_model (*gvrp_instance, execution_time);  
+    cubic_model.preprocessings.push_back(new Invalid_edge_preprocessing(cubic_model));
 ;
-    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    execute_model(cubic_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
@@ -127,10 +127,10 @@ int main (int argc, char **argv)
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
-    Compact_model compact_model (*gvrp_instance, execution_time);  
-    compact_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(compact_model));
+    Cubic_model cubic_model (*gvrp_instance, execution_time);  
+    cubic_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(cubic_model));
 ;
-    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    execute_model(cubic_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
@@ -143,10 +143,10 @@ int main (int argc, char **argv)
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
-    Compact_model compact_model (*gvrp_instance, execution_time);  
-    compact_model.extra_constraints.push_back(new Max_distance_route_constraint(compact_model));
+    Cubic_model cubic_model (*gvrp_instance, execution_time);  
+    cubic_model.extra_constraints.push_back(new Max_distance_route_constraint(cubic_model));
 ;
-    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    execute_model(cubic_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
@@ -157,10 +157,10 @@ int main (int argc, char **argv)
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
-    Compact_model compact_model (*gvrp_instance, execution_time);  
-    compact_model.extra_constraints.push_back(new Max_afs_visit_constraint(compact_model));
+    Cubic_model cubic_model (*gvrp_instance, execution_time);  
+    cubic_model.extra_constraints.push_back(new Max_afs_visit_constraint(cubic_model));
 ;
-    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    execute_model(cubic_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
@@ -171,10 +171,10 @@ int main (int argc, char **argv)
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
-    Compact_model compact_model (*gvrp_instance, execution_time);  
-    compact_model.extra_constraints.push_back(new Min_distance_route_constraint(compact_model, lambdas[i]));
+    Cubic_model cubic_model (*gvrp_instance, execution_time);  
+    cubic_model.extra_constraints.push_back(new Min_distance_route_constraint(cubic_model, lambdas[i]));
 ;
-    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    execute_model(cubic_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
@@ -185,10 +185,10 @@ int main (int argc, char **argv)
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
-    Compact_model compact_model (*gvrp_instance, execution_time);  
-    compact_model.extra_constraints.push_back(new Energy_lb_constraint(compact_model));
+    Cubic_model cubic_model (*gvrp_instance, execution_time);  
+    cubic_model.extra_constraints.push_back(new Energy_lb_constraint(cubic_model));
 ;
-    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    execute_model(cubic_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
@@ -199,10 +199,10 @@ int main (int argc, char **argv)
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
-    Compact_model compact_model (*gvrp_instance, execution_time);  
-    compact_model.extra_constraints.push_back(new Energy_ub_constraint(compact_model));
+    Cubic_model cubic_model (*gvrp_instance, execution_time);  
+    cubic_model.extra_constraints.push_back(new Energy_ub_constraint(cubic_model));
 ;
-    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    execute_model(cubic_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
@@ -213,10 +213,10 @@ int main (int argc, char **argv)
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
-    Compact_model compact_model (*gvrp_instance, execution_time);  
-    compact_model.extra_constraints.push_back(new Energy_lifting_constraint(compact_model));
+    Cubic_model cubic_model (*gvrp_instance, execution_time);  
+    cubic_model.extra_constraints.push_back(new Energy_lifting_constraint(cubic_model));
 ;
-    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    execute_model(cubic_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
@@ -227,10 +227,10 @@ int main (int argc, char **argv)
   i = 0;
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
-    Compact_model compact_model (*gvrp_instance, execution_time);  
-    compact_model.extra_constraints.push_back(new Routes_order_constraint(compact_model));
+    Cubic_model cubic_model (*gvrp_instance, execution_time);  
+    cubic_model.extra_constraints.push_back(new Routes_order_constraint(cubic_model));
 ;
-    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    execute_model(cubic_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
@@ -243,28 +243,28 @@ int main (int argc, char **argv)
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
     cout<<instance<<endl;
-//    Compact_model compact_model (*gvrp_instance, execution_time);  
+//    Cubic_model cubic_model (*gvrp_instance, execution_time);  
     Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (*gvrp_instance);
     Gvrp_solution gvrp_solution = gvrp_feasible_solution_heuristic.run();
-    Mip_start_compact_model compact_model (*gvrp_instance, execution_time, gvrp_solution);  
+    Mip_start_cubic_model cubic_model (*gvrp_instance, execution_time, gvrp_solution);  
     //frac cuts
-    compact_model.user_constraints.push_back(new Subcycle_user_constraint_compact_model(compact_model));
+    cubic_model.user_constraints.push_back(new Subcycle_user_constraint_cubic_model(cubic_model));
     //preprocessings
-    compact_model.preprocessings.push_back(new Invalid_edge_preprocessing(compact_model));
-    compact_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(compact_model));
-    compact_model.preprocessings.push_back(new Invalid_edge_preprocessing_3(compact_model));
-    compact_model.preprocessings.push_back(new Invalid_edge_preprocessing_4(compact_model));
-    compact_model.preprocessings.push_back(new No_consecutive_afs_visit_preprocessing(compact_model));
+    cubic_model.preprocessings.push_back(new Invalid_edge_preprocessing(cubic_model));
+    cubic_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(cubic_model));
+    cubic_model.preprocessings.push_back(new Invalid_edge_preprocessing_3(cubic_model));
+    cubic_model.preprocessings.push_back(new Invalid_edge_preprocessing_4(cubic_model));
+    cubic_model.preprocessings.push_back(new No_consecutive_afs_visit_preprocessing(cubic_model));
     //extra constraints
-    compact_model.extra_constraints.push_back(new Max_distance_route_constraint(compact_model));
-    compact_model.extra_constraints.push_back(new Max_afs_visit_constraint(compact_model));
-    compact_model.extra_constraints.push_back(new Min_distance_route_constraint(compact_model, lambdas[i]));
-    compact_model.extra_constraints.push_back(new Energy_lb_constraint(compact_model));
-    compact_model.extra_constraints.push_back(new Energy_ub_constraint(compact_model));
-    compact_model.extra_constraints.push_back(new Energy_lifting_constraint(compact_model));
-    compact_model.extra_constraints.push_back(new Routes_order_constraint(compact_model));
+    cubic_model.extra_constraints.push_back(new Max_distance_route_constraint(cubic_model));
+    cubic_model.extra_constraints.push_back(new Max_afs_visit_constraint(cubic_model));
+    cubic_model.extra_constraints.push_back(new Min_distance_route_constraint(cubic_model, lambdas[i]));
+    cubic_model.extra_constraints.push_back(new Energy_lb_constraint(cubic_model));
+    cubic_model.extra_constraints.push_back(new Energy_ub_constraint(cubic_model));
+    cubic_model.extra_constraints.push_back(new Energy_lifting_constraint(cubic_model));
+    cubic_model.extra_constraints.push_back(new Routes_order_constraint(cubic_model));
 ;
-    execute_model(compact_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+    execute_model(cubic_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
@@ -273,11 +273,11 @@ int main (int argc, char **argv)
   return 0;
 }
 
-void execute_model(Compact_model& compact_model, const string& instance_name, string& prefix_solution_files, unsigned int nIntSol, bool VERBOSE, Mip_solution_info& mipSolInfo) {
+void execute_model(Cubic_model& cubic_model, const string& instance_name, string& prefix_solution_files, unsigned int nIntSol, bool VERBOSE, Mip_solution_info& mipSolInfo) {
   try {
-    compact_model.max_num_feasible_integer_sol = nIntSol;
-    compact_model.VERBOSE = VERBOSE;
-    pair<Gvrp_solution, Mip_solution_info > sol = compact_model.run();    
+    cubic_model.max_num_feasible_integer_sol = nIntSol;
+    cubic_model.VERBOSE = VERBOSE;
+    pair<Gvrp_solution, Mip_solution_info > sol = cubic_model.run();    
     sol.first.write_in_file(PROJECT_SOLUTIONS_PATH + string("EMH/") + string(prefix_solution_files)  + instance_name);
     mipSolInfo = sol.second;
   } catch (string s){
