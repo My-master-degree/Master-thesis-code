@@ -3,6 +3,7 @@
 #include "models/gvrp_solution.hpp"
 #include "models/distances_enum.hpp"
 #include "models/mip_solution_info.hpp"
+#include "models/gvrp_model.hpp"
 #include "models/cubic_model/cubic_model.hpp"
 #include "models/cubic_model/subcycle_lazy_constraint_cubic_model.hpp"
 #include "models/cubic_model/lazy_constraint_cubic_model.hpp"
@@ -26,8 +27,7 @@ using namespace std;
 using namespace models;
 using namespace models::cubic_model;
 
-Cubic_model::Cubic_model(Gvrp_instance& _gvrp_instance, unsigned int _time_limit): 
-  gvrp_instance(_gvrp_instance), time_limit(_time_limit), max_num_feasible_integer_sol(2100000000), VERBOSE(true), ALLOW_SUBCYCLE_USER_CUT(true), ub_edge_visit(1) {
+Cubic_model::Cubic_model(Gvrp_instance& gvrp_instance, unsigned int time_limit): Gvrp_model(gvrp_instance, time_limit), ALLOW_SUBCYCLE_USER_CUT(true), ub_edge_visit(1) {
   if (gvrp_instance.distances_enum != SYMMETRIC && gvrp_instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
   //fill all and customers
