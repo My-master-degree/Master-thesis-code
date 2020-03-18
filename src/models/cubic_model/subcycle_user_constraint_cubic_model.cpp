@@ -29,16 +29,16 @@ void Subcycle_user_constraint_cubic_model::main() {
   if (!cubic_model.ALLOW_SUBCYCLE_USER_CUT)
     return;
   int depot = cubic_model.gvrp_instance.depot.id,
-      i;
+      i,
+      k;
 //  int j;
   IloEnv env = getEnv();
   IloExpr lhs(env);
   bool infeasibilityFound = false;
 //  vector<ListGraph::Node> nodes (all.size());
-  size_t k;
   //get values
-  Matrix3DVal x_vals (env, cubic_model.gvrp_instance.customers.size());
-  for (k = 0; k < cubic_model.gvrp_instance.customers.size(); k++) {
+  Matrix3DVal x_vals (env, cubic_model.gvrp_instance.nRoutes);
+  for (k = 0; k < cubic_model.gvrp_instance.nRoutes; k++) {
     x_vals[k] = IloArray<IloNumArray> (env, cubic_model.all.size());
     for (const pair<int, Vertex>& p : cubic_model.all) {
       i = p.first;
@@ -47,7 +47,7 @@ void Subcycle_user_constraint_cubic_model::main() {
     }
   }
   //get subcycles
-  for (k = 0; k < cubic_model.gvrp_instance.customers.size(); k++) {
+  for (k = 0; k < cubic_model.gvrp_instance.nRoutes; k++) {
     /*
     //gomory hu
     ListGraph graph;

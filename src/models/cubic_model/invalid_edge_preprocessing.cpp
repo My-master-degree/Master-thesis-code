@@ -12,7 +12,7 @@ void Invalid_edge_preprocessing::add () {
     for (pair<int, Vertex> p1 : cubic_model.all){
       int j = p1.first;
       if (cubic_model.gvrp_instance.distances[i][j] * cubic_model.gvrp_instance.vehicleFuelConsumptionRate > cubic_model.gvrp_instance.vehicleFuelCapacity || cubic_model.gvrp_instance.distances[i][j] / cubic_model.gvrp_instance.vehicleAverageSpeed > cubic_model.gvrp_instance.timeLimit)
-        for (unsigned int k = 0; k < cubic_model.gvrp_instance.customers.size(); k++)
+        for (int k = 0; k < cubic_model.gvrp_instance.nRoutes; k++)
           cubic_model.model.add(cubic_model.x[k][i][j] == 0);
     }
   }

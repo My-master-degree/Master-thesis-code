@@ -12,7 +12,7 @@ void Energy_lifting_constraint::add () {
   IloExpr rhs (cubic_model.env);
   IloConstraint c;
   //e_j \leq e_i - c_{ij} x_{ij}^k + \beta (1 - x_{ij}^k), \forall v_j \in C,\forall v_i \in V, \forall k \in M
-  for (unsigned int k = 0; k < cubic_model.gvrp_instance.customers.size(); k++) {
+  for (int k = 0; k < cubic_model.gvrp_instance.nRoutes; k++) {
     for (Vertex customer : cubic_model.gvrp_instance.customers) {
       int j = customer.id;
       for (pair<int, Vertex> p :cubic_model.all) {

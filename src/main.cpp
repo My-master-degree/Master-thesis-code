@@ -19,7 +19,6 @@
 #include "models/cubic_model/energy_ub_constraint.hpp"
 #include "models/cubic_model/energy_lifting_constraint.hpp"
 #include "models/cubic_model/routes_order_constraint.hpp"
-#include "models/cubic_model/custom_test_constraint.hpp"
 #include "SampleConfig.h"
 
 #include <string>
@@ -243,10 +242,10 @@ int main (int argc, char **argv)
   gvrp_instance = gvrp_instances.begin();
   for (const string& instance : instances) {
     cout<<instance<<endl;
-//    Cubic_model cubic_model (*gvrp_instance, execution_time);  
+    Cubic_model cubic_model (*gvrp_instance, execution_time);  
     Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (*gvrp_instance);
     Gvrp_solution gvrp_solution = gvrp_feasible_solution_heuristic.run();
-    Mip_start_cubic_model cubic_model (*gvrp_instance, execution_time, gvrp_solution);  
+//    Mip_start_cubic_model cubic_model (*gvrp_instance, execution_time, gvrp_solution);  
     //frac cuts
     cubic_model.user_constraints.push_back(new Subcycle_user_constraint_cubic_model(cubic_model));
     //preprocessings

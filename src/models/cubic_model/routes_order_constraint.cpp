@@ -12,7 +12,7 @@ void Routes_order_constraint::add() {
   IloExpr lhs (cubic_model.env), 
           rhs (cubic_model.env);
   IloConstraint c;
-  for (unsigned int k = 1; k < cubic_model.gvrp_instance.customers.size(); k++) {
+  for (int k = 1; k < cubic_model.gvrp_instance.nRoutes; k++) {
     c = IloConstraint (cubic_model.x[k][0][0] == 0);
     c.setName("Depot invalid edge");
     cubic_model.model.add(c);

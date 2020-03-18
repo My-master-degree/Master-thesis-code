@@ -26,8 +26,8 @@ void Invalid_edge_preprocessing_3::add () {
   vector<Vertex> f0 = createF0Set (cubic_model.gvrp_instance);
   size_t sf0 = f0.size(),
           r,
-          f,
-          k;
+          f;
+  int k;
   //dijkstra
   vector<size_t> pred (sf0);
   vector<double> costs (sf0);
@@ -53,7 +53,7 @@ void Invalid_edge_preprocessing_3::add () {
             }
       if (invalidEdge) {
         //cout<<"Invalid edge here in "<<i.id<<" "<<j.id<<endl;
-        for (k = 0; k < cubic_model.gvrp_instance.customers.size(); k++) {
+        for (k = 0; k < cubic_model.gvrp_instance.nRoutes; k++) {
           cubic_model.model.add(cubic_model.x[k][i.id][j.id] == 0);
           cubic_model.model.add(cubic_model.x[k][j.id][i.id] == 0);
         }

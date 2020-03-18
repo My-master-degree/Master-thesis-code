@@ -11,6 +11,6 @@ No_consecutive_afs_visit_preprocessing::No_consecutive_afs_visit_preprocessing (
 void No_consecutive_afs_visit_preprocessing::add () {
   for (Vertex v_r : cubic_model.gvrp_instance.afss)
     for (Vertex v_f : cubic_model.gvrp_instance.afss)
-      for (unsigned int k = 0; k < cubic_model.gvrp_instance.customers.size(); k++) 
+      for (int k = 0; k < cubic_model.gvrp_instance.nRoutes; k++) 
         cubic_model.model.add(cubic_model.x[k][v_r.id][v_f.id] == 0);
 }

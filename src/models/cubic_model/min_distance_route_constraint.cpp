@@ -21,7 +21,7 @@ void Min_distance_route_constraint::add (){
   IloConstraint c;
   IloExpr lhs (cubic_model.env),
           rhs (cubic_model.env);
-  for (unsigned int k = 0; k < cubic_model.gvrp_instance.customers.size(); k++){
+  for (int k = 0; k < cubic_model.gvrp_instance.nRoutes; k++){
     //sum_{(i, j) \in E} x_{ij}^k c_{ij} = lhs
     for (pair<int, Vertex> p : cubic_model.all) {
       int i = p.first;

@@ -42,6 +42,7 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
     customers;
   stringstream ss;
   Vertex depot;
+  int nRoutes;
   double vehicleFuelCapacity,
          vehicleFuelConsumptionRate,
          timeLimit,
@@ -126,6 +127,13 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
   while (!ss.eof())
     ss>>buff;  
   vehicleAverageSpeed = stod(buff.substr(1), NULL);
+  //get number of routes 
+  getline(inFile, line);
+  ss.clear();
+  ss.str(line);  
+  while (!ss.eof())
+    ss>>buff;  
+  nRoutes = stoi(buff.substr(1), NULL);
   inFile.close();
   //save data
   customers_size = customers.size();
@@ -159,7 +167,7 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
       //      distances[vertexes[i].id][vertexes[j].id] = sqrt(pow(vertexes[i].x - vertexes[j].x, 2) + pow(vertexes[i].y - vertexes[j].y, 2)); 
     }
   }
-  return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
+  return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, nRoutes, timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
 }
 
 double utils::calculateGvrpInstanceLambdaFactor (const Gvrp_instance& gvrp_instance) {
@@ -261,7 +269,7 @@ Vrp_instance utils::read_uchoa_vrp_instance (const string& file_path) {
   //    Vertex depot = Vertex (vertexes.begin()->id, vertexes.begin()->x, vertexes.begin()->y);
   //remove header
   vertexes.erase (vertexes.begin());
-  return Vrp_instance (vertexes, depot, distances, METRIC);
+  return Vrp_instance (vertexes, depot, distances, METRIC, vertexes.size());
 } 
 
 list<list<Vertex> > utils::getGvrpConnectedComponents (const Gvrp_instance& gvrp_instance) {

@@ -30,7 +30,7 @@ void Invalid_edge_preprocessing_2::add () {
     if (!cubic_model.customers.count(second->id) && !cubic_model.customers.count(penultimate->id)) {
       //get customer
       for (second++; !cubic_model.customers.count(second->id); second++);
-      for (size_t k = 0; k < cubic_model.gvrp_instance.customers.size(); k++) {
+      for (int k = 0; k < cubic_model.gvrp_instance.nRoutes; k++) {
         cubic_model.model.add(cubic_model.x[k][0][second->id] == 0);
         cubic_model.model.add(cubic_model.x[k][second->id][0] == 0);
       }
