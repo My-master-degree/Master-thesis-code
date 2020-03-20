@@ -179,11 +179,14 @@ double utils::calculateGvrpInstanceLambdaFactor (const Gvrp_instance& gvrp_insta
     for (Vertex afs : gvrp_instance.afss)
       afssAndDepot.insert(afs.id);
     afssAndDepot.insert(gvrp_instance.depot.id);
-    //min_{(f, r) \in F_0 : r \neq f} c_{fr} . C
+    //min_{(f, r) \in F_0 x F_0: r \neq f} c_{fr} . C
     for (int f : afssAndDepot)
       for (int r : afssAndDepot)
         if (f != r)
           lambda = min(gvrp_instance.distances[f][r] * gvrp_instance.vehicleFuelConsumptionRate, lambda);
+    //min_{(i, 0) \in C x \{v_0\}} c_{i0} . C
+    for (const Vertex& i : gvrp_instance.customers)
+      lambda = min(gvrp_instance.distances[i.id][0] * gvrp_instance.vehicleFuelConsumptionRate, lambda);
     return lambda;
   }
   return 0.0;  

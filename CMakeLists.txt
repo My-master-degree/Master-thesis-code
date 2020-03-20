@@ -21,7 +21,7 @@ set (BUILD_SHARED_LIBS On)
 ##### Additional páckages 
 
 find_package (CPLEX)
-find_package (LEMON)
+#find_package (LEMON)
 
 ##### Config files 
 
