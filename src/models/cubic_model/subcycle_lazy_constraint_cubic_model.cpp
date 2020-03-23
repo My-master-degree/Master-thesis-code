@@ -17,12 +17,12 @@ IloCplex::CallbackI* Subcycle_lazy_constraint_cubic_model::duplicateCallback() c
 }
 
 void Subcycle_lazy_constraint_cubic_model::main() {
-  int depot = cubic_model.gvrp_instance.depot.id;
+  int depot = cubic_model.instance.depot.id;
   IloEnv env = getEnv();
   IloExpr lhs(env);
   //get values
-  Matrix3DVal x_vals (env, cubic_model.gvrp_instance.nRoutes);
-  for (int k = 0; k < cubic_model.gvrp_instance.nRoutes; k++) {
+  Matrix3DVal x_vals (env, cubic_model.instance.nRoutes);
+  for (int k = 0; k < cubic_model.instance.nRoutes; k++) {
     x_vals[k] = IloArray<IloNumArray> (env, cubic_model.all.size());
     for (pair<int, Vertex> p : cubic_model.all) {
       int i = p.first;
@@ -31,7 +31,7 @@ void Subcycle_lazy_constraint_cubic_model::main() {
     }
   }
   //get subcycles
-  for (int k = 0; k < cubic_model.gvrp_instance.nRoutes; k++) {
+  for (int k = 0; k < cubic_model.instance.nRoutes; k++) {
     //bfs to remove all edges connected to the depot
     queue<int> q;
     q.push(depot);
@@ -45,7 +45,7 @@ void Subcycle_lazy_constraint_cubic_model::main() {
         }        
     }
     //bfs to remove all edges not connected to the depot
-    for (auto customer : cubic_model.gvrp_instance.customers) {
+    for (auto customer : cubic_model.instance.customers) {
       set<int> component, customersComponent;
       //checking for neighboring
       bool hasNeighboring = false;
@@ -71,7 +71,7 @@ void Subcycle_lazy_constraint_cubic_model::main() {
             q.push(p.first);
           }
       }
-      for (int k_ = 0; k_ < cubic_model.gvrp_instance.nRoutes; k_++) { 
+      for (int k_ = 0; k_ < cubic_model.instance.nRoutes; k_++) { 
         for (int customer_ : customersComponent) {
           //getting lhs
           for (pair<int, Vertex> p2 : cubic_model.all) {

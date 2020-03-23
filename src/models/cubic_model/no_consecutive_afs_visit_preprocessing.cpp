@@ -9,8 +9,8 @@ No_consecutive_afs_visit_preprocessing::No_consecutive_afs_visit_preprocessing (
 }
 
 void No_consecutive_afs_visit_preprocessing::add () {
-  for (Vertex v_r : cubic_model.gvrp_instance.afss)
-    for (Vertex v_f : cubic_model.gvrp_instance.afss)
-      for (int k = 0; k < cubic_model.gvrp_instance.nRoutes; k++) 
+  for (Vertex v_r : cubic_model.instance.afss)
+    for (Vertex v_f : cubic_model.instance.afss)
+      for (int k = 0; k < cubic_model.instance.nRoutes; k++) 
         cubic_model.model.add(cubic_model.x[k][v_r.id][v_f.id] == 0);
 }

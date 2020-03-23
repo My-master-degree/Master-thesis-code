@@ -328,16 +328,16 @@ list<list<Vertex> > utils::getGvrpConnectedComponents (const Gvrp_instance& gvrp
 
 map<int, double> utils::calculateCustomersEnergyUB (Cubic_model& cubic_model) {
   map<int, double> customersEnergyUBs;
-  for (Vertex customer : cubic_model.gvrp_instance.customers){
+  for (Vertex customer : cubic_model.instance.customers){
     int i = customer.id;
     //min_{(j, i) \in E} c_{ji} = minEdge
     double minEdge = DBL_MAX;
     for (pair <int, Vertex> p : cubic_model.all) {
       int j = p.first;
       if (i != j)
-        minEdge = min (minEdge, cubic_model.gvrp_instance.distances[i][j]);
+        minEdge = min (minEdge, cubic_model.instance.distances[i][j]);
     }
-    customersEnergyUBs[i] = cubic_model.gvrp_instance.vehicleFuelCapacity - minEdge * cubic_model.gvrp_instance.vehicleFuelConsumptionRate;
+    customersEnergyUBs[i] = cubic_model.instance.vehicleFuelCapacity - minEdge * cubic_model.instance.vehicleFuelConsumptionRate;
   }
   return customersEnergyUBs;
 }
@@ -352,7 +352,7 @@ vector<Vertex> utils::createF0Set (Gvrp_instance& gvrp_instance) {
   return f0;
 }
 
-void utils::gvrpDijkstra (vector<Vertex>& f0, vector<size_t>& pred, vector<double>& costs, Gvrp_instance& gvrp_instance) {
+void utils::gvrpDijkstra (vector<Vertex>& f0, vector<size_t>& pred, vector<double>& fuels, vector<double>& times, Gvrp_instance& gvrp_instance) {
   if (gvrp_instance.distances_enum != METRIC)
     throw string("The algorithm 'Gvrp Dijkstra' only works for METRIC instances.");
   size_t size = f0.size();
@@ -361,27 +361,37 @@ void utils::gvrpDijkstra (vector<Vertex>& f0, vector<size_t>& pred, vector<doubl
     ss<<"The pred vector requires at least "<<size<<" of length";
     throw ss.str();
   }
-  if (costs.size() < size) {
+  if (fuels.size() < size) {
     stringstream ss;
-    ss<<"The costs vector requires at least "<<size<<" of length";
+    ss<<"The fuels vector requires at least "<<size<<" of length";
+    throw ss.str();
+  }
+  if (times.size() < size) {
+    stringstream ss;
+    ss<<"The times vector requires at least "<<size<<" of length";
     throw ss.str();
   }
   size_t curr,
       f;
-  double cost;
+  double cost, time, fuel;
   for (f = 0; f < size; f++) 
     pred[f] = f;
-  costs.assign(size, DBL_MAX);
+  fuels.assign(size, DBL_MAX);
+  times.assign(size, DBL_MAX);
   queue<int> q;
   q.push(0);
-  costs[0] = 0.0;
+  fuels[gvrp_instance.depot.id] = 0.0;
+  times[gvrp_instance.depot.id] = 0.0;
   while (!q.empty()) {
     curr = q.front();
     q.pop();
     for (f = 0; f < size; f++) {
       cost = gvrp_instance.distances[f0[curr].id][f0[f].id];
-      if (cost * gvrp_instance.vehicleFuelConsumptionRate <= gvrp_instance.vehicleFuelCapacity && costs[curr] + cost < costs[f]) {
-        costs[f] = costs[curr] + cost;
+      fuel = cost * gvrp_instance.vehicleFuelConsumptionRate;
+      time = (cost / gvrp_instance.vehicleAverageSpeed) + f0[f].serviceTime; 
+      if (fuel <= gvrp_instance.vehicleFuelCapacity && fuels[curr] + fuel < fuels[f] && times[curr] + time < times[f]) {
+        fuels[f] = fuels[curr] + fuel;
+        times[f] = times[curr] + time;
         pred[f] = curr;
         q.push(f);
       }

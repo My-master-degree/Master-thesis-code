@@ -16,12 +16,12 @@ IloCplex::CallbackI* Improved_subcycle_lazy_constraint_cubic_model::duplicateCal
 }
 
 void Improved_subcycle_lazy_constraint_cubic_model::main() {
-  int depot = cubic_model.gvrp_instance.depot.id;
+  int depot = cubic_model.instance.depot.id;
   IloEnv env = getEnv();
   IloExpr lhs(env), lhs_(env);
   //get values
-  Matrix3DVal x_vals (env, cubic_model.gvrp_instance.customers.size());
-  for (int k = 0; k < cubic_model.gvrp_instance.nRoutes; k++) {
+  Matrix3DVal x_vals (env, cubic_model.instance.customers.size());
+  for (int k = 0; k < cubic_model.instance.nRoutes; k++) {
     x_vals[k] = IloArray<IloNumArray> (env, cubic_model.all.size());
     for (pair<int, Vertex> p : cubic_model.all) {
       int i = p.first;
@@ -30,7 +30,7 @@ void Improved_subcycle_lazy_constraint_cubic_model::main() {
     }
   }
   //get subcycles
-  for (int k = 0; k < int(cubic_model.gvrp_instance.customers.size()); k++) {
+  for (int k = 0; k < int(cubic_model.instance.customers.size()); k++) {
 //    cout<<"=====Route "<<k<<endl;
     //bfs to remove all edges related to the depot
     queue<int> q;
@@ -101,7 +101,7 @@ void Improved_subcycle_lazy_constraint_cubic_model::main() {
               }
             }
             //getting rhs
-            for (auto customer : cubic_model.gvrp_instance.customers)
+            for (auto customer : cubic_model.instance.customers)
               if (vertexes.count(customer.id)) {
                 lhs_ = lhs;
                 for (int b : vertexes)

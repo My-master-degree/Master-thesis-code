@@ -28,7 +28,7 @@ IloCplex::CallbackI* Subcycle_user_constraint_cubic_model::duplicateCallback() c
 void Subcycle_user_constraint_cubic_model::main() {
   if (!cubic_model.ALLOW_SUBCYCLE_USER_CUT)
     return;
-  int depot = cubic_model.gvrp_instance.depot.id,
+  int depot = cubic_model.instance.depot.id,
       i,
       k;
 //  int j;
@@ -37,8 +37,8 @@ void Subcycle_user_constraint_cubic_model::main() {
   bool infeasibilityFound = false;
 //  vector<ListGraph::Node> nodes (all.size());
   //get values
-  Matrix3DVal x_vals (env, cubic_model.gvrp_instance.nRoutes);
-  for (k = 0; k < cubic_model.gvrp_instance.nRoutes; k++) {
+  Matrix3DVal x_vals (env, cubic_model.instance.nRoutes);
+  for (k = 0; k < cubic_model.instance.nRoutes; k++) {
     x_vals[k] = IloArray<IloNumArray> (env, cubic_model.all.size());
     for (const pair<int, Vertex>& p : cubic_model.all) {
       i = p.first;
@@ -47,7 +47,7 @@ void Subcycle_user_constraint_cubic_model::main() {
     }
   }
   //get subcycles
-  for (k = 0; k < cubic_model.gvrp_instance.nRoutes; k++) {
+  for (k = 0; k < cubic_model.instance.nRoutes; k++) {
     /*
     //gomory hu
     ListGraph graph;
@@ -85,7 +85,7 @@ void Subcycle_user_constraint_cubic_model::main() {
         }        
     }
     //bfs to remove all edges not connected to the depot
-    for (Vertex customer : cubic_model.gvrp_instance.customers) {
+    for (Vertex customer : cubic_model.instance.customers) {
       set<int> component, customersComponent;
       //checking for neighboring
       bool hasNeighboring = false;

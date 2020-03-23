@@ -26,22 +26,22 @@ using namespace std;
 using namespace models;
 using namespace models::cubic_model;
 
-Cubic_model::Cubic_model(Gvrp_instance& _gvrp_instance, unsigned int _time_limit): 
-  gvrp_instance(_gvrp_instance), time_limit(_time_limit), max_num_feasible_integer_sol(2100000000), VERBOSE(true), ALLOW_SUBCYCLE_USER_CUT(true), ub_edge_visit(1) {
-  if (gvrp_instance.distances_enum != SYMMETRIC && gvrp_instance.distances_enum != METRIC)
+Cubic_model::Cubic_model(Gvrp_instance& instance, unsigned int _time_limit): 
+  Cplex_model(instance, time_limit), ALLOW_SUBCYCLE_USER_CUT(true), ub_edge_visit(1) {
+  if (instance.distances_enum != SYMMETRIC && instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
   //fill all and customers
-  for (Vertex customer : gvrp_instance.customers) {
+  for (Vertex customer : instance.customers) {
     all[customer.id] = customer;
     customers.insert(customer.id);
   }
-  for (Vertex afs : gvrp_instance.afss) 
+  for (Vertex afs : instance.afss) 
     all[afs.id] = afs;
-  all[gvrp_instance.depot.id] = gvrp_instance.depot;
+  all[instance.depot.id] = instance.depot;
 }
 
 pair<Gvrp_solution, Mip_solution_info> Cubic_model::run(){
-  if (gvrp_instance.distances_enum != SYMMETRIC && gvrp_instance.distances_enum != METRIC)
+  if (instance.distances_enum != SYMMETRIC && instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
   //setup
   stringstream output_exception;
@@ -74,7 +74,7 @@ pair<Gvrp_solution, Mip_solution_info> Cubic_model::run(){
     mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), total_time, cplex.getObjValue());
     endVars();
     env.end();
-    return make_pair(*gvrp_solution, mipSolInfo);
+    return make_pair(*solution, mipSolInfo);
   } catch (IloException& e) {
     output_exception<<"Concert exception caught: " << e<<endl;
     throw output_exception.str();
@@ -85,8 +85,8 @@ pair<Gvrp_solution, Mip_solution_info> Cubic_model::run(){
 }
 
 void Cubic_model::createVariables(){
-  x = Matrix3DVar (env, gvrp_instance.nRoutes);
-  e = IloNumVarArray (env, all.size(), 0, gvrp_instance.vehicleFuelCapacity, IloNumVar::Float);
+  x = Matrix3DVar (env, instance.nRoutes);
+  e = IloNumVarArray (env, all.size(), 0, instance.vehicleFuelCapacity, IloNumVar::Float);
   try {
     //setting names
     stringstream nameStream;
@@ -99,7 +99,7 @@ void Cubic_model::createVariables(){
       nameStream.str("");
     }
     //x var
-    for (int k = 0; k < gvrp_instance.nRoutes; k++){
+    for (int k = 0; k < instance.nRoutes; k++){
       x[k] = IloArray<IloNumVarArray> (env, all.size());
       for (pair<int, Vertex> p : all){
         int i = p.first;
@@ -126,12 +126,12 @@ void Cubic_model::createObjectiveFunction() {
 //objective function
   try{
     IloExpr fo (env);
-    for (int k = 0; k < gvrp_instance.nRoutes; k++)
+    for (int k = 0; k < instance.nRoutes; k++)
       for (pair<int, Vertex> p : all){
         int i = p.first;
         for (pair<int, Vertex> p1 : all){
           int j = p1.first;
-          fo +=  gvrp_instance.distances[i][j] * x[k][i][j];
+          fo +=  instance.distances[i][j] * x[k][i][j];
         }
       }  
     model = IloModel (env);
@@ -149,16 +149,16 @@ void Cubic_model::createModel() {
     for (Preprocessing_cubic_model* preprocessing : preprocessings)
       preprocessing->add();
     //setup
-    int depot = gvrp_instance.depot.id;
-    double beta = gvrp_instance.vehicleFuelCapacity;
-    double T = gvrp_instance.timeLimit;
+    int depot = instance.depot.id;
+    double beta = instance.vehicleFuelCapacity;
+    double T = instance.timeLimit;
     //constraints
     IloExpr expr(env),
             expr1(env);    
     IloConstraint c;
     stringstream constraintName;
     //\sum_{v_j \in V} x_{ij}^k = \sum_{v_j \in V} x_{ji}^k, \forall v_i \in V, \forall k \in M
-    for (int k = 0; k < gvrp_instance.nRoutes; k++)
+    for (int k = 0; k < instance.nRoutes; k++)
       for (pair<int, Vertex> p : all){
         int i = p.first;
         for (pair<int, Vertex> p1 : all){
@@ -175,7 +175,7 @@ void Cubic_model::createModel() {
         expr1 = IloExpr(env);
       }    
     //\sum_{v_i \in V} x_{0i}^k \leqslant 1, \forall k in M
-    for (int k = 0; k < gvrp_instance.nRoutes; k++){
+    for (int k = 0; k < instance.nRoutes; k++){
       for (pair<int, Vertex> p : all){
         int i = p.first;
         expr += x[k][depot][i];
@@ -187,9 +187,9 @@ void Cubic_model::createModel() {
       expr = IloExpr(env);
     }
     //\sum_{k \in M} \sum_{v_j \in V} x_{ij}^{k} = 1, \forall v_i \in C
-    for (Vertex customer :gvrp_instance.customers){
+    for (Vertex customer :instance.customers){
       int i = customer.id;
-      for (int k = 0; k < gvrp_instance.nRoutes; k++){
+      for (int k = 0; k < instance.nRoutes; k++){
         for (pair<int, Vertex> p1 : all){
           int j = p1.first;
           expr += x[k][i][j];
@@ -202,10 +202,10 @@ void Cubic_model::createModel() {
       expr = IloExpr(env);
     }
     //\sum_{k \in M} \sum_{v_j \in V} x_{0j}^k \leqslant m
-    for (int k = 0; k < gvrp_instance.nRoutes; k++)
+    for (int k = 0; k < instance.nRoutes; k++)
       for (pair<int, Vertex> p : all)
         expr += x[k][0][p.first];
-    c = IloConstraint (expr <= gvrp_instance.nRoutes);
+    c = IloConstraint (expr <= instance.nRoutes);
     c.setName("# routes upper bound");
     model.add(c);
     expr.end();
@@ -215,19 +215,19 @@ void Cubic_model::createModel() {
     c.setName("e_depot = beta");
     model.add(c);
     //e_f = \beta, \forall v_f \in F
-    for (Vertex afs : gvrp_instance.afss)  {
+    for (Vertex afs : instance.afss)  {
       int f = afs.id;
       c = IloConstraint (e[f] == beta);
       c.setName("e_f = beta");
       model.add(c);
     }
     //e_j \leq e_i - c_{ij} x_{ij}^k + \beta (1 - x_{ij}^k), \forall v_j \in C,\forall v_i \in V, \forall k \in M
-    for (int k = 0; k < gvrp_instance.nRoutes; k++)
-      for (Vertex customer : gvrp_instance.customers) {
+    for (int k = 0; k < instance.nRoutes; k++)
+      for (Vertex customer : instance.customers) {
         int j = customer.id;
         for (pair<int, Vertex> p :all) {
           int i =  p.first;
-          expr = e[i] - x[k][i][j] * gvrp_instance.distances[i][j] * gvrp_instance.vehicleFuelConsumptionRate + beta * (1 -  x[k][i][j]);
+          expr = e[i] - x[k][i][j] * instance.distances[i][j] * instance.vehicleFuelConsumptionRate + beta * (1 -  x[k][i][j]);
           c = IloConstraint (e[j] <= expr);
           c.setName("updating fuel level");
           model.add(c);
@@ -236,12 +236,12 @@ void Cubic_model::createModel() {
         }
       }
     //e_i \geq c_{ij} x_{ij}^k, \forall v_i, \forall v_j \in V, \forall k \in M
-    for (int k = 0; k < gvrp_instance.nRoutes; k++)
+    for (int k = 0; k < instance.nRoutes; k++)
       for (pair<int, Vertex> p : all){
         int i = p.first;
         for (pair<int, Vertex> p1 : all){
           int j = p1.first;
-          expr = gvrp_instance.distances[i][j] * x[k][i][j] * gvrp_instance.vehicleFuelConsumptionRate;
+          expr = instance.distances[i][j] * x[k][i][j] * instance.vehicleFuelConsumptionRate;
           c = IloConstraint (e[i] >= expr);
           c.setName("disabling infeasible edges");
           model.add(c);
@@ -250,12 +250,12 @@ void Cubic_model::createModel() {
         }
       }
     //x_{ij}^k c_{ij} \leq \beta, \forall v_i, \forall v_j \in V, \forall k \in M
-      for (int k = 0; k < gvrp_instance.nRoutes; k++)
+      for (int k = 0; k < instance.nRoutes; k++)
         for (pair<int, Vertex> p : all){
           int i = p.first;
           for (pair<int, Vertex> p1 : all){
             int j = p1.first;
-            expr = gvrp_instance.distances[i][j] * x[k][i][j] * gvrp_instance.vehicleFuelConsumptionRate;
+            expr = instance.distances[i][j] * x[k][i][j] * instance.vehicleFuelConsumptionRate;
             c = IloConstraint (expr <= beta);
             c.setName("disabling infeasible edges 2");
             model.add(c);
@@ -264,12 +264,12 @@ void Cubic_model::createModel() {
           }
         }
       //\sum_{(i, j) \in E} x_{ij}^k ((c_{ij} / S) + time(v_i) )\leq T, \forall k \in M
-      for (int k = 0; k < gvrp_instance.nRoutes; k++){
+      for (int k = 0; k < instance.nRoutes; k++){
         for (pair<int, Vertex> p : all){
           int i = p.first;
           for (pair<int, Vertex> p1 : all){
             int j = p1.first;
-            expr += x[k][i][j] * ((gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed) + p.second.serviceTime);
+            expr += x[k][i][j] * ((instance.distances[i][j] / instance.vehicleAverageSpeed) + p.second.serviceTime);
           }
         }
         c = IloConstraint (expr <= T);
@@ -284,7 +284,7 @@ void Cubic_model::createModel() {
     //init
     cplex = IloCplex(model);
     //\sum_{(v_i, v_j) \in \delta(S)} x_{ij}^k \geq 2, \forall k \in M, \forall S \subseteq V \backlash \{v_0\} : |C \wedge S| \geq 1 \wedge |S \wedge F| \geq 1
-    //cplex.use(Subcycle_constraint(env, x, gvrp_instance, all, ub_edge_visit));
+    //cplex.use(Subcycle_constraint(env, x, instance, all, ub_edge_visit));
     cplex.use(separation_algorithm()); 
     //user cuts
     for (User_constraint_cubic_model* user_constraint : user_constraints)
@@ -308,8 +308,7 @@ Lazy_constraint_cubic_model* Cubic_model::separation_algorithm(){
 
 void Cubic_model::setCustomParameters(){
   try{
-    if (!VERBOSE)
-      cplex.setOut(env.getNullStream());
+    setParameters();
     //DOUBTS:
     // Turn off the presolve reductions and set the CPLEX optimizer
     // to solve the worker LP with primal simplex method.
@@ -336,10 +335,6 @@ void Cubic_model::setCustomParameters(){
     cplex.setParam(IloCplex::Param::MIP::Cuts::ZeroHalfCut, -1);
     cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques, -1);
     cplex.setParam(IloCplex::Param::MIP::Cuts::Covers, -1);
-    //time out
-    cplex.setParam(IloCplex::Param::TimeLimit, time_limit);
-    //num of feasible integers solution allowed
-    cplex.setParam(IloCplex::Param::MIP::Limits::Solutions, max_num_feasible_integer_sol);
   } catch (IloException& e) {
     throw e;
   } catch (...) {
@@ -350,8 +345,8 @@ void Cubic_model::setCustomParameters(){
 void Cubic_model::fillX_vals(){
   //getresult
   try{
-    x_vals = Matrix3DVal (env, gvrp_instance.nRoutes);
-    for (int k = 0; k < gvrp_instance.nRoutes; k++) { 
+    x_vals = Matrix3DVal (env, instance.nRoutes);
+    for (int k = 0; k < instance.nRoutes; k++) { 
       x_vals[k] = IloArray<IloNumArray> (env, all.size());
       for (pair<int, Vertex> p : all){
         int i = p.first;
@@ -369,7 +364,7 @@ void Cubic_model::fillX_vals(){
 void Cubic_model::createGvrp_solution(){
   /*
   //print x vals
-  for (int k = 0; k < gvrp_instance.nRoutes; k++){ {
+  for (int k = 0; k < instance.nRoutes; k++){ {
     //columns
     cout<<" ";
     for (auto p : all){
@@ -393,10 +388,10 @@ void Cubic_model::createGvrp_solution(){
   try{
     list<list<Vertex> > routes;
     //dfs
-    int depot = gvrp_instance.depot.id;
+    int depot = instance.depot.id;
     int curr,
         next;    
-    for (int k = 0; k < gvrp_instance.nRoutes; k++) {
+    for (int k = 0; k < instance.nRoutes; k++) {
       curr = depot;
       next = depot;
       //checking if the route is used
@@ -465,7 +460,7 @@ void Cubic_model::createGvrp_solution(){
       if (route.size() > 2)
         routes.push_back(route);
     }
-    gvrp_solution = new Gvrp_solution(routes, gvrp_instance);
+    solution = new Gvrp_solution(routes, instance);
   } catch (IloException& e) {
     throw e;
   } catch (...) {
@@ -474,7 +469,7 @@ void Cubic_model::createGvrp_solution(){
 }
 
 void Cubic_model::endVars(){
-  for (int k = 0; k < gvrp_instance.nRoutes; k++){ 
+  for (int k = 0; k < instance.nRoutes; k++){ 
     for (pair<int, Vertex> p : all)
       x[k][p.first].end();
     x[k].end();

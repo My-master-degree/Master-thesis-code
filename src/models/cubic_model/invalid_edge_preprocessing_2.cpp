@@ -13,14 +13,14 @@ using namespace utils;
 using namespace models::cubic_model;
 
 Invalid_edge_preprocessing_2::Invalid_edge_preprocessing_2 (Cubic_model& cubic_model) : Preprocessing_cubic_model (cubic_model) {
-  if (cubic_model.gvrp_instance.distances_enum != METRIC)
+  if (cubic_model.instance.distances_enum != METRIC)
     throw string("The preprocessing 'Invalid edge preprocessing 3' only applies for metric instances");
 }
 
 void Invalid_edge_preprocessing_2::add () {
-  if (cubic_model.gvrp_instance.distances_enum != METRIC)
+  if (cubic_model.instance.distances_enum != METRIC)
     throw string("The preprocessing 'Invalid edge preprocessing 3' only applies for metric instances");
-  Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (cubic_model.gvrp_instance);
+  Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (cubic_model.instance);
   Gvrp_solution gvrp_solution =  gvrp_feasible_solution_heuristic.run();
   //for each route
   for (const list<Vertex>& route : gvrp_solution.routes) {
@@ -30,7 +30,7 @@ void Invalid_edge_preprocessing_2::add () {
     if (!cubic_model.customers.count(second->id) && !cubic_model.customers.count(penultimate->id)) {
       //get customer
       for (second++; !cubic_model.customers.count(second->id); second++);
-      for (int k = 0; k < cubic_model.gvrp_instance.nRoutes; k++) {
+      for (int k = 0; k < cubic_model.instance.nRoutes; k++) {
         cubic_model.model.add(cubic_model.x[k][0][second->id] == 0);
         cubic_model.model.add(cubic_model.x[k][second->id][0] == 0);
       }

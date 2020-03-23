@@ -9,7 +9,6 @@
 
 using namespace std;
 using namespace models;
-//using namespace models;
 
 namespace models {
   namespace cubic_model {

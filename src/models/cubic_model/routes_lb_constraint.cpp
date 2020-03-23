@@ -15,11 +15,11 @@ void Routes_lb_constraint::add() {
 // int bfsLb = 0;
 // double componentTime = 0;
 // //bfs
-// if (cubic_model.gvrp_instance.distance_enum == METRIC || cubic_model.gvrp_instance.distance_enum == SYMMETRIC) {
+// if (cubic_model.instance.distance_enum == METRIC || cubic_model.instance.distance_enum == SYMMETRIC) {
 //   set<int> visited;
 //   queue<int> q;
 //   //for each customer
-//   for (Vertex customer : cubic_model.gvrp_instance.customers) {
+//   for (Vertex customer : cubic_model.instance.customers) {
 //     if (!visited.count(customer.id)) {
 //       //bfs itself
 //       q.push(customer.id);

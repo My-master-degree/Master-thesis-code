@@ -29,28 +29,31 @@ Gvrp_solution Gvrp_feasible_solution_heuristic::run () {
          f;
   //dijkstra
   vector<size_t> pred (sf0);
-  vector<double> costs (sf0);
-  utils::gvrpDijkstra(f0, pred, costs, gvrp_instance);
+  vector<double> fuels (sf0);
+  vector<double> times (sf0);
+  utils::gvrpDijkstra(f0, pred, fuels, times, gvrp_instance);
   //build spanning tree
-  double routeCost,
-         distance,
-          bestAfssCost;
+  double routeFuel,
+         fuel,
+         cost,
+          bestAfssFuel;
   list<list<Vertex> > routes;
   list<Vertex> route;  
   for (const Vertex& customer : gvrp_instance.customers) {
     //arg\ min_{f0[f], f0[r] \in F_0 : c_{fi} + c_{ir} \leqslant \beta} {\pi_f + c_{fi} + \pi_r + c_{ir}}
     pair<int, int> bestAfss = make_pair(-1, -1);
-    bestAfssCost = DBL_MAX;
+    bestAfssFuel = DBL_MAX;
     for (f = 0; f < sf0; f++) 
       if (f0[f].id == gvrp_instance.depot.id || pred[f] != f)
         for (r = 0; r < sf0; r++) 
           //if the afss f and r are connected 
           if (f0[r].id == gvrp_instance.depot.id || pred[r] != r) {
-            distance = gvrp_instance.distances[f0[f].id][customer.id] + gvrp_instance.distances[customer.id][f0[r].id];
-            if (distance * gvrp_instance.vehicleFuelConsumptionRate <= gvrp_instance.vehicleFuelCapacity) {
-              routeCost = costs[f] + distance + costs[r] ;
-              if (routeCost/gvrp_instance.vehicleAverageSpeed <= gvrp_instance.timeLimit && routeCost < bestAfssCost) {
-                bestAfssCost = routeCost; 
+            cost = gvrp_instance.distances[f0[f].id][customer.id] + gvrp_instance.distances[customer.id][f0[r].id];
+            fuel = cost * gvrp_instance.vehicleFuelConsumptionRate;
+            if (fuel <= gvrp_instance.vehicleFuelCapacity) {
+              routeFuel = fuels[f] + fuel + fuels[r] ;
+              if (times[f] + (cost/gvrp_instance.vehicleAverageSpeed) + customer.serviceTime + times[r] <= gvrp_instance.timeLimit && routeFuel < bestAfssFuel) {
+                bestAfssFuel = routeFuel; 
                 bestAfss = make_pair(f, r);
               }
             }

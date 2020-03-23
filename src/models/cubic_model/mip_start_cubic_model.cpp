@@ -11,18 +11,18 @@ using namespace std;
 using namespace models;
 using namespace models::cubic_model;
 
-Mip_start_cubic_model::Mip_start_cubic_model (Gvrp_instance& gvrp_instance, unsigned int time_limit, Gvrp_solution& gvrp_solution_) : Cubic_model (gvrp_instance, time_limit), gvrp_solution (gvrp_solution_) {
-  gvrp_instance.nRoutes = gvrp_instance.customers.size();
+Mip_start_cubic_model::Mip_start_cubic_model (Gvrp_instance& instance, unsigned int time_limit, Gvrp_solution& gvrp_solution_) : Cubic_model (instance, time_limit), gvrp_solution (gvrp_solution_) {
+  instance.nRoutes = instance.customers.size();
 }
 
 void Mip_start_cubic_model::extraStepsAfterModelCreation () {
   try {
     Cubic_model::extraStepsAfterModelCreation();
     //setup
-    IloNumArray e_vals (env, all.size(), 0, gvrp_instance.vehicleFuelCapacity, IloNumVar::Float);
-    x_vals = Matrix3DVal (env, gvrp_instance.customers.size());
+    IloNumArray e_vals (env, all.size(), 0, instance.vehicleFuelCapacity, IloNumVar::Float);
+    x_vals = Matrix3DVal (env, instance.customers.size());
     //create vals
-    for (size_t k = 0; k < gvrp_instance.customers.size(); k++) {
+    for (size_t k = 0; k < instance.customers.size(); k++) {
       x_vals[k] = IloArray<IloNumArray> (env, all.size());
       for (pair<int, Vertex> p : all){
         int i = p.first;
@@ -32,7 +32,7 @@ void Mip_start_cubic_model::extraStepsAfterModelCreation () {
       }
     }
     for (pair<int, Vertex> p : all) 
-      e_vals[p.first] = gvrp_instance.vehicleFuelCapacity;
+      e_vals[p.first] = instance.vehicleFuelCapacity;
     //get values
     int k = 0, 
         i;
@@ -41,14 +41,14 @@ void Mip_start_cubic_model::extraStepsAfterModelCreation () {
       auto node = route.begin();
       i = node->id;
       node++;
-      fuel = gvrp_instance.vehicleFuelCapacity;
+      fuel = instance.vehicleFuelCapacity;
       for (; node != route.end(); i = node->id, node++) {
         //update fuel
         if (customers.count(node->id)) {
-          fuel -= gvrp_instance.distances[i][node->id] * gvrp_instance.vehicleFuelConsumptionRate;
+          fuel -= instance.distances[i][node->id] * instance.vehicleFuelConsumptionRate;
           e_vals[node->id] = fuel;
         } else
-          fuel = gvrp_instance.vehicleFuelCapacity;
+          fuel = instance.vehicleFuelCapacity;
         x_vals[k][i][node->id] = 1;
       }
       k++;
@@ -61,7 +61,7 @@ void Mip_start_cubic_model::extraStepsAfterModelCreation () {
       startVar.add(e[p.first]);
       startVal.add(e_vals[p.first]);
     }
-    for (size_t k = 0; k < gvrp_instance.customers.size(); k++)
+    for (size_t k = 0; k < instance.customers.size(); k++)
       for (pair<int, Vertex> p : all) {
         int i = p.first;
         for (pair<int, Vertex> p1 : all) {
@@ -72,7 +72,7 @@ void Mip_start_cubic_model::extraStepsAfterModelCreation () {
       }
     cplex.addMIPStart (startVar, startVal);
     //clean vals
-    for (size_t k = 0; k < gvrp_instance.customers.size(); x_vals[k++].end()) 
+    for (size_t k = 0; k < instance.customers.size(); x_vals[k++].end()) 
       for (pair<int, Vertex> p : all)
         x_vals[k][p.first].end();
     x_vals.end();

@@ -17,7 +17,7 @@ Energy_ub_constraint::Energy_ub_constraint (Cubic_model& cubic_model) : Extra_co
 void Energy_ub_constraint::add () {
   map<int, double> customersEnergyUBs = calculateCustomersEnergyUB(cubic_model);
   IloConstraint c;
-  for (Vertex customer : cubic_model.gvrp_instance.customers){
+  for (Vertex customer : cubic_model.instance.customers){
     int i = customer.id;
     //e_i \leqslant minEdge
     c = IloConstraint (cubic_model.e[i] <= customersEnergyUBs[i]);

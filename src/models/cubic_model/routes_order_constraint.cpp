@@ -12,19 +12,28 @@ void Routes_order_constraint::add() {
   IloExpr lhs (cubic_model.env), 
           rhs (cubic_model.env);
   IloConstraint c;
-  for (int k = 1; k < cubic_model.gvrp_instance.nRoutes; k++) {
-    c = IloConstraint (cubic_model.x[k][0][0] == 0);
-    c.setName("Depot invalid edge");
+  if (cubic_model.instance.customers.size() > 0) {
+    for (const pair<int, Vertex>& p : cubic_model.all) 
+      //\sum_{(0, j) \in E} x_{0i}^k
+      lhs += cubic_model.x[0][0][p.first];
+    //lhs \geqslant rhs
+    c = IloConstraint (lhs == 1);
+    c.setName("Route order");
     cubic_model.model.add(c);
+    //clean
+    lhs.end();
     c.end();
-    for (pair<int, Vertex> p : cubic_model.all) {
+    lhs = IloExpr (cubic_model.env);
+  }
+  for (int k = 1; k < cubic_model.instance.nRoutes; k++) {
+    for (const pair<int, Vertex>& p : cubic_model.all) {
       //\sum_{(0, j) \in E} x_{0i}^k
       lhs += cubic_model.x[k][0][p.first];
       //\sum_{(0, j) \in E} x_{0i}^{k-1}
-      rhs += cubic_model.x[k][k - 1][p.first];
+      rhs += cubic_model.x[k - 1][0][p.first];
     }
     //lhs \geqslant rhs
-    c = IloConstraint (lhs >= rhs);
+    c = IloConstraint (lhs <= rhs);
     c.setName("Route order");
     cubic_model.model.add(c);
     //clean
