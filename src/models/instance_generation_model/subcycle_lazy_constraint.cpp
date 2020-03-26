@@ -25,7 +25,19 @@ void Subcycle_lazy_constraint::main() {
   set<int> component;
   list<set<int>> components;
   //get values
-  instance_generation_model.fillVals();
+  try{
+    instance_generation_model.x_vals = Matrix2DVal (env, instance_generation_model.sNodes);
+    instance_generation_model.z_vals = IloNumArray (env, instance_generation_model.sNodes, 0, 1, IloNumVar::Int);
+    getValues(instance_generation_model.z_vals, instance_generation_model.z);
+    for (size_t i = 0; i < instance_generation_model.sNodes; i++) {
+      instance_generation_model.x_vals[i] = IloNumArray (env, instance_generation_model.sNodes, 0, 1, IloNumVar::Int);
+      getValues(instance_generation_model.x_vals[i], instance_generation_model.x[i]);
+    }
+  } catch (IloException& e) {
+    throw e;
+  } catch (...) {
+    throw string("Error in getting solution");
+  }
   //get components
   for (i = 0; i < instance_generation_model.sNodes; i++)
     //if i is a facility

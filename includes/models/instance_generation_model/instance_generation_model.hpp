@@ -40,7 +40,7 @@ namespace models {
         void createObjectiveFunction();
         void createModel();
         void setCustomParameters();
-        void createGvrp_solution();
+        void createGvrp_instance();
         void endVars();
     };
   }

@@ -1,14 +1,17 @@
+#include "models/dsu.hpp"
 #include "models/instance_generation_model/user_constraint.hpp"
 #include "models/instance_generation_model/subcycle_user_constraint.hpp"
 #include "models/instance_generation_model/instance_generation_model.hpp"
+
 #include <lemon/gomory_hu.h>
 #include <lemon/concepts/graph.h>
 #include <lemon/list_graph.h>
-
-#include <set>
+#include <map>
 #include <list>
+#include <queue>
 #include <ilcplex/ilocplex.h>
 
+using namespace models;
 using namespace models::instance_generation_model;
 using namespace lemon;
 using namespace lemon::concepts;
@@ -25,51 +28,124 @@ void Subcycle_user_constraint::main() {
   IloExpr lhs(env);
   size_t i,
          j, 
-         curr, 
-         next;
-  set<int> component;
-  list<set<int>> components;
+         k,
+         curr;
+  map<unsigned int, ListGraph::Node> componentNodes;
+  multimap<unsigned int, unsigned int> subcomponents;
+  list<unsigned int> component;
+  list<list<unsigned int>> components;
+  ListGraph graph;
+  queue<unsigned int> q;
+  DSU dsu (instance_generation_model.sNodes);
+  vector<bool> visited (instance_generation_model.sNodes, false);
   //get values
-  instance_generation_model.fillVals();
+  try{
+    instance_generation_model.x_vals = Matrix2DVal (env, instance_generation_model.sNodes);
+    instance_generation_model.z_vals = IloNumArray (env, instance_generation_model.sNodes, 0, 1, IloNumVar::Float);
+    getValues(instance_generation_model.z_vals, instance_generation_model.z);
+    for (size_t i = 0; i < instance_generation_model.sNodes; i++) {
+      instance_generation_model.x_vals[i] = IloNumArray (env, instance_generation_model.sNodes, 0, 1, IloNumVar::Float);
+      getValues(instance_generation_model.x_vals[i], instance_generation_model.x[i]);
+    }
+  } catch (IloException& e) {
+    throw e;
+  } catch (...) {
+    throw string("Error in getting solution");
+  }
   //get components
   for (i = 0; i < instance_generation_model.sNodes; i++)
     //if i is a facility
-    if (instance_generation_model.z_vals[i] > 0) {
-      //dfs
-      next = i;
-      do {
-        curr = next;
-        component.insert(curr);
+    if (instance_generation_model.z_vals[i] > EPS && !visited[i]) {
+      ListGraph::EdgeMap<double> weight(graph); 
+      //bfs
+      q.push(i);
+      componentNodes[i] = graph.addNode();
+      while (!q.empty()) {
+        curr = q.front();
+        q.pop();
+        visited[curr] = true;
+        //iterate over the neighboring
         for (j = 0; j < instance_generation_model.sNodes; j++)
-          if (instance_generation_model.x_vals[curr][j] > 0) {
-            instance_generation_model.x_vals[curr][j] = 0;
-            next = j;
-            break;
+          if (instance_generation_model.x_vals[curr][j] > EPS) {
+            if (!componentNodes.count(j))
+              componentNodes[j] = graph.addNode();
+            weight[graph.addEdge(componentNodes[curr], componentNodes[j])] = instance_generation_model.x_vals[curr][j];
+            instance_generation_model.x_vals[curr][j] = 0.0;
+            q.push(j);
+          } else if (instance_generation_model.z_vals[j] > EPS && instance_generation_model.x_vals[j][curr] > EPS) {
+            if (!componentNodes.count(j))
+              componentNodes[j] = graph.addNode();
+            weight[graph.addEdge(componentNodes[j], componentNodes[curr])] = instance_generation_model.x_vals[j][curr];
+            instance_generation_model.x_vals[j][curr] = 0.0;
+            q.push(j);
           }
-      } while (curr != next);
+
+      } 
+      //gomory hu
+      GomoryHu<ListGraph, ListGraph::EdgeMap<double> > gh (graph, weight);
+      gh.run();
+      //get subcomponents
+      for (const pair<unsigned int, ListGraph::Node>& p : componentNodes) {
+        j = p.first;
+        if (dsu.pred[j] == j) 
+          for (const pair<unsigned int, ListGraph::Node>& p1 : componentNodes) {
+            k = p1.first;
+            if (gh.minCutValue(p.second, p1.second) >= instance_generation_model.z_vals[k])
+              dsu.join(j, k);
+          }
+      }
+        //clean z_vals
+      for (const pair<unsigned int, ListGraph::Node>& p : componentNodes) 
+        subcomponents.insert(make_pair(dsu.findSet(p.first), p.first));
+      //store components
+      multimap<unsigned int, unsigned int>::iterator it = subcomponents.begin();
+      j = it->first;
+      for (; it != subcomponents.end(); it++) {
+        if (it->first != j) {
+          j = it->first;
+          components.push_back(component);
+          component.clear();
+        } 
+        component.push_back(it->second);
+      }
+        //end of multimap 
       components.push_back(component);
-      component = set<int> ();
+      //reset vars
+      component = list<unsigned int> ();
+      graph.clear();
+      subcomponents.clear();
+      componentNodes.clear();
     }
+  cout<<"Frac cuts components:"<<endl;
+  for (const list<unsigned int>& S : components) {
+    cout<<"- ";
+    for (unsigned int i : S) 
+      cout<<i<<" ";
+    cout<<endl;
+  }
+
   //inequallitites
-  for (const set<int>& T : components) 
-    for (const set<int>& S : components) 
-      if (*T.begin() != *S.begin()) 
+  for (const list<unsigned int>& S : components) 
+    for (const list<unsigned int>& T : components) 
+      if (T != S){ 
+        cout<<"inserting"<<endl;
         //for ech component facility        
         //\sum_{v_j \in T} \sum_{v_k \in S} y_{jk} + y_{kj} \geqslant z_{k*}, \forall k* \in S
-        for (int k_ : S) {
-          for (int j : T) 
-            for (int k : S) 
-              lhs += instance_generation_model.x[k][j] + instance_generation_model.x[j][k];
-          lhs -= instance_generation_model.z[k_];
+        for (unsigned int j_ : T) {
+          for (unsigned int i : S) 
+            for (unsigned int j: T) 
+              lhs += instance_generation_model.x[i][j] + instance_generation_model.x[j][i];
+          lhs -= instance_generation_model.z[j_];
           try {
             add(lhs >= 0).end();
           } catch(IloException& e) {
-            cerr << "Exception while adding lazy constraint" << e.getMessage() << "\n";
+            cerr << "Exception while adding user constraint" << e.getMessage() << "\n";
             throw;
           }
           lhs.end();
           lhs = IloExpr(env);
         }
+      }
   //end vals
   for (i = 0; i < instance_generation_model.sNodes; i++)
     instance_generation_model.x_vals[i].end();

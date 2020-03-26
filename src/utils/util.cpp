@@ -206,16 +206,6 @@ list<string> utils::listFilesFromDir(string path) {
   return files; 
 }
 
-void utils::generate_new_gvrp_instances () {
-  //
-  string uchoaInstancesDir = PROJECT_INSTANCES_PATH + string("UchoaEtAl/");
-  list<string> instances = utils::listFilesFromDir(uchoaInstancesDir);
-  for (string instance : instances) {
-    Vrp_instance vrp_instance = utils::read_uchoa_vrp_instance (uchoaInstancesDir + instance);
-
-  }
-}
-
 Vrp_instance utils::read_uchoa_vrp_instance (const string& file_path) {
   int id = 0,
       nVertexes;
@@ -235,11 +225,10 @@ Vrp_instance utils::read_uchoa_vrp_instance (const string& file_path) {
     getline(inFile, line);
   //get # vertexes
   ss.str(line);
-  //ignore text 
   ss>>buff;
   ss>>buff;
-  //get #
-  ss>>nVertexes;
+  ss>>buff;
+  nVertexes = stoi(buff, NULL);
   ss.clear();
   //ignore header
   for (int i = 0; i < 3; i++)
@@ -257,14 +246,11 @@ Vrp_instance utils::read_uchoa_vrp_instance (const string& file_path) {
   } 
   //calculate distances
   vector<vector<double> > distances(nVertexes);
-  int i = 0, j;
+  int i = 0;
   for (Vertex a : vertexes) {
     distances[i] = vector<double> (nVertexes);
-    j = 0;
-    for (Vertex b : vertexes) {
-      distances[a.id][b.id] = distances[a.id][b.id] = sqrt (pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
-      j++;
-    }
+    for (Vertex b : vertexes) 
+      distances[a.id][b.id] = floor(sqrt (pow(a.x - b.x, 2) + pow(a.y - b.y, 2)) + 0.5);
     i++;
   }
   //get depot

@@ -19,7 +19,6 @@ namespace utils {
   Vrp_instance read_uchoa_vrp_instance (const string &file_path);    
   Gvrp_instance erdogan_instance_reader(string file_path);
   list<string> listFilesFromDir(string path);
-  void generate_new_gvrp_instances (); 
   double calculateGvrpInstanceLambdaFactor (const Gvrp_instance& gvrp_instance);
   list<list<Vertex> > getGvrpConnectedComponents (const Gvrp_instance& gvrp_instance);
   map<int, double> calculateCustomersEnergyUB (Cubic_model& gvrp_instance);

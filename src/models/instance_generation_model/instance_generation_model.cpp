@@ -21,7 +21,7 @@ using namespace models::instance_generation_model;
 
 Instance_generation_model::Instance_generation_model(Vrp_instance& vrp_instance, unsigned int time_limit): Cplex_model(vrp_instance, time_limit) {
   if (instance.distances_enum != SYMMETRIC && instance.distances_enum != METRIC)
-    throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
+    throw string("Error: The compact model requires a VRP instance with symmetric or metric distances");
   sNodes = instance.customers.size() + 1;
 }
 
@@ -52,10 +52,10 @@ pair<Gvrp_instance, Mip_solution_info> Instance_generation_model::run () {
     double total_time =  (double) (clock() - start) / (double) CLOCKS_PER_SEC;
 //    cplex.exportModel("cplexcpp.lp");
 //    env.out() << "Solution value = " << cplex.getObjValue() << endl;
-//    cout<<"Getting x values"<<endl;
+//    cout<<"Getting values"<<endl;
     fillVals();
-//    cout<<"Creating GVRP solution"<<endl;
-    createGvrp_solution();
+    //cout<<"Creating VRP instance"<<endl;
+    createGvrp_instance();
     mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), total_time, cplex.getObjValue());
     endVars();
     env.end();
@@ -99,10 +99,12 @@ void Instance_generation_model::createObjectiveFunction() {
 //objective function
   try{
     IloExpr fo (env);
-    for (size_t i = 0; i < sNodes; i++)
+    for (size_t i = 0; i < sNodes; i++) {
+      fo += z[i];
       //setting names
       for (size_t j = 0; j < sNodes; j++)
         fo +=  instance.distances[i][j] * x[i][j];
+    }
     model = IloModel (env);
     model.add(IloMinimize(env, fo));
   } catch (IloException& e) {
@@ -121,6 +123,9 @@ void Instance_generation_model::createModel() {
             expr1(env);    
     IloConstraint c;
     stringstream constraintName;
+    //x[i][i] == 0, \forall v_i \in V
+    for (size_t i = 0; i < sNodes; i++) 
+      model.add(x[i][i] == 0);
     //\sum_{v_j \in V : v_i \neq v_j} x_{ij} = 1, \forall v_i \in V 
     for (size_t i = 0; i < sNodes; i++) {
       //setting names
@@ -206,7 +211,7 @@ void Instance_generation_model::fillVals(){
   //getresult
   try{
     x_vals = Matrix2DVal (env, sNodes);
-    z_vals = IloNumArray (env, sNodes);
+    z_vals = IloNumArray (env, sNodes, 0, 1, IloNumVar::Int);
     cplex.getValues(z_vals, z);
     for (size_t i = 0; i < sNodes; i++) {
       x_vals[i] = IloNumArray (env, sNodes, 0, 1, IloNumVar::Int);
@@ -219,7 +224,7 @@ void Instance_generation_model::fillVals(){
   }
 }
 
-void Instance_generation_model::createGvrp_solution(){
+void Instance_generation_model::createGvrp_instance(){
   try{
     list<Vertex> customers,
                  afss;
@@ -228,9 +233,16 @@ void Instance_generation_model::createGvrp_solution(){
            vehicleFuelConsumptionRate, 
            vehicleAverageSpeed;
     for (const Vertex& v : instance.customers)
-      if (z_vals[v.id] > 0)
+      if (z_vals[v.id] > 0) {
         afss.push_back(v);
-      else
+        /*
+        cout<<"Facility "<<v.id<<"("<<z_vals[v.id]<<") serve: ";
+        for (size_t i = 0; i < sNodes; i++)
+          if (x_vals[i][v.id] > 0)
+            cout<<i<<" ";
+        cout<<endl;
+        */
+      } else
         customers.push_back(v);
     //get \beta
     vehicleFuelCapacity = 60;
@@ -239,6 +251,7 @@ void Instance_generation_model::createGvrp_solution(){
     timeLimit = 11; 
     vehicleAverageSpeed = 40;
     solution = new Gvrp_instance(afss, customers, instance.depot, vehicleFuelCapacity, instance.distances, instance.distances_enum, customers.size(), timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
+//    cout<<*solution<<endl;
   } catch (IloException& e) {
     throw e;
   } catch (...) {

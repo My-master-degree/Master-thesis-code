@@ -1,9 +1,11 @@
 #include "tests/gvrp/cubic_model_tests.hpp"
+#include "tests/instance_generation/model_tests.hpp"
 
 #include <string>
 
 using namespace std;
 using namespace tests::gvrp;
+using namespace tests::instance_generation;
 
 int main (int argc, char **argv)
 { 
@@ -24,7 +26,13 @@ int main (int argc, char **argv)
         nIntSol = 2100000000;
     }
   //experiments
+    //cubic model
+  /*
   Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);
   cubic_model_tests.run();
+  */
+    //instance generation model
+  Model_tests model_tests (VERBOSE, execution_time, nIntSol);
+  model_tests.run();
   return 0;
 }

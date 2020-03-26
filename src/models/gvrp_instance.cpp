@@ -28,6 +28,10 @@ void Gvrp_instance::write_in_csv(const string& file_path){
   instanceFile.open (file_path);
   //params
   instanceFile<<"Vehicle:"<<endl<<"Average speed:;"<<this->vehicleAverageSpeed<<endl<<"Time limit:;"<<this->timeLimit<<endl<<"Fuel comsumption rate:;"<<this->vehicleFuelConsumptionRate<<endl<<"Fuel Capacity:;"<<this->vehicleFuelCapacity<<endl;
+  //depot
+  instanceFile <<"Depot:"<<endl;
+  instanceFile <<"ID;X;Y;Service Time"<<endl;
+  instanceFile<<depot.id<<";"<<depot.x<<";"<<depot.y<<";"<<depot.serviceTime<<endl;
   //customers
   instanceFile <<"Customers:"<<endl;
   instanceFile <<"ID;X;Y;Service Time"<<endl;
