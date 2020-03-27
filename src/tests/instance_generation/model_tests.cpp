@@ -53,7 +53,7 @@ void Model_tests::execute_model(Instance_generation_model& instance_generation_m
     instance_generation_model.max_num_feasible_integer_sol = nIntSol;
     instance_generation_model.VERBOSE = VERBOSE;
     pair<Gvrp_instance, Mip_solution_info > sol = instance_generation_model.run();    
-    sol.first.write_in_csv(PROJECT_INSTANCES_PATH + string("new/") + string(prefix_solution_files)  + instance_name);
+    sol.first.write_in_csv(PROJECT_INSTANCES_PATH + string("new/") + string(prefix_solution_files)  + to_string(sol.first.customers.size()) + string ("c") + to_string(sol.first.afss.size()) + string ("f-") + instance_name);
     mipSolInfo = sol.second;
   } catch (string s){
     cout<<"Error:"<<s;
