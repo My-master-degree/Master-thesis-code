@@ -12,6 +12,7 @@ namespace models {
       explicit DSU (unsigned int n_);
       void join (unsigned int i, unsigned int j);
       unsigned int findSet (unsigned int i);
+      void clean();
     private:
       void swap (unsigned int &a, unsigned int &b);
   };

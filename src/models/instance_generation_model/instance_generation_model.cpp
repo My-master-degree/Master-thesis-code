@@ -7,6 +7,7 @@
 #include "models/instance_generation_model/subcycle_lazy_constraint.hpp"
 #include "models/instance_generation_model/user_constraint.hpp"
 #include "models/instance_generation_model/subcycle_user_constraint.hpp"
+#include "models/depth_node_callback.hpp"
 
 #include <list>
 #include <stdlib.h>
@@ -160,6 +161,8 @@ void Instance_generation_model::createModel() {
     //user cuts
     for (User_constraint* user_constraint : user_constraints)
       cplex.use(user_constraint);
+    //depth node callback
+    cplex.use(new Depth_node_callback(env));
   } catch (IloException& e) {
     throw e;
   } catch (string s) {

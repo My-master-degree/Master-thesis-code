@@ -1,4 +1,5 @@
 #include "models/dsu.hpp"
+#include "models/mip_depth.hpp"
 #include "models/instance_generation_model/user_constraint.hpp"
 #include "models/instance_generation_model/subcycle_user_constraint.hpp"
 #include "models/instance_generation_model/instance_generation_model.hpp"
@@ -24,6 +25,12 @@ IloCplex::CallbackI* Subcycle_user_constraint::duplicateCallback() const {
 }
 
 void Subcycle_user_constraint::main() {
+  Depth const* const d = (Depth *)getNodeData();
+  IloInt depth = d ? d->depth : 0;
+  if (depth > 0) {
+    abortCutLoop();
+    return;
+  }
   IloEnv env = getEnv();
   IloExpr lhs(env);
   size_t i,
@@ -34,8 +41,7 @@ void Subcycle_user_constraint::main() {
   multimap<unsigned int, unsigned int> subcomponents;
   list<unsigned int> component;
   list<list<unsigned int>> components;
-  ListGraph graph;
-  queue<unsigned int> q;
+  ListGraph graph; queue<unsigned int> q;
   DSU dsu (instance_generation_model.sNodes);
   vector<bool> visited (instance_generation_model.sNodes, false);
   //get values
@@ -90,7 +96,8 @@ void Subcycle_user_constraint::main() {
         if (dsu.pred[j] == j) 
           for (const pair<unsigned int, ListGraph::Node>& p1 : componentNodes) {
             k = p1.first;
-            if (gh.minCutValue(p.second, p1.second) >= instance_generation_model.z_vals[k])
+//             if (gh.minCutValue(p.second, p1.second) >= instance_generation_model.z_vals[k])
+            if (gh.minCutValue(p.second, p1.second) >= max(instance_generation_model.z_vals[k], instance_generation_model.z_vals[j]) - EPS) 
               dsu.join(j, k);
           }
       }
@@ -115,20 +122,12 @@ void Subcycle_user_constraint::main() {
       graph.clear();
       subcomponents.clear();
       componentNodes.clear();
+      dsu.clean();
     }
-  cout<<"Frac cuts components:"<<endl;
-  for (const list<unsigned int>& S : components) {
-    cout<<"- ";
-    for (unsigned int i : S) 
-      cout<<i<<" ";
-    cout<<endl;
-  }
-
   //inequallitites
   for (const list<unsigned int>& S : components) 
     for (const list<unsigned int>& T : components) 
       if (T != S){ 
-        cout<<"inserting"<<endl;
         //for ech component facility        
         //\sum_{v_j \in T} \sum_{v_k \in S} y_{jk} + y_{kj} \geqslant z_{k*}, \forall k* \in S
         for (unsigned int j_ : T) {

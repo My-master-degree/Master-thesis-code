@@ -37,3 +37,6 @@ unsigned int DSU::findSet (unsigned int i) {
   return pred[i] = pred[findSet(pred[i])];
 }
 
+void DSU::clean () {
+  for (unsigned int i = 0; i < n; pred[i] = i, rank[i++] = 0);
+}
