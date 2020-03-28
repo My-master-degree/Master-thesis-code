@@ -1,6 +1,7 @@
 #include "models/cubic_model/lazy_constraint_cubic_model.hpp"
 #include "models/cubic_model/cubic_model.hpp"
 #include "models/cubic_model/subcycle_user_constraint_cubic_model.hpp"
+#include "models/mip_depth.hpp"
 
 #include <set>
 #include <queue>
@@ -26,15 +27,18 @@ IloCplex::CallbackI* Subcycle_user_constraint_cubic_model::duplicateCallback() c
 }
 
 void Subcycle_user_constraint_cubic_model::main() {
-  if (!cubic_model.ALLOW_SUBCYCLE_USER_CUT)
+  Depth const* const d = (Depth *)getNodeData();
+  IloInt depth = d ? d->depth : 0;
+  if (depth > 0) {
+    abortCutLoop();
     return;
+  }
   int depot = cubic_model.instance.depot.id,
       i,
       k;
 //  int j;
   IloEnv env = getEnv();
   IloExpr lhs(env);
-  bool infeasibilityFound = false;
 //  vector<ListGraph::Node> nodes (all.size());
   //get values
   Matrix3DVal x_vals (env, cubic_model.instance.nRoutes);
@@ -97,7 +101,6 @@ void Subcycle_user_constraint_cubic_model::main() {
       //checking if bfs is needed
       if (!hasNeighboring)
         continue;
-      infeasibilityFound = true;
       q.push(customer.id);
       while (!q.empty()) {
         int curr = q.front();
@@ -139,5 +142,4 @@ void Subcycle_user_constraint_cubic_model::main() {
     }
   }
   x_vals.end();
-  cubic_model.ALLOW_SUBCYCLE_USER_CUT = infeasibilityFound;
 }

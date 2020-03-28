@@ -9,6 +9,7 @@
 #include "models/cubic_model/user_constraint_cubic_model.hpp"
 #include "models/cubic_model/extra_constraint_cubic_model.hpp"
 #include "models/cubic_model/preprocessing_cubic_model.hpp"
+#include "models/depth_node_callback.hpp"
 
 #include <list>
 #include <set>
@@ -27,7 +28,7 @@ using namespace models;
 using namespace models::cubic_model;
 
 Cubic_model::Cubic_model(Gvrp_instance& instance, unsigned int _time_limit): 
-  Cplex_model(instance, time_limit), ALLOW_SUBCYCLE_USER_CUT(true), ub_edge_visit(1) {
+  Cplex_model(instance, time_limit), ub_edge_visit(1) {
   if (instance.distances_enum != SYMMETRIC && instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
   //fill all and customers
@@ -291,6 +292,8 @@ void Cubic_model::createModel() {
       cplex.use(user_constraint);
     //extra steps
     extraStepsAfterModelCreation();
+    //depth node callback
+    cplex.use(new Depth_node_callback(env));
   } catch (IloException& e) {
     throw e;
   } catch (string s) {

@@ -2,7 +2,7 @@
 #include "models/instance_generation_model/instance_generation_model.hpp"
 #include "models/instance_generation_model/subcycle_lazy_constraint.hpp"
 
-#include <set>
+#include <queue>
 #include <list>
 #include <ilcplex/ilocplex.h>
 
@@ -20,10 +20,10 @@ void Subcycle_lazy_constraint::main() {
   IloExpr lhs(env);
   size_t i,
          j, 
-         curr, 
-         next;
-  set<int> component;
-  list<set<int>> components;
+         curr;
+  list<int> component;
+  list<list<int>> components;
+  queue<int> q;
   //get values
   try{
     instance_generation_model.x_vals = Matrix2DVal (env, instance_generation_model.sNodes);
@@ -42,24 +42,25 @@ void Subcycle_lazy_constraint::main() {
   for (i = 0; i < instance_generation_model.sNodes; i++)
     //if i is a facility
     if (instance_generation_model.z_vals[i] > 0) {
-      //dfs
-      next = i;
-      do {
-        curr = next;
-        component.insert(curr);
+      //bfs
+      instance_generation_model.z_vals[i] = 0;
+      q.push(i);
+      while (!q.empty()) {
+        curr = q.front();
+        component.push_back(curr);
+        q.pop();
         for (j = 0; j < instance_generation_model.sNodes; j++)
-          if (instance_generation_model.x_vals[curr][j] > 0) {
-            instance_generation_model.x_vals[curr][j] = 0;
-            next = j;
-            break;
+          if ((instance_generation_model.x_vals[j][curr] > 0 || instance_generation_model.x_vals[curr][j] > 0) && instance_generation_model.z_vals[j] > 0) {
+            instance_generation_model.z_vals[j] = 0;
+            q.push(j);
           }
-      } while (curr != next);
+      } 
       components.push_back(component);
-      component = set<int> ();
+      component = list<int> ();
     }
   //inequallitites
-  for (const set<int>& T : components) 
-    for (const set<int>& S : components) 
+  for (const list<int>& T : components) 
+    for (const list<int>& S : components) 
       if (*T.begin() != *S.begin()) 
         //for ech component facility        
         //\sum_{v_j \in T} \sum_{v_k \in S} y_{jk} + y_{kj} \geqslant z_{k*}, \forall k* \in S

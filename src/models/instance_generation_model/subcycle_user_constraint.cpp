@@ -8,6 +8,7 @@
 #include <lemon/concepts/graph.h>
 #include <lemon/list_graph.h>
 #include <map>
+#include <set>
 #include <list>
 #include <queue>
 #include <ilcplex/ilocplex.h>
@@ -44,6 +45,7 @@ void Subcycle_user_constraint::main() {
   ListGraph graph; queue<unsigned int> q;
   DSU dsu (instance_generation_model.sNodes);
   vector<bool> visited (instance_generation_model.sNodes, false);
+  bool cond1, cond2;
   //get values
   try{
     instance_generation_model.x_vals = Matrix2DVal (env, instance_generation_model.sNodes);
@@ -65,27 +67,27 @@ void Subcycle_user_constraint::main() {
       ListGraph::EdgeMap<double> weight(graph); 
       //bfs
       q.push(i);
+      visited[curr] = true;
       componentNodes[i] = graph.addNode();
       while (!q.empty()) {
         curr = q.front();
         q.pop();
-        visited[curr] = true;
         //iterate over the neighboring
-        for (j = 0; j < instance_generation_model.sNodes; j++)
-          if (instance_generation_model.x_vals[curr][j] > EPS) {
+        for (j = 0; j < instance_generation_model.sNodes; j++) {
+          cond1 = instance_generation_model.x_vals[curr][j] > EPS;
+          cond2 = instance_generation_model.z_vals[j] > EPS && instance_generation_model.x_vals[j][curr] > EPS;
+          if (cond1 || cond2) {
             if (!componentNodes.count(j))
               componentNodes[j] = graph.addNode();
-            weight[graph.addEdge(componentNodes[curr], componentNodes[j])] = instance_generation_model.x_vals[curr][j];
-            instance_generation_model.x_vals[curr][j] = 0.0;
-            q.push(j);
-          } else if (instance_generation_model.z_vals[j] > EPS && instance_generation_model.x_vals[j][curr] > EPS) {
-            if (!componentNodes.count(j))
-              componentNodes[j] = graph.addNode();
-            weight[graph.addEdge(componentNodes[j], componentNodes[curr])] = instance_generation_model.x_vals[j][curr];
-            instance_generation_model.x_vals[j][curr] = 0.0;
-            q.push(j);
+            if (cond1)
+              weight[graph.addEdge(componentNodes[curr], componentNodes[j])] = instance_generation_model.x_vals[curr][j];
+            if (cond2)
+              weight[graph.addEdge(componentNodes[j], componentNodes[curr])] = instance_generation_model.x_vals[j][curr];
+            if (!visited[j])
+              q.push(j);
+            visited[j] = true;
           }
-
+        }
       } 
       //gomory hu
       GomoryHu<ListGraph, ListGraph::EdgeMap<double> > gh (graph, weight);
