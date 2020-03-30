@@ -18,7 +18,7 @@ namespace tests {
         bool VERBOSE;
         unsigned int execution_time;
         unsigned int nIntSol;
-        void execute_model(Instance_generation_model& cubic_model, const string& instance_name, string& prefix_solution_files, unsigned int nIntSol, bool VERBOSE, Mip_solution_info& mipSolInfo);
+        void execute_model(Instance_generation_model& instance_generation_model, const string& instance_name, string& prefix_solution_files, unsigned int nIntSol, bool VERBOSE, Mip_solution_info& mipSolInfo);
         void openResultFile (ofstream& file, string fileName);
         void closeResultFile (ofstream& file);
     };

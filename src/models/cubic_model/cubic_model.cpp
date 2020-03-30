@@ -42,7 +42,6 @@ Cubic_model::Cubic_model(Gvrp_instance& instance, unsigned int _time_limit):
 }
 
 pair<Gvrp_solution, Mip_solution_info> Cubic_model::run(){
-  if (instance.distances_enum != SYMMETRIC && instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
   //setup
   stringstream output_exception;

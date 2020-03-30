@@ -1,4 +1,5 @@
 #include "tests/instance_generation/model_tests.hpp"
+#include "models/vrp_instance.hpp"
 #include "models/gvrp_instance.hpp"
 #include "models/instance_generation_model/instance_generation_model.hpp"
 #include "models/instance_generation_model/subcycle_user_constraint.hpp"
@@ -33,7 +34,7 @@ void Model_tests::run() {
   auto vrp_instance = vrp_instances.begin();
   ofstream resultsFile;
       //model only
-  solution_name = "model_";
+  solution_name = "instance_generation_";
   openResultFile(resultsFile, solution_name);
   i = 0;
   for (const string& instance : instances) {
