@@ -204,7 +204,7 @@ void Cubic_model::createModel() {
     //\sum_{k \in M} \sum_{v_j \in V} x_{0j}^k \leqslant m
     for (int k = 0; k < instance.nRoutes; k++)
       for (pair<int, Vertex> p : all)
-        expr += x[k][0][p.first];
+        expr += x[k][depot][p.first];
     c = IloConstraint (expr <= instance.nRoutes);
     c.setName("# routes upper bound");
     model.add(c);

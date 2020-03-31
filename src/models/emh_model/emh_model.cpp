@@ -1,25 +1,28 @@
 #include "models/emh_model/emh_model.hpp"
-
-#include <algorithm>
+#include "models/emh_model/preprocessing_emh_model.hpp"
 
 using namespace models::emh_model;
 
 EMH_model::EMH_model(Gvrp_instance& instance, unsigned int time_limit) : Cplex_model(instance, time_limit) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
-  //populating all map
+  //populating all map and customers set
   all[instance.depot.id] = &instance.depot;
-  for (const Vertex& customer: instance.customers)
+  for (const Vertex& customer: instance.customers) {
     all[customer.id] = &customer;
+    customers.insert(customer.id);
+  }
+  //creating dummies
   for (const Vertex& afs: instance.afss) {
+    afs_dummies[afs.id].push_back(afs.id);
     all[afs.id] = &afs;
     dummies[afs.id] = &afs;
   }
-    //creating dummies
   int dummy_id = all.rbegin()->second->id;
   for (const Vertex& afs: instance.afss)
-    for (size_t i = 0; i < instance.customers.size(); i++) {
-      all[++dummy_id] = &afs;
+    for (size_t i = 0; i < instance.customers.size() + 1; i++) {
+      afs_dummies[afs.id].push_back(++dummy_id);
+      all[dummy_id] = &afs;
       dummies[dummy_id] = &afs;
     }
 } 
@@ -124,6 +127,9 @@ void EMH_model::createObjectiveFunction() {
 
 void EMH_model::createModel() {
   try {
+    //preprocessing conditions
+    for (Preprocessing_emh_model* preprocessing : preprocessings)
+      preprocessing->add();
     //setup
     int depot = instance.depot.id;
     double beta = instance.vehicleFuelCapacity;

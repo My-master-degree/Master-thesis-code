@@ -5,7 +5,7 @@
 #include "utils/util.hpp"
 
 #include <iostream>
-#include <map>
+#include <list>
 
 using namespace std;
 using namespace models;
@@ -18,22 +18,8 @@ Invalid_edge_preprocessing_2::Invalid_edge_preprocessing_2 (Cubic_model& cubic_m
 }
 
 void Invalid_edge_preprocessing_2::add () {
-  if (cubic_model.instance.distances_enum != METRIC)
-    throw string("The preprocessing 'Invalid edge preprocessing 3' only applies for metric instances");
-  Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (cubic_model.instance);
-  Gvrp_solution gvrp_solution =  gvrp_feasible_solution_heuristic.run();
-  //for each route
-  for (const list<Vertex>& route : gvrp_solution.routes) {
-    auto second = ++route.begin();
-    auto penultimate = --route.rbegin();
-    //valid preprocessing
-    if (!cubic_model.customers.count(second->id) && !cubic_model.customers.count(penultimate->id)) {
-      //get customer
-      for (second++; !cubic_model.customers.count(second->id); second++);
-      for (int k = 0; k < cubic_model.instance.nRoutes; k++) {
-        cubic_model.model.add(cubic_model.x[k][0][second->id] == 0);
-        cubic_model.model.add(cubic_model.x[k][second->id][0] == 0);
-      }
-    }
-  }
+  list<pair<int, int>> edges = get_invalid_edges_2(cubic_model.instance);
+  for (const auto& [i, j] : edges)
+    for (int k = 0; k < cubic_model.instance.nRoutes; k++) 
+      cubic_model.model.add(cubic_model.x[k][i][j] == 0);
 }

@@ -15,7 +15,7 @@ void Routes_order_constraint::add() {
   if (cubic_model.instance.customers.size() > 0) {
     for (const pair<int, Vertex>& p : cubic_model.all) 
       //\sum_{(0, j) \in E} x_{0i}^k
-      lhs += cubic_model.x[0][0][p.first];
+      lhs += cubic_model.x[0][cubic_model.instance.depot.id][p.first];
     //lhs \geqslant rhs
     c = IloConstraint (lhs == 1);
     c.setName("Route order");
@@ -28,12 +28,12 @@ void Routes_order_constraint::add() {
   for (int k = 1; k < cubic_model.instance.nRoutes; k++) {
     for (const pair<int, Vertex>& p : cubic_model.all) {
       //\sum_{(0, j) \in E} x_{0i}^k
-      lhs += cubic_model.x[k][0][p.first];
+      lhs += cubic_model.x[k][cubic_model.instance.depot.id][p.first];
       //\sum_{(0, j) \in E} x_{0i}^{k-1}
-      rhs += cubic_model.x[k - 1][0][p.first];
+      rhs += cubic_model.x[k - 1][cubic_model.instance.depot.id][p.first];
     }
     //lhs \geqslant rhs
-    c = IloConstraint (lhs <= rhs);
+    c = IloConstraint (lhs >= rhs);
     c.setName("Route order");
     cubic_model.model.add(c);
     //clean

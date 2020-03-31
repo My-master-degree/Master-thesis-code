@@ -24,5 +24,9 @@ namespace utils {
   map<int, double> calculateCustomersEnergyUB (Cubic_model& gvrp_instance);
   void gvrpDijkstra (vector<Vertex>& f0, vector<size_t>& pred, vector<double>& fuels, vector<double>& times, Gvrp_instance& gvrp_instance);
   vector<Vertex> createF0Set (Gvrp_instance& gvrp_instance);
+  list<pair<int, int>> get_invalid_edges_1 (Gvrp_instance& gvrp_instance);
+  list<pair<int, int>> get_invalid_edges_2 (Gvrp_instance& gvrp_instance);
+  list<pair<int, int>> get_invalid_edges_3 (Gvrp_instance& gvrp_instance);
+  list<pair<int, int>> get_invalid_edges_4 (Gvrp_instance& gvrp_instance);
 } 
 #endif
