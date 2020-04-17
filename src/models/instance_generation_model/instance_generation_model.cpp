@@ -1,13 +1,13 @@
-#include "models/mip_solution_info.hpp"
-#include "models/cplex_model.hpp"
+#include "models/cplex/mip_solution_info.hpp"
+#include "models/cplex/cplex_model.hpp"
+#include "models/cplex/depth_node_callback.hpp"
 #include "models/vrp_instance.hpp"
-#include "models/gvrp_instance.hpp"
+#include "models/gvrp_models/gvrp_instance.hpp"
 #include "models/instance_generation_model/instance_generation_model.hpp"
 #include "models/instance_generation_model/lazy_constraint.hpp"
 #include "models/instance_generation_model/subcycle_lazy_constraint.hpp"
 #include "models/instance_generation_model/user_constraint.hpp"
 #include "models/instance_generation_model/subcycle_user_constraint.hpp"
-#include "models/depth_node_callback.hpp"
 
 #include <list>
 #include <stdlib.h>
@@ -18,9 +18,11 @@
 
 using namespace std;
 using namespace models;
+using namespace models::cplex;
+using namespace models::gvrp_models;
 using namespace models::instance_generation_model;
 
-Instance_generation_model::Instance_generation_model(Vrp_instance& vrp_instance, unsigned int time_limit): Cplex_model(vrp_instance, time_limit) {
+Instance_generation_model::Instance_generation_model(const Vrp_instance& vrp_instance, unsigned int time_limit): Cplex_model(vrp_instance, time_limit) {
   if (instance.distances_enum != SYMMETRIC && instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a VRP instance with symmetric or metric distances");
   sNodes = instance.customers.size() + 1;

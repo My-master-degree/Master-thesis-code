@@ -1,6 +1,6 @@
 #include "tests/instance_generation/model_tests.hpp"
 #include "models/vrp_instance.hpp"
-#include "models/gvrp_instance.hpp"
+#include "models/gvrp_models/gvrp_instance.hpp"
 #include "models/instance_generation_model/instance_generation_model.hpp"
 #include "models/instance_generation_model/subcycle_user_constraint.hpp"
 #include "utils/util.hpp"
@@ -14,6 +14,7 @@ using namespace std;
 using namespace utils;
 using namespace tests::instance_generation;
 using namespace models;
+using namespace models::gvrp_models;
 
 Model_tests::Model_tests (bool VERBOSE_, unsigned int execution_time_, unsigned int nIntSol_): VERBOSE(VERBOSE_), execution_time(execution_time_), nIntSol(nIntSol_){}
 

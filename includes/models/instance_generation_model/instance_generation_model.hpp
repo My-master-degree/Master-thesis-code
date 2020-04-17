@@ -2,9 +2,9 @@
 #define INSTANCES_GENERATION_MODEL_HPP_
 
 #include "models/vrp_instance.hpp"
-#include "models/gvrp_instance.hpp"
-#include "models/cplex_model.hpp"
-#include "models/mip_solution_info.hpp"
+#include "models/gvrp_models/gvrp_instance.hpp"
+#include "models/cplex/cplex_model.hpp"
+#include "models/cplex/mip_solution_info.hpp"
 #include "models/instance_generation_model/lazy_constraint.hpp"
 #include "models/instance_generation_model/user_constraint.hpp"
 
@@ -15,6 +15,8 @@ ILOSTLBEGIN
 
 using namespace std;
 using namespace models;
+using namespace models::gvrp_models;
+using namespace models::cplex;
 
 typedef IloArray<IloNumVarArray> Matrix2DVar;
 typedef IloArray<IloNumArray> Matrix2DVal;
@@ -25,7 +27,7 @@ namespace models {
     class User_constraint;
     class Instance_generation_model : public Cplex_model<Vrp_instance, Gvrp_instance> {
       public:
-        explicit Instance_generation_model(Vrp_instance& vrp_instance, unsigned int time_limit);
+        explicit Instance_generation_model(const Vrp_instance& vrp_instance, unsigned int time_limit);
         pair<Gvrp_instance, Mip_solution_info> run();
         Matrix2DVar x;
         Matrix2DVal x_vals;

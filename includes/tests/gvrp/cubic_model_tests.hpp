@@ -1,12 +1,12 @@
 #ifndef GVRP_TESTS_HPP_
 #define GVRP_TESTS_HPP_
 
-#include "models/cubic_model/cubic_model.hpp" 
+#include "models/gvrp_models/cplex/cubic_model/cubic_model.hpp" 
 
 #include <string>
 
 using namespace std;
-using namespace models::cubic_model;
+using namespace models::gvrp_models::cplex::cubic_model;
 
 namespace tests {
   namespace gvrp {

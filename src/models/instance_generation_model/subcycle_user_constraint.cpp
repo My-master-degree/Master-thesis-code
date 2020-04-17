@@ -1,5 +1,5 @@
 #include "models/dsu.hpp"
-#include "models/mip_depth.hpp"
+#include "models/cplex/mip_depth.hpp"
 #include "models/instance_generation_model/user_constraint.hpp"
 #include "models/instance_generation_model/subcycle_user_constraint.hpp"
 #include "models/instance_generation_model/instance_generation_model.hpp"
@@ -14,6 +14,7 @@
 #include <ilcplex/ilocplex.h>
 
 using namespace models;
+using namespace models::cplex;
 using namespace models::instance_generation_model;
 using namespace lemon;
 using namespace lemon::concepts;

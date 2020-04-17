@@ -1,10 +1,10 @@
 #include "models/vertex.hpp"
 #include "models/vrp_instance.hpp"
-#include "models/gvrp_instance.hpp"
-#include "models/gvrp_solution.hpp"
 #include "models/distances_enum.hpp"
-#include "models/cubic_model/cubic_model.hpp"
-#include "models/gvrp_feasible_solution_heuristic.hpp"
+#include "models/gvrp_models/gvrp_instance.hpp"
+#include "models/gvrp_models/gvrp_solution.hpp"
+#include "models/gvrp_models/cplex/cubic_model/cubic_model.hpp"
+#include "models/gvrp_models/gvrp_feasible_solution_heuristic.hpp"
 #include "utils/util.hpp"
 
 #include <float.h>
@@ -25,9 +25,10 @@
 #include "SampleConfig.h"
 
 using namespace models;
-using namespace models::cubic_model;
+using namespace models::gvrp_models;
+using namespace models::gvrp_models::cplex::cubic_model;
 
-Gvrp_instance utils::erdogan_instance_reader(string file_path){
+Gvrp_instance utils::erdogan_instance_reader(const string file_path){
   double time_customer = 0.5,
           time_afss = 0.25;
   int id = 0,
@@ -172,26 +173,54 @@ Gvrp_instance utils::erdogan_instance_reader(string file_path){
   return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, nRoutes, timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
 }
 
-double utils::calculateGvrpInstanceLambdaFactor (const Gvrp_instance& gvrp_instance) {
+double utils::calculateGvrpInstanceLambda (const Gvrp_instance& gvrp_instance) {
   if (gvrp_instance.afss.size() > 0){
     //calculate lambda
     double lambda = DBL_MAX;
-    //F_0
-    set<int> afssAndDepot;
-    for (Vertex afs : gvrp_instance.afss)
-      afssAndDepot.insert(afs.id);
-    afssAndDepot.insert(gvrp_instance.depot.id);
-    //min_{(f, r) \in F_0 x F_0: r \neq f} c_{fr} . C
-    for (int f : afssAndDepot)
-      for (int r : afssAndDepot)
-        if (f != r)
-          lambda = min(gvrp_instance.distances[f][r] * gvrp_instance.vehicleFuelConsumptionRate, lambda);
-    //min_{(i, 0) \in C x \{v_0\}} c_{i0} . C
-    for (const Vertex& i : gvrp_instance.customers)
-      lambda = min(gvrp_instance.distances[i.id][0] * gvrp_instance.vehicleFuelConsumptionRate, lambda);
-    return lambda;
+    //min_{v_f \in F} c_{f0} . C
+    for (const Vertex& f : gvrp_instance.afss)
+      lambda = min(gvrp_instance.distances[f.id][0], lambda);
+    return lambda * gvrp_instance.vehicleFuelConsumptionRate;
   }
   return 0.0;  
+}
+
+double utils::calculateGvrpInstancePsi (const Gvrp_instance& gvrp_instance) {
+  if (gvrp_instance.afss.size() > 1){
+    //calculate psi 
+    double psi = DBL_MAX;
+    //min_{(f, r) \in F : r \neq f} c_{fr} . C
+    for (const Vertex& f : gvrp_instance.afss)
+      for (const Vertex& r : gvrp_instance.afss)
+        if (f.id != r.id)
+          psi = min(gvrp_instance.distances[f.id][r.id], psi);
+    return psi * gvrp_instance.vehicleFuelConsumptionRate;
+  }
+  return 0.0;  
+}
+
+double utils::calculateCustomerMinRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer) {
+  //min_{v_f \in F : s_i + t_{if} + t_{T[f]}} c_{fi} = minAfsFuel 
+  double minAfsFuel = DBL_MAX;
+  for (size_t f = 0; f < gvrp_afs_tree.f0.size(); f++) 
+    if (customer.serviceTime + (gvrp_instance.distances[customer.id][gvrp_afs_tree.f0[f]->id]/gvrp_instance.vehicleAverageSpeed) + gvrp_afs_tree.times[f] < gvrp_instance.timeLimit && gvrp_instance.distances[customer.id][gvrp_afs_tree.f0[f]->id] < minAfsFuel) 
+      minAfsFuel = gvrp_instance.distances[customer.id][gvrp_afs_tree.f0[f]->id];    
+  return minAfsFuel * gvrp_instance.vehicleFuelConsumptionRate;
+}
+
+double utils::calculateCustomerMaxRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer) {
+  return gvrp_instance.vehicleFuelCapacity - utils::calculateCustomerMinRequiredFuel(gvrp_instance, gvrp_afs_tree, customer);
+}
+
+list<pair<int, int>> utils::get_invalid_edges_1 (const Gvrp_instance& gvrp_instance) {
+  if (gvrp_instance.distances_enum != METRIC)
+    throw string("The preprocessing 'Invalid edge preprocessing 1' only applies for metric instances");
+  list<pair<int, int>> edges;
+  for (size_t i = 0; i < gvrp_instance.distances.size(); i++)
+    for (size_t j = 0; j < gvrp_instance.distances.size(); j++)
+      if (gvrp_instance.distances[i][j] * gvrp_instance.vehicleFuelConsumptionRate > gvrp_instance.vehicleFuelCapacity || gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed > gvrp_instance.timeLimit)
+        edges.push_back(make_pair(i, j));
+  return edges;
 }
 
 list<string> utils::listFilesFromDir(string path) {
@@ -314,91 +343,8 @@ list<list<Vertex> > utils::getGvrpConnectedComponents (const Gvrp_instance& gvrp
   return components;
 }
 
-map<int, double> utils::calculateCustomersEnergyUB (Cubic_model& cubic_model) {
-  map<int, double> customersEnergyUBs;
-  for (Vertex customer : cubic_model.instance.customers){
-    int i = customer.id;
-    //min_{(j, i) \in E} c_{ji} = minEdge
-    double minEdge = DBL_MAX;
-    for (pair <int, Vertex> p : cubic_model.all) {
-      int j = p.first;
-      if (i != j)
-        minEdge = min (minEdge, cubic_model.instance.distances[i][j]);
-    }
-    customersEnergyUBs[i] = cubic_model.instance.vehicleFuelCapacity - minEdge * cubic_model.instance.vehicleFuelConsumptionRate;
-  }
-  return customersEnergyUBs;
-}
 
-vector<Vertex> utils::createF0Set (Gvrp_instance& gvrp_instance) {
-  int size = gvrp_instance.afss.size() + 1;
-  vector<Vertex> f0;
-  f0.reserve(size);
-  f0.push_back(gvrp_instance.depot);
-  for (const Vertex& afs : gvrp_instance.afss)
-    f0.push_back(afs);
-  return f0;
-}
-
-void utils::gvrpDijkstra (vector<Vertex>& f0, vector<size_t>& pred, vector<double>& fuels, vector<double>& times, Gvrp_instance& gvrp_instance) {
-  if (gvrp_instance.distances_enum != METRIC)
-    throw string("The algorithm 'Gvrp Dijkstra' only works for METRIC instances.");
-  size_t size = f0.size();
-  if (pred.size() < size) {
-    stringstream ss;
-    ss<<"The pred vector requires at least "<<size<<" of length";
-    throw ss.str();
-  }
-  if (fuels.size() < size) {
-    stringstream ss;
-    ss<<"The fuels vector requires at least "<<size<<" of length";
-    throw ss.str();
-  }
-  if (times.size() < size) {
-    stringstream ss;
-    ss<<"The times vector requires at least "<<size<<" of length";
-    throw ss.str();
-  }
-  size_t curr,
-      f;
-  double cost, time, fuel;
-  for (f = 0; f < size; f++) 
-    pred[f] = f;
-  fuels.assign(size, DBL_MAX);
-  times.assign(size, DBL_MAX);
-  queue<int> q;
-  q.push(0);
-  fuels[gvrp_instance.depot.id] = 0.0;
-  times[gvrp_instance.depot.id] = 0.0;
-  while (!q.empty()) {
-    curr = q.front();
-    q.pop();
-    for (f = 0; f < size; f++) {
-      cost = gvrp_instance.distances[f0[curr].id][f0[f].id];
-      fuel = cost * gvrp_instance.vehicleFuelConsumptionRate;
-      time = (cost / gvrp_instance.vehicleAverageSpeed) + f0[f].serviceTime; 
-      if (fuel <= gvrp_instance.vehicleFuelCapacity && fuels[curr] + fuel < fuels[f] && times[curr] + time < times[f]) {
-        fuels[f] = fuels[curr] + fuel;
-        times[f] = times[curr] + time;
-        pred[f] = curr;
-        q.push(f);
-      }
-    }
-  }
-}
-
-list<pair<int, int>> utils::get_invalid_edges_1 (Gvrp_instance& gvrp_instance) {
-  if (gvrp_instance.distances_enum != METRIC)
-    throw string("The preprocessing 'Invalid edge preprocessing 1' only applies for metric instances");
-  list<pair<int, int>> edges;
-  for (size_t i = 0; i < gvrp_instance.distances.size(); i++)
-    for (size_t j = 0; j < gvrp_instance.distances.size(); j++)
-      if (gvrp_instance.distances[i][j] * gvrp_instance.vehicleFuelConsumptionRate > gvrp_instance.vehicleFuelCapacity || gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed > gvrp_instance.timeLimit)
-        edges.push_back(make_pair(i, j));
-  return edges;
-}
-
-list<pair<int, int>> utils::get_invalid_edges_2 (Gvrp_instance& gvrp_instance) {
+list<pair<int, int>> utils::get_invalid_edges_2 (const Gvrp_instance& gvrp_instance) {
   if (gvrp_instance.distances_enum != METRIC)
     throw string("The preprocessing 'Invalid edge preprocessing 2' only applies for metric instances");
   list<pair<int, int>> edges;
@@ -423,20 +369,17 @@ list<pair<int, int>> utils::get_invalid_edges_2 (Gvrp_instance& gvrp_instance) {
   return edges;
 }
 
-list<pair<int, int>> utils::get_invalid_edges_3 (Gvrp_instance& gvrp_instance) {
+list<pair<int, int>> utils::get_invalid_edges_3 (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree) {
   if (gvrp_instance.distances_enum != METRIC)
     throw string("The preprocessing 'Invalid edge preprocessing 3' only applies for metric instances");
   list<pair<int, int>> edges;
   //create induced graph
-  vector<Vertex> f0 = createF0Set (gvrp_instance);
+  const vector<const Vertex *>& f0 = gvrp_afs_tree.f0;
+  const vector<size_t>& pred = gvrp_afs_tree.pred;
+  const vector<double>& times = gvrp_afs_tree.times;
   size_t sf0 = f0.size(),
           r,
           f;
-  //dijkstra
-  vector<size_t> pred (sf0);
-  vector<double> fuels (sf0);
-  vector<double> times (sf0);
-  gvrpDijkstra(f0, pred, fuels, times, gvrp_instance);
   //get invalid edges
   bool invalidEdge;
   double distance;
@@ -445,11 +388,11 @@ list<pair<int, int>> utils::get_invalid_edges_3 (Gvrp_instance& gvrp_instance) {
       invalidEdge = true;
       //check if edge (i, j) can be feasible
       for (f = 0; f < sf0; f++) 
-        if (f0[f].id == gvrp_instance.depot.id || pred[f] != f) 
+        if (f0[f]->id == gvrp_instance.depot.id || pred[f] != f) 
           for (r = 0; r < sf0; r++) 
             //if the afss f and r are connected 
-            if (f0[r].id == gvrp_instance.depot.id || pred[r] != r) {
-              distance = gvrp_instance.distances[f0[f].id][i.id] + gvrp_instance.distances[i.id][j.id] + gvrp_instance.distances[j.id][f0[r].id];
+            if (f0[r]->id == gvrp_instance.depot.id || pred[r] != r) {
+              distance = gvrp_instance.distances[f0[f]->id][i.id] + gvrp_instance.distances[i.id][j.id] + gvrp_instance.distances[j.id][f0[r]->id];
               if (distance * gvrp_instance.vehicleFuelConsumptionRate <= gvrp_instance.vehicleFuelCapacity && (times[f] + (distance/gvrp_instance.vehicleAverageSpeed) + i.serviceTime + j.serviceTime + times[r] <= gvrp_instance.timeLimit)) { 
                 invalidEdge = false;
                 f = sf0;
@@ -464,31 +407,28 @@ list<pair<int, int>> utils::get_invalid_edges_3 (Gvrp_instance& gvrp_instance) {
   return edges;
 }
 
-list<pair<int, int>> utils::get_invalid_edges_4 (Gvrp_instance& gvrp_instance) {
+list<pair<int, int>> utils::get_invalid_edges_4 (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree) {
   if (gvrp_instance.distances_enum != METRIC)
     throw string("The preprocessing 'Invalid edge preprocessing 4' only applies for metric instances");
   list<pair<int, int>> edges;
   //create induced graph
-  vector<Vertex> f0 = createF0Set (gvrp_instance);
+  const vector<const Vertex *>& f0 = gvrp_afs_tree.f0;
+  const vector<size_t>& pred = gvrp_afs_tree.pred;
+  const vector<double>& times = gvrp_afs_tree.times;
   size_t sf0 = f0.size(),
           r,
           f;
-  //dijkstra
-  vector<size_t> pred (sf0);
-  vector<double> fuels (sf0);
-  vector<double> times (sf0);
-  gvrpDijkstra(f0, pred, fuels, times, gvrp_instance);
   //get invalid edges
   bool invalidEdge;
   double distance;
   for (const Vertex& i : gvrp_instance.customers)
     for (f = 0; f < sf0; f++) {
       invalidEdge = true;
-      if (f0[f].id == gvrp_instance.depot.id || pred[f] != f) 
+      if (f0[f]->id == gvrp_instance.depot.id || pred[f] != f) 
         for (r = 0; r < sf0; r++) 
           //if the afss f and r are connected 
-          if (f0[r].id == gvrp_instance.depot.id || pred[r] != r) {
-            distance = gvrp_instance.distances[f0[f].id][i.id] + gvrp_instance.distances[i.id][f0[r].id];
+          if (f0[r]->id == gvrp_instance.depot.id || pred[r] != r) {
+            distance = gvrp_instance.distances[f0[f]->id][i.id] + gvrp_instance.distances[i.id][f0[r]->id];
             if (distance * gvrp_instance.vehicleFuelConsumptionRate <= gvrp_instance.vehicleFuelCapacity && times[f] + (distance/gvrp_instance.vehicleAverageSpeed) + i.serviceTime + times[r] <= gvrp_instance.timeLimit) { 
               invalidEdge = false;
               f = sf0;
@@ -496,8 +436,8 @@ list<pair<int, int>> utils::get_invalid_edges_4 (Gvrp_instance& gvrp_instance) {
             }
           }
       if (invalidEdge) {
-        edges.push_back(make_pair(i.id, f0[f].id));
-        edges.push_back(make_pair(f0[f].id, i.id));
+        edges.push_back(make_pair(i.id, f0[f]->id));
+        edges.push_back(make_pair(f0[f]->id, i.id));
       }
     }
   return edges;

@@ -1,11 +1,11 @@
 #include "tests/gvrp/emh_model_tests.hpp"
-#include "models/gvrp_instance.hpp"
-#include "models/gvrp_solution.hpp"
-#include "models/emh_model/emh_model.hpp"
-#include "models/emh_model/invalid_edge_preprocessing.hpp"
-#include "models/emh_model/invalid_edge_preprocessing_2.hpp"
-#include "models/emh_model/invalid_edge_preprocessing_3.hpp"
-#include "models/emh_model/invalid_edge_preprocessing_4.hpp"
+#include "models/gvrp_models/gvrp_instance.hpp"
+#include "models/gvrp_models/gvrp_solution.hpp"
+#include "models/gvrp_models/cplex/emh_model/emh_model.hpp"
+#include "models/gvrp_models/cplex/emh_model/invalid_edge_preprocessing.hpp"
+#include "models/gvrp_models/cplex/emh_model/invalid_edge_preprocessing_2.hpp"
+#include "models/gvrp_models/cplex/emh_model/invalid_edge_preprocessing_3.hpp"
+#include "models/gvrp_models/cplex/emh_model/invalid_edge_preprocessing_4.hpp"
 #include "utils/util.hpp"
 #include "SampleConfig.h"
 
@@ -16,7 +16,8 @@
 using namespace std;
 using namespace utils;
 using namespace tests::gvrp;
-using namespace models;
+using namespace models::gvrp_models;
+using namespace models::gvrp_models::cplex::emh_model;
 
 EMH_model_tests::EMH_model_tests (bool VERBOSE_, unsigned int execution_time_, unsigned int nIntSol_): VERBOSE(VERBOSE_), execution_time(execution_time_), nIntSol(nIntSol_){}
 
@@ -42,6 +43,7 @@ void EMH_model_tests::run() {
   i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
+    gvrp_instance->nRoutes = gvrp_instance->customers.size();
     EMH_model emh_model (*gvrp_instance, execution_time);  
     emh_model.preprocessings.push_back(new Invalid_edge_preprocessing(emh_model));
     emh_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(emh_model));

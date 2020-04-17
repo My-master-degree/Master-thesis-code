@@ -2,12 +2,12 @@
 #define EMH_MODEL_TESTS_HPP_
 
 #include "tests/gvrp/emh_model_tests.hpp"
-#include "models/emh_model/emh_model.hpp"
+#include "models/gvrp_models/cplex/emh_model/emh_model.hpp"
 
 #include <string>
 
 using namespace std;
-using namespace models::emh_model;
+using namespace models::gvrp_models::cplex::emh_model;
 
 namespace tests {
   namespace gvrp {
