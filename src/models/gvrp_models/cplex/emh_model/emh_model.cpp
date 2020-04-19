@@ -42,12 +42,19 @@ EMH_model::EMH_model(const Gvrp_instance& instance, unsigned int time_limit) : G
     dummies[afs.id] = &afs;
   }
   int dummy_id = all.rbegin()->second->id;
+  //afs dummies
   for (const Vertex& afs: instance.afss)
-    for (size_t i = 0; i < instance.customers.size() + 1; i++) {
+    for (size_t i = 0; i < instance.customers.size(); ++i) {
       afs_dummies[afs.id].push_back(++dummy_id);
       all[dummy_id] = &afs;
       dummies[dummy_id] = &afs;
     }
+  //depot dummies
+  for (size_t i = 0; i < instance.customers.size() + 1; ++i) {
+    afs_dummies[instance.depot.id].push_back(++dummy_id);
+    all[dummy_id] = &instance.depot;
+    dummies[dummy_id] = &instance.depot;
+  }
 } 
 
 pair<Gvrp_solution, Mip_solution_info> EMH_model::run(){

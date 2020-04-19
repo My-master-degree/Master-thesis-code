@@ -152,20 +152,18 @@ Gvrp_instance utils::erdogan_instance_reader(const string file_path){
     vertexes[j++] = *i;
   vector<vector<double> > distances(total_size);
   double radiusOfEarth = 4182.44949; // miles, 6371km; 
-//  double radiusOfEarth = 6373.0; // miles, 6371km; 
+//  double radiusOfEarth = 6371.0; // miles, 6371km; 
   for (int i = 0; i < total_size; i++){
     distances[i] = vector<double> (total_size);
     for (int j = 0; j < total_size; j++){
 //      double PI = 4.0*atan(1.0);
-      double dLat1 = vertexes[i].y * (M_PI/180);
-      double dLat2 = vertexes[j].y * (M_PI/180);
-      double dLon1 = vertexes[i].x * (M_PI/180);
-      double dLon2 = vertexes[j].x * (M_PI/180);
-
+      double dLat1 = vertexes[i].y * (M_PI/180.0);
+      double dLat2 = vertexes[j].y * (M_PI/180.0);
       double dLat = dLat1 - dLat2; 
-      double dLon = dLon1 - dLon2; 
-      double a = pow(sin(dLat / 2.0), 2.0) + pow(sin(dLon / 2.0), 2.0) * cos(dLat1) * cos(dLat2); 
-      double c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
+      double dLon = (vertexes[i].x - vertexes[j].x) * (M_PI/180.0); 
+      double a = pow(sin(dLat / 2), 2) + pow(sin(dLon / 2), 2) * cos(dLat1) * cos(dLat2); 
+//      double c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
+      double c = 2 * asin(sqrt(a));
       distances[vertexes[i].id][vertexes[j].id] = radiusOfEarth * c;
       //      distances[vertexes[i].id][vertexes[j].id] = sqrt(pow(vertexes[i].x - vertexes[j].x, 2) + pow(vertexes[i].y - vertexes[j].y, 2)); 
     }

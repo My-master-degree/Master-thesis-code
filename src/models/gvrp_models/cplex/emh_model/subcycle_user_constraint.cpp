@@ -36,6 +36,7 @@ void Subcycle_user_constraint::main() {
     abortCutLoop();
     return;
   }
+  /*
   int depot = emh_model.instance.depot.id;
   //int i,
   //k;
@@ -48,43 +49,30 @@ void Subcycle_user_constraint::main() {
   for (const pair<int, const Vertex *>& p : emh_model.all) 
     x_vals[p.first] = IloNumArray (env, emh_model.all.size());
   //get subcycles
-  /*
   //gomory hu
   ListGraph graph;
-  ListGraph::EdgeMap<double>  weight(graph); 
+  ListGraph::EdgeMap<double> weight(graph); 
   //creating nodes
   for (const pair<int, Vertex>& p : emh_model.all) 
-  nodes[p.first] = graph.addNode();
+    nodes[p.first] = graph.addNode();
   //creating edges
   for (const pair<int, Vertex>& p : emh_model.all) {
-  i = p.first;
-  for (const pair<int, Vertex>& p1 : emh_model.all) {
-  j = p1.first;
-  weight[graph.addEdge(nodes[i], nodes[j])] = x_vals[k][i][j];
-  }
+    i = p.first;
+    for (const pair<int, Vertex>& p1 : emh_model.all) {
+      j = p1.first;
+      weight[graph.addEdge(nodes[i], nodes[j])] = x_vals[k][i][j];
+    }
   }
   GomoryHu<ListGraph, ListGraph::EdgeMap<double> > gh (graph, weight);
   gh.run();
   //get subcycles
   for (int i : emh_model.customers) {
-  if (gh.minCutValue(nodes[i], nodes[0]) < 2.0) {
+    if (gh.minCutValue(nodes[i], nodes[0]) < 2.0) {
 
+    }
   }
-  }
-  */
-  //bfs to remove all edges connected to the depot
   queue<int> q;
-  q.push(depot);
-  while (!q.empty()) {
-    int curr = q.front();
-    q.pop();
-    for (const pair<int, const Vertex *>& p : emh_model.all)
-      if (x_vals[curr][p.first] > EPS){
-        x_vals[curr][p.first] = 0.0;
-        q.push(p.first);
-      }        
-  }
-  //bfs to remove all edges not connected to the depot
+  //bfs to get components connected to a customer 
   for (const Vertex& customer : emh_model.instance.customers) {
     set<int> component, customersComponent;
     //checking for neighboring
@@ -138,4 +126,5 @@ void Subcycle_user_constraint::main() {
     x_vals[i].end();
   }
   x_vals.end();
+  */
 }

@@ -43,7 +43,7 @@ void EMH_model_tests::run() {
   i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
-    gvrp_instance->nRoutes = gvrp_instance->customers.size();
+//    gvrp_instance->nRoutes = gvrp_instance->customers.size();
     EMH_model emh_model (*gvrp_instance, execution_time);  
     emh_model.preprocessings.push_back(new Invalid_edge_preprocessing(emh_model));
     emh_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(emh_model));
