@@ -68,7 +68,7 @@ void Subcycle_user_constraint::main() {
       ListGraph::EdgeMap<double> weight(graph); 
       //bfs
       q.push(i);
-      visited[curr] = true;
+      visited[i] = true;
       componentNodes[i] = graph.addNode();
       while (!q.empty()) {
         curr = q.front();
