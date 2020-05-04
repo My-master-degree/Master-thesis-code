@@ -6,6 +6,7 @@
 #include "models/gvrp_models/cplex/emh_model/invalid_edge_preprocessing_2.hpp"
 #include "models/gvrp_models/cplex/emh_model/invalid_edge_preprocessing_3.hpp"
 #include "models/gvrp_models/cplex/emh_model/invalid_edge_preprocessing_4.hpp"
+#include "models/gvrp_models/cplex/emh_model/subcycle_user_constraint.hpp"
 #include "utils/util.hpp"
 #include "SampleConfig.h"
 
@@ -45,10 +46,13 @@ void EMH_model_tests::run() {
     cout<<instance<<endl;
 //    gvrp_instance->nRoutes = gvrp_instance->customers.size();
     EMH_model emh_model (*gvrp_instance, execution_time);  
+    /*
     emh_model.preprocessings.push_back(new Invalid_edge_preprocessing(emh_model));
     emh_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(emh_model));
     emh_model.preprocessings.push_back(new Invalid_edge_preprocessing_3(emh_model));
     emh_model.preprocessings.push_back(new Invalid_edge_preprocessing_4(emh_model));
+    emh_model.user_constraints.push_back(new Subcycle_user_constraint(emh_model));
+    */
     execute_model(emh_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
@@ -75,7 +79,7 @@ void EMH_model_tests::execute_model(EMH_model& emh_model, const string& instance
 }
 
 void EMH_model_tests::openResultFile (ofstream& resultsFile, string fileName) {
-  resultsFile.open (fileName + string("results.csv"));
+  resultsFile.open (fileName + string("emh_results.csv"));
   resultsFile<<"Instance,Solution,GAP,Cost,Time,Status"<<endl;
 }
 

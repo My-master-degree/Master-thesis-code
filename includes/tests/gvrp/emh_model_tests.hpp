@@ -1,7 +1,6 @@
 #ifndef EMH_MODEL_TESTS_HPP_
 #define EMH_MODEL_TESTS_HPP_
 
-#include "tests/gvrp/emh_model_tests.hpp"
 #include "models/gvrp_models/cplex/emh_model/emh_model.hpp"
 
 #include <string>

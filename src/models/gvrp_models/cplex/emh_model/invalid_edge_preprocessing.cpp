@@ -14,20 +14,22 @@ Invalid_edge_preprocessing::Invalid_edge_preprocessing (EMH_model& emh_model) : 
 void Invalid_edge_preprocessing::add () {
   list<pair<int, int>> edges = get_invalid_edges_1(emh_model.instance);
   for (auto const& [i, j] : edges) {
+    auto f1 = emh_model.afs_dummies.find(i),
+         f2 = emh_model.afs_dummies.find(j);
     //both are customers
-    if (!emh_model.afs_dummies.count(i) && !emh_model.afs_dummies.count(j)) 
+    if (f1 == emh_model.afs_dummies.end() && f2 == emh_model.afs_dummies.end()) 
       emh_model.model.add(emh_model.x[i][j] == 0);
     //first is afs and second is customer
-    else if (emh_model.afs_dummies.count(i) && !emh_model.afs_dummies.count(j)) 
-      for (int i_dummy : emh_model.afs_dummies[i])
+    else if (f1 != emh_model.afs_dummies.end() && f2 == emh_model.afs_dummies.end()) 
+      for (int i_dummy : f1->second)
         emh_model.model.add(emh_model.x[i_dummy][j] == 0);
     //first is customer and second is afs 
-    else if (!emh_model.afs_dummies.count(i) && emh_model.afs_dummies.count(j)) 
-      for (int j_dummy : emh_model.afs_dummies[j])
+    else if (f1 == emh_model.afs_dummies.end() && f2 != emh_model.afs_dummies.end()) 
+      for (int j_dummy : f2->second)
         emh_model.model.add(emh_model.x[i][j_dummy] == 0);
     else 
-      for (int i_dummy : emh_model.afs_dummies[i])
-        for (int j_dummy : emh_model.afs_dummies[j])
+      for (int i_dummy : f1->second)
+        for (int j_dummy : f2->second)
         emh_model.model.add(emh_model.x[i_dummy][j_dummy] == 0);
   }
 }

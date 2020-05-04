@@ -16,6 +16,14 @@ Gvrp_instance::Gvrp_instance(list<Vertex> afss_, list<Vertex> customers_, Vertex
   vehicleAverageSpeed = 1.0;
 }
 
+double Gvrp_instance::time(int i, int j) const {
+  return distances[i][j] / vehicleAverageSpeed;
+}
+
+double Gvrp_instance::fuel(int i, int j) const {
+  return distances[i][j] * vehicleFuelConsumptionRate;
+}
+
 Gvrp_instance::Gvrp_instance(list<Vertex> _afss, list<Vertex> _customers, Vertex _depot, double _vehicleFuelCapacity, vector<vector<double> > _distances, Distances_enum _distances_enum, int nRoutes, double _timeLimit, double _vehicleFuelConsumptionRate, double _vehicleAverageSpeed) : Gvrp_instance(_afss, _customers, _depot, _vehicleFuelCapacity, _distances, _distances_enum, nRoutes) {
   timeLimit = _timeLimit;
   vehicleFuelConsumptionRate = _vehicleFuelConsumptionRate;

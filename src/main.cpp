@@ -1,5 +1,6 @@
 #include "tests/gvrp/cubic_model_tests.hpp"
 #include "tests/gvrp/emh_model_tests.hpp"
+#include "tests/gvrp/kk_model_tests.hpp"
 #include "tests/instance_generation/model_tests.hpp"
 
 #include <string>
@@ -31,14 +32,15 @@ int main (int argc, char **argv)
   /*
   Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);
   cubic_model_tests.run();
-  */
     //instance generation model
   Model_tests model_tests (VERBOSE, execution_time, nIntSol);
   model_tests.run();
     //EMH model
-  /*
   EMH_model_tests emh_model_tests (VERBOSE, execution_time, nIntSol);
   emh_model_tests.run();
   */
+    //KK model
+  KK_model_tests kk_model_tests (VERBOSE, execution_time, nIntSol);
+  kk_model_tests.run();
   return 0;
 }

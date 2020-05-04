@@ -27,6 +27,8 @@ namespace models{
           output<<endl<<"Vehicle:"<<endl<<"\tAverage speed:"<<gvrp_instance.vehicleAverageSpeed<<endl<<"\tTime limit:"<<gvrp_instance.timeLimit<<endl<<"\tFuel comsumption rate:"<<gvrp_instance.vehicleFuelConsumptionRate<<endl<<"\tFuel Capacity:"<<gvrp_instance.vehicleFuelCapacity<<endl;
           return strm << output.str();
         };
+        double time(int i, int j) const;
+        double fuel(int i, int j) const;
         void write_in_csv(const string& file_path);
         list<Vertex> afss;
         double vehicleFuelCapacity;

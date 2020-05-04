@@ -18,13 +18,16 @@ Invalid_edge_preprocessing_4::Invalid_edge_preprocessing_4 (EMH_model& emh_model
 
 void Invalid_edge_preprocessing_4::add () {
   list<pair<int, int>> edges = get_invalid_edges_4(emh_model.instance, *emh_model.gvrp_afs_tree);
-  for (auto const& [i, j] : edges)
+  for (auto const& [i, j] : edges) {
+    auto f1 = emh_model.afs_dummies.find(i),
+         f2 = emh_model.afs_dummies.find(j);
     //first is afs and second is customer
-    if (emh_model.afs_dummies.count(i)) 
-      for (int i_dummy : emh_model.afs_dummies[i])
+    if (f1 != emh_model.afs_dummies.end()) 
+      for (int i_dummy : f1->second)
         emh_model.model.add(emh_model.x[i_dummy][j] == 0);
   //first is customer and second is afs 
-    else if (emh_model.afs_dummies.count(j)) 
-      for (int j_dummy : emh_model.afs_dummies[j])
+    else if (f2 != emh_model.afs_dummies.end()) 
+      for (int j_dummy : f2->second)
         emh_model.model.add(emh_model.x[i][j_dummy] == 0);
+  }
 }
