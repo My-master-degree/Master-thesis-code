@@ -61,7 +61,7 @@ void Subcycle_user_constraint::main() {
     }
   }
   //creating nodes
-  for (size_t i = 0; i < sc0; ++i) {
+  for (size_t i = 0; i < sc0; ++i) 
     nodes[i] = graph.addNode();
   //get components
   for (int i = 1; i < sc0; ++i) {
@@ -102,24 +102,16 @@ void Subcycle_user_constraint::main() {
           }
         }
         if (flowExists) {
-          cout<<"flow from "<<curr<<" to "<<j<<" exists"<<endl;
           if (!visited.count(j)) {
             component.insert(j);
             q.push(j);
           }
-          cout<<j<<" inserted into the queue"<<endl;
           nodes[curr];
-          cout<<"curr "<<endl;
           nodes[j];
-          cout<<"j "<<endl;
           auto e = graph.addEdge(nodes[curr], nodes[j]);
-          cout<<j<<" inserted into the queue"<<endl;
           weight[e] = currToJFlow;
-          cout<<j<<" inserted into the queue"<<endl;
           e = graph.addEdge(nodes[j], nodes[curr]);
-          cout<<j<<" inserted into the queue"<<endl;
           weight[e] = jToCurrFlow;
-          cout<<"flows inserted into the graph"<<endl;
         }
       } 
     }
@@ -135,35 +127,21 @@ void Subcycle_user_constraint::main() {
           cout<<"ooooopssss "<<i<<" and "<<j<<endl;
     component.clear();
   }
-  cout<<"user constraints"<<endl;
   //get subcomponents
   for (int i = 0; i < sc0; ++i) 
     subcomponents.insert(make_pair(dsu.findSet(i), i));
   //store components
   multimap<int, int>::iterator it = subcomponents.begin();
-  cout<<"components:"<<endl;
   int j = it->first;
   for (; it != subcomponents.end(); it++) {
     if (it->first != j) {
       j = it->first;
       components.push_back(component);
-      cout<<"\t";
-      for (int a : component)
-        cout<<a<<" ";
-      cout<<endl;
       component.clear();
     } 
     component.insert(it->second);
   }
-  cout<<"\t";
-  for (int a : component)
-    cout<<a<<" ";
-  cout<<endl;
   components.push_back(component);
-  if (components.size() > 1) {
-    cout<<"FOUND"<<endl;
-    exit(0);
-  }
   //end of multimap 
   //inequallitites
   for (const set<int>& S : components) 
@@ -188,12 +166,13 @@ void Subcycle_user_constraint::main() {
       lhs.end();
       lhs = IloExpr(env);
     }
-  }
-  cout<<"inserted"<<endl;
   //clean
-  for (const pair<int, const Vertex *>& p : kk_model.all){
-    int i = p.first;
+  for (size_t i = 0; i < sc0; ++i) {
     x_vals[i].end();
+    for (size_t f = 0; f < sf0; ++f) 
+      y_vals[i][f].end();
+    y_vals[i].end();
   }
   x_vals.end();
+  y_vals.end();
 }
