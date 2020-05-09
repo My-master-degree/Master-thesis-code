@@ -1,5 +1,5 @@
-#ifndef GVRP_TESTS_HPP_
-#define GVRP_TESTS_HPP_
+#ifndef CUBIC_MODEL_TESTS_HPP_
+#define CUBIC_MODEL_TESTS_HPP_
 
 #include "models/gvrp_models/cplex/cubic_model/cubic_model.hpp" 
 

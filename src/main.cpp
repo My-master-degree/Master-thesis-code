@@ -2,10 +2,12 @@
 #include "tests/gvrp/emh_model_tests.hpp"
 #include "tests/gvrp/kk_model_tests.hpp"
 #include "tests/instance_generation/model_tests.hpp"
+#include "tests/bpp/bpp_model_tests.hpp"
 
 #include <string>
 
 using namespace std;
+using namespace tests::bpp;
 using namespace tests::gvrp;
 using namespace tests::instance_generation;
 
@@ -38,9 +40,12 @@ int main (int argc, char **argv)
     //EMH model
   EMH_model_tests emh_model_tests (VERBOSE, execution_time, nIntSol);
   emh_model_tests.run();
-  */
     //KK model
   KK_model_tests kk_model_tests (VERBOSE, execution_time, nIntSol);
   kk_model_tests.run();
+  */
+    //BBP model
+  BPP_model_tests bpp_model_tests (VERBOSE, execution_time, nIntSol);
+  bpp_model_tests.run();
   return 0;
 }
