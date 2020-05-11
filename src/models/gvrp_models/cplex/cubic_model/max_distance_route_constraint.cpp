@@ -13,7 +13,7 @@ void Max_distance_route_constraint::add (){
           rhs (cubic_model.env);
   IloConstraint c;
   //\sum_{(i, j) \in E} c_{ij} . C . x_{ij}^k = lhs
-  for (int k = 0; k < cubic_model.instance.nRoutes; k++){
+  for (int k = 0; k < cubic_model.instance.maxRoutes; k++){
     for (const pair<int, const Vertex *>& p : cubic_model.all){
       int i = p.first;
       for (const pair<int, const Vertex *>& p1 : cubic_model.all){

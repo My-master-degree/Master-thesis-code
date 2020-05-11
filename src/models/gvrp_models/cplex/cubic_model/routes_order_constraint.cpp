@@ -27,7 +27,7 @@ void Routes_order_constraint::add() {
     c.end();
     lhs = IloExpr (cubic_model.env);
   }
-  for (int k = 1; k < cubic_model.instance.nRoutes; k++) {
+  for (int k = 1; k < cubic_model.instance.maxRoutes; k++) {
     for (const pair<int, const Vertex *>& p : cubic_model.all) {
       //\sum_{(0, j) \in E} x_{0i}^k
       lhs += cubic_model.x[k][cubic_model.instance.depot.id][p.first];

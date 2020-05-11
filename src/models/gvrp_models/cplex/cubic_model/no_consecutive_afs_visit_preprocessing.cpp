@@ -13,6 +13,6 @@ No_consecutive_afs_visit_preprocessing::No_consecutive_afs_visit_preprocessing (
 void No_consecutive_afs_visit_preprocessing::add () {
   for (const Vertex& v_r : cubic_model.instance.afss)
     for (const Vertex& v_f : cubic_model.instance.afss)
-      for (int k = 0; k < cubic_model.instance.nRoutes; k++) 
+      for (int k = 0; k < cubic_model.instance.maxRoutes; k++) 
         cubic_model.model.add(cubic_model.x[k][v_r.id][v_f.id] == 0);
 }

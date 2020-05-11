@@ -89,7 +89,7 @@ pair<Gvrp_solution, Mip_solution_info> Cubic_model::run(){
 }
 
 void Cubic_model::createVariables(){
-  x = Matrix3DVar (env, instance.nRoutes);
+  x = Matrix3DVar (env, instance.maxRoutes);
   e = IloNumVarArray (env, all.size(), 0, instance.vehicleFuelCapacity, IloNumVar::Float);
   try {
     //setting names
@@ -103,7 +103,7 @@ void Cubic_model::createVariables(){
       nameStream.str("");
     }
     //x var
-    for (int k = 0; k < instance.nRoutes; k++){
+    for (int k = 0; k < instance.maxRoutes; k++){
       x[k] = IloArray<IloNumVarArray> (env, all.size());
       for (const pair<int, const Vertex *>& p : all){
         int i = p.first;
@@ -130,7 +130,7 @@ void Cubic_model::createObjectiveFunction() {
 //objective function
   try{
     IloExpr fo (env);
-    for (int k = 0; k < instance.nRoutes; k++)
+    for (int k = 0; k < instance.maxRoutes; k++)
       for (const pair<int, const Vertex *>& p : all){
         int i = p.first;
         for (const pair<int, const Vertex *>& p1 : all){
@@ -162,7 +162,7 @@ void Cubic_model::createModel() {
     IloConstraint c;
     stringstream constraintName;
     //\sum_{v_j \in V} x_{ij}^k = \sum_{v_j \in V} x_{ji}^k, \forall v_i \in V, \forall k \in M
-    for (int k = 0; k < instance.nRoutes; k++)
+    for (int k = 0; k < instance.maxRoutes; k++)
       for (const pair<int, const Vertex *>& p : all){
         int i = p.first;
         for (const pair<int, const Vertex *>& p1 : all){
@@ -179,7 +179,7 @@ void Cubic_model::createModel() {
         expr1 = IloExpr(env);
       }    
     //\sum_{v_i \in V} x_{0i}^k \leqslant 1, \forall k in M
-    for (int k = 0; k < instance.nRoutes; k++){
+    for (int k = 0; k < instance.maxRoutes; k++){
       for (const pair<int, const Vertex *>& p : all){
         int i = p.first;
         expr += x[k][depot][i];
@@ -193,7 +193,7 @@ void Cubic_model::createModel() {
     //\sum_{k \in M} \sum_{v_j \in V} x_{ij}^{k} = 1, \forall v_i \in C
     for (Vertex customer :instance.customers){
       int i = customer.id;
-      for (int k = 0; k < instance.nRoutes; k++){
+      for (int k = 0; k < instance.maxRoutes; k++){
         for (const pair<int, const Vertex *>& p1 : all){
           int j = p1.first;
           expr += x[k][i][j];
@@ -206,10 +206,10 @@ void Cubic_model::createModel() {
       expr = IloExpr(env);
     }
     //\sum_{k \in M} \sum_{v_j \in V} x_{0j}^k \leqslant m
-    for (int k = 0; k < instance.nRoutes; k++)
+    for (int k = 0; k < instance.maxRoutes; k++)
       for (const pair<int, const Vertex *>& p : all)
         expr += x[k][depot][p.first];
-    c = IloConstraint (expr <= instance.nRoutes);
+    c = IloConstraint (expr <= instance.maxRoutes);
     c.setName("# routes upper bound");
     model.add(c);
     expr.end();
@@ -226,7 +226,7 @@ void Cubic_model::createModel() {
       model.add(c);
     }
     //e_j \leq e_i - c_{ij} x_{ij}^k + \beta (1 - x_{ij}^k), \forall v_j \in C,\forall v_i \in V, \forall k \in M
-    for (int k = 0; k < instance.nRoutes; k++)
+    for (int k = 0; k < instance.maxRoutes; k++)
       for (Vertex customer : instance.customers) {
         int j = customer.id;
         for (const pair<int, const Vertex *>& p :all) {
@@ -240,7 +240,7 @@ void Cubic_model::createModel() {
         }
       }
     //e_i \geq c_{ij} x_{ij}^k, \forall v_i, \forall v_j \in V, \forall k \in M
-    for (int k = 0; k < instance.nRoutes; k++)
+    for (int k = 0; k < instance.maxRoutes; k++)
       for (const pair<int, const Vertex *>& p : all){
         int i = p.first;
         for (const pair<int, const Vertex *>& p1 : all){
@@ -254,7 +254,7 @@ void Cubic_model::createModel() {
         }
       }
     //x_{ij}^k c_{ij} \leq \beta, \forall v_i, \forall v_j \in V, \forall k \in M
-      for (int k = 0; k < instance.nRoutes; k++)
+      for (int k = 0; k < instance.maxRoutes; k++)
         for (const pair<int, const Vertex *>& p : all){
           int i = p.first;
           for (const pair<int, const Vertex *>& p1 : all){
@@ -268,7 +268,7 @@ void Cubic_model::createModel() {
           }
         }
       //\sum_{(i, j) \in E} x_{ij}^k ((c_{ij} / S) + time(v_i) )\leq T, \forall k \in M
-      for (int k = 0; k < instance.nRoutes; k++){
+      for (int k = 0; k < instance.maxRoutes; k++){
         for (const pair<int, const Vertex *>& p : all){
           int i = p.first;
           for (const pair<int, const Vertex *>& p1 : all){
@@ -351,8 +351,8 @@ void Cubic_model::setCustomParameters(){
 void Cubic_model::fillX_vals(){
   //getresult
   try{
-    x_vals = Matrix3DVal (env, instance.nRoutes);
-    for (int k = 0; k < instance.nRoutes; k++) { 
+    x_vals = Matrix3DVal (env, instance.maxRoutes);
+    for (int k = 0; k < instance.maxRoutes; k++) { 
       x_vals[k] = IloArray<IloNumArray> (env, all.size());
       for (const pair<int, const Vertex *>& p : all){
         int i = p.first;
@@ -370,7 +370,7 @@ void Cubic_model::fillX_vals(){
 void Cubic_model::createGvrp_solution(){
   /*
   //print x vals
-  for (int k = 0; k < instance.nRoutes; k++){ {
+  for (int k = 0; k < instance.maxRoutes; k++){ {
     //columns
     cout<<" ";
     for (auto p : all){
@@ -397,7 +397,7 @@ void Cubic_model::createGvrp_solution(){
     int depot = instance.depot.id;
     int curr,
         next;    
-    for (int k = 0; k < instance.nRoutes; k++) {
+    for (int k = 0; k < instance.maxRoutes; k++) {
       curr = depot;
       next = depot;
       //checking if the route is used
@@ -475,7 +475,7 @@ void Cubic_model::createGvrp_solution(){
 }
 
 void Cubic_model::endVars(){
-  for (int k = 0; k < instance.nRoutes; k++){ 
+  for (int k = 0; k < instance.maxRoutes; k++){ 
     for (const pair<int, const Vertex *>& p : all)
       x[k][p.first].end();
     x[k].end();

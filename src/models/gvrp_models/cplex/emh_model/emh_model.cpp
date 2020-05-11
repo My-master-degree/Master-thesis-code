@@ -231,7 +231,7 @@ void EMH_model::createModel() {
     //\sum_{v_j \in V' : v_j \neq v_0} x_{0j} \leqslant m
     for (const pair<int, const Vertex *>& p : all)
       expr += x[depot][p.first];
-    c = IloConstraint (expr <= instance.nRoutes);
+    c = IloConstraint (expr <= instance.maxRoutes);
     c.setName(string(" # routes limit == ").c_str());
     model.add(c);
     expr.end();

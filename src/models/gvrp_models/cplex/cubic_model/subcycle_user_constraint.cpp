@@ -44,8 +44,8 @@ void Subcycle_user_constraint::main() {
   IloExpr lhs(env);
 //  vector<ListGraph::Node> nodes (all.size());
   //get values
-  Matrix3DVal x_vals (env, cubic_model.instance.nRoutes);
-  for (k = 0; k < cubic_model.instance.nRoutes; k++) {
+  Matrix3DVal x_vals (env, cubic_model.instance.maxRoutes);
+  for (k = 0; k < cubic_model.instance.maxRoutes; k++) {
     x_vals[k] = IloArray<IloNumArray> (env, cubic_model.all.size());
     for (const pair<int, const Vertex *>& p : cubic_model.all) {
       i = p.first;
@@ -54,7 +54,7 @@ void Subcycle_user_constraint::main() {
     }
   }
   //get subcycles
-  for (k = 0; k < cubic_model.instance.nRoutes; k++) {
+  for (k = 0; k < cubic_model.instance.maxRoutes; k++) {
     /*
     //gomory hu
     ListGraph graph;

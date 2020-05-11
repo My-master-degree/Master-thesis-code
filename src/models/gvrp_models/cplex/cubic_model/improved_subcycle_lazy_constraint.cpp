@@ -23,7 +23,7 @@ void Improved_subcycle_lazy_constraint::main() {
   IloExpr lhs(env), lhs_(env);
   //get values
   Matrix3DVal x_vals (env, cubic_model.instance.customers.size());
-  for (int k = 0; k < cubic_model.instance.nRoutes; k++) {
+  for (int k = 0; k < cubic_model.instance.maxRoutes; k++) {
     x_vals[k] = IloArray<IloNumArray> (env, cubic_model.all.size());
     for (const pair<int, const Vertex *>& p : cubic_model.all) {
       int i = p.first;

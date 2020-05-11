@@ -14,7 +14,7 @@ void Energy_lifting_constraint::add () {
   IloExpr rhs (cubic_model.env);
   IloConstraint c;
   //e_j \leq e_i - c_{ij} x_{ij}^k + \beta (1 - x_{ij}^k), \forall v_j \in C,\forall v_i \in V, \forall k \in M
-  for (int k = 0; k < cubic_model.instance.nRoutes; k++) {
+  for (int k = 0; k < cubic_model.instance.maxRoutes; k++) {
     for (const Vertex& customer : cubic_model.instance.customers) {
       int j = customer.id;
       for (const pair<int, const Vertex *>& p : cubic_model.all) {

@@ -1,4 +1,5 @@
 #include "models/vertex.hpp"
+#include "models/dsu.hpp"
 #include "models/vrp_instance.hpp"
 #include "models/distances_enum.hpp"
 #include "models/gvrp_models/gvrp_instance.hpp"
@@ -45,7 +46,7 @@ Gvrp_instance utils::erdogan_instance_reader(const string file_path){
     customers;
   stringstream ss;
   Vertex depot;
-  int nRoutes;
+  int maxRoutes;
   double vehicleFuelCapacity,
          vehicleFuelConsumptionRate,
          timeLimit,
@@ -136,7 +137,7 @@ Gvrp_instance utils::erdogan_instance_reader(const string file_path){
   ss.str(line);  
   while (!ss.eof())
     ss>>buff;  
-  nRoutes = stoi(buff.substr(1), NULL);
+  maxRoutes = stoi(buff.substr(1), NULL);
   inFile.close();
   //save data
   customers_size = customers.size();
@@ -168,7 +169,7 @@ Gvrp_instance utils::erdogan_instance_reader(const string file_path){
       //      distances[vertexes[i].id][vertexes[j].id] = sqrt(pow(vertexes[i].x - vertexes[j].x, 2) + pow(vertexes[i].y - vertexes[j].y, 2)); 
     }
   }
-  return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, nRoutes, timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
+  return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, maxRoutes, timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
 }
 
 double utils::calculateGvrpInstanceLambda (const Gvrp_instance& gvrp_instance) {
@@ -195,6 +196,36 @@ double utils::calculateGvrpInstancePsi (const Gvrp_instance& gvrp_instance) {
     return psi * gvrp_instance.vehicleFuelConsumptionRate;
   }
   return 0.0;  
+}
+
+double utils::calculateVrpInstanceMST (const Vrp_instance& vrp_instance) {
+  //build c0 
+  const size_t sc0 = vrp_instance.customers.size() + 1;
+  auto comp = [](const tuple<int, int, double> & edge1, const tuple<int, int, double> & edge2)
+  {
+    return get<2>(edge1) > get<2>(edge2);
+  };
+  priority_queue <tuple<int, int, double>, vector<tuple<int, int, double>>, decltype(comp)> pq (comp); 
+  auto end = vrp_instance.customers.end();
+  int i = 1;
+  for (auto customer_i = vrp_instance.customers.begin(); customer_i != end; ++customer_i, ++i) {
+    pq.push (make_tuple(0, i, vrp_instance.distances[vrp_instance.depot.id][customer_i->id]));
+    int j = i + 1;
+    auto customer_j = customer_i;
+    for (++customer_j; customer_j != end; ++customer_j, ++j) 
+      pq.push (make_tuple(j, i, vrp_instance.distances[customer_i->id][customer_j->id]));
+  }
+  DSU dsu(sc0);
+  double cost = 0;
+  while (!pq.empty()) {
+    tuple<int, int, double> item = pq.top();
+    pq.pop();
+    if (dsu.findSet(get<0>(item)) != dsu.findSet(get<1>(item))) {
+      dsu.join(get<0>(item), get<1>(item));
+      cost += get<2> (item);
+    }
+  }
+  return cost;
 }
 
 double utils::calculateCustomerMinRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer) {

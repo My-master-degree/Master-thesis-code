@@ -21,7 +21,7 @@ void Min_distance_route_constraint::add (){
   IloConstraint c;
   IloExpr lhs (cubic_model.env),
           rhs (cubic_model.env);
-  for (int k = 0; k < cubic_model.instance.nRoutes; k++)
+  for (int k = 0; k < cubic_model.instance.maxRoutes; k++)
     for (const pair<int, const Vertex *>& p : cubic_model.all) 
       for (const pair<int, const Vertex *>& p1 : cubic_model.all) {
         //sum_{(i, j) \in E} x_{ij}^k c_{ij} = lhs

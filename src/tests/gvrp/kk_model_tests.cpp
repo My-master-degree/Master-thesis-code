@@ -44,7 +44,7 @@ void KK_model_tests::run() {
   i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
-//    gvrp_instance->nRoutes = gvrp_instance->customers.size();
+//    gvrp_instance->maxRoutes = gvrp_instance->customers.size();
     KK_model kk_model (*gvrp_instance, execution_time);  
     kk_model.preprocessings.push_back(new Invalid_edge_preprocessing(kk_model));
     kk_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(kk_model));

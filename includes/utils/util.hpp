@@ -23,6 +23,7 @@ namespace utils {
   list<string> listFilesFromDir(string path);
   double calculateGvrpInstanceLambda (const Gvrp_instance& gvrp_instance);
   double calculateGvrpInstancePsi (const Gvrp_instance& gvrp_instance);
+  double calculateVrpInstanceMST (const Vrp_instance& vrp_instance);
   double calculateCustomerMinRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer);
   double calculateCustomerMaxRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer);
   list<list<Vertex> > getGvrpConnectedComponents (const Gvrp_instance& gvrp_instance);

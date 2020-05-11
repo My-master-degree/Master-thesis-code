@@ -239,8 +239,8 @@ void KK_model::createModel() {
       for (size_t f = 0; f < f0.size(); ++f)
         expr += y[0][f][j];
     }
-    c = IloConstraint (expr <= instance.nRoutes);
-    constraintName<<instance.nRoutes<<" routes must be used";
+    c = IloConstraint (expr <= instance.maxRoutes);
+    constraintName<<instance.maxRoutes<<" routes must be used";
     c.setName(constraintName.str().c_str());
     model.add(c);
     expr.end();

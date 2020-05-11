@@ -16,7 +16,7 @@ void Max_afs_visit_constraint::add () {
           rhs (cubic_model.env);
   IloConstraint c;
   for (const Vertex& afs : cubic_model.instance.afss)
-    for (int k = 0; k < cubic_model.instance.nRoutes; k++) {
+    for (int k = 0; k < cubic_model.instance.maxRoutes; k++) {
       //number of visits to the AFS
       for (const pair<int, const Vertex *>& p : cubic_model.all)
         lhs += cubic_model.x[k][afs.id][p.first];

@@ -23,8 +23,8 @@ void Subcycle_lazy_constraint::main() {
   IloEnv env = getEnv();
   IloExpr lhs(env);
   //get values
-  Matrix3DVal x_vals (env, cubic_model.instance.nRoutes);
-  for (int k = 0; k < cubic_model.instance.nRoutes; k++) {
+  Matrix3DVal x_vals (env, cubic_model.instance.maxRoutes);
+  for (int k = 0; k < cubic_model.instance.maxRoutes; k++) {
     x_vals[k] = IloArray<IloNumArray> (env, cubic_model.all.size());
     for (const pair<int, const Vertex *>& p : cubic_model.all) {
       int i = p.first;
@@ -33,7 +33,7 @@ void Subcycle_lazy_constraint::main() {
     }
   }
   //get subcycles
-  for (int k = 0; k < cubic_model.instance.nRoutes; k++) {
+  for (int k = 0; k < cubic_model.instance.maxRoutes; k++) {
     //bfs to remove all edges connected to the depot
     queue<int> q;
     q.push(depot);
@@ -73,7 +73,7 @@ void Subcycle_lazy_constraint::main() {
             q.push(p.first);
           }
       }
-      for (int k_ = 0; k_ < cubic_model.instance.nRoutes; k_++) { 
+      for (int k_ = 0; k_ < cubic_model.instance.maxRoutes; k_++) { 
         for (int customer_ : customersComponent) {
           //getting lhs
           for (const pair<int, const Vertex *>& p2 : cubic_model.all) {
