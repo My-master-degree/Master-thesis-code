@@ -22,15 +22,18 @@ using namespace models::cplex;
 using namespace models::gvrp_models;
 using namespace models::instance_generation_model;
 
-Instance_generation_model::Instance_generation_model(const Vrp_instance& vrp_instance, unsigned int time_limit): Cplex_model(vrp_instance, time_limit) {
+Instance_generation_model::Instance_generation_model(const Vrp_instance& vrp_instance, double vehicleFuelCapacity_, unsigned int time_limit): Cplex_model(vrp_instance, time_limit), vehicleFuelCapacity(vehicleFuelCapacity_) {
   if (instance.distances_enum != SYMMETRIC && instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a VRP instance with symmetric or metric distances");
   sNodes = instance.customers.size() + 1;
+  ids = vector<int> (sNodes);
+  ids[0] = instance.depot.id;
+  auto customer = instance.customers.begin();
+  for (size_t i = 1; i < sNodes; ++i, ++customer)
+    ids[i] = customer->id;
 }
 
 pair<Gvrp_instance, Mip_solution_info> Instance_generation_model::run () {
-  if (instance.distances_enum != SYMMETRIC && instance.distances_enum != METRIC)
-    throw string("Error: The instance generation model requires a G-VRP instance with symmetric or metric distances");
   //setup
   stringstream output_exception;
   Mip_solution_info mipSolInfo;
@@ -157,6 +160,30 @@ void Instance_generation_model::createModel() {
     c = IloConstraint (z[depot] == 1);
     c.setName("depot is a facility");
     model.add(c);
+    //(x_{ij} + z_i + z_j - 2) e_{ij} \leqslant \beta, \forall v_i, v_j \in V : v_ \neq v_j
+    for (size_t i = 0; i < sNodes; i++) 
+      //setting names
+      for (size_t j = 0; j < sNodes; j++)
+        if (i != j) {
+          expr = (x[i][j] + z[i] + z[j] - 2) * instance.distances[ids[i]][ids[j]];
+          c = IloConstraint (expr <= vehicleFuelCapacity);
+          c.setName("two connected facilities must have distance at most beta");
+          model.add(c);
+          expr.end();
+          expr = IloExpr(env);
+        }
+    //(x_{ij} - z_i + z_j - 1) e_{ij} \leqslant \beta/2, \forall v_i, v_j \in V : v_ \neq v_j
+    for (size_t i = 0; i < sNodes; i++) 
+      //setting names
+      for (size_t j = 0; j < sNodes; j++)
+        if (i != j) {
+          expr = (x[i][j] - z[i] + z[j] - 1) * instance.distances[ids[i]][ids[j]];
+          c = IloConstraint (expr <= vehicleFuelCapacity/2);
+          c.setName("is a customer is connected to a facility, then their distance must have distance at most beta/2");
+          model.add(c);
+          expr.end();
+          expr = IloExpr(env);
+        }
     //init
     cplex = IloCplex(model);
     cplex.use(separation_algorithm()); 

@@ -156,9 +156,6 @@ void EMH_model::createObjectiveFunction() {
 
 void EMH_model::createModel() {
   try {
-    //preprocessing conditions
-    for (Preprocessing* preprocessing : preprocessings)
-      preprocessing->add();
     //setup
     int depot = instance.depot.id;
     double beta = instance.vehicleFuelCapacity;
@@ -173,6 +170,8 @@ void EMH_model::createModel() {
       int i = p.first;
       model.add(x[i][i] == 0);
     }
+    for (Preprocessing* preprocessing : preprocessings)
+      preprocessing->add();
     //\sum_{v_j \in V' : v_i \neq v_j} x_{ij} = 1, \forall v_i \in C
     for (const Vertex& customer : instance.customers){
       int i = customer.id;
@@ -267,7 +266,7 @@ void EMH_model::createModel() {
     }
     //e_f = \beta, \forall v_f \in F_0
     for (const pair<int, const Vertex *>& p : dummies) {
-      c = IloConstraint (e[p.second->id] == beta);
+      c = IloConstraint (e[p.first] == beta);
       c.setName("e_f = beta");
       model.add(c);
     }
@@ -303,16 +302,14 @@ void EMH_model::createModel() {
       }
     }
     //extra constraints
-    for (Extra_constraint* extra_constraint : extra_constraints) 
+    for (Extra_constraint* extra_constraint : extra_constraints)
       extra_constraint->add();
     //init
-    cplex = IloCplex(model);
     //lazy cuts
-    for (User_constraint* user_constraint : user_constraints)
-      cplex.use(user_constraint);
     //user cuts
     for (User_constraint* user_constraint : user_constraints)
       cplex.use(user_constraint);
+    cplex = IloCplex(model);
     //extra steps
     extraStepsAfterModelCreation();
     //depth node callback
@@ -331,32 +328,7 @@ void EMH_model::extraStepsAfterModelCreation() {
 void EMH_model::setCustomParameters(){
   try{
     setParameters();
-    //DOUBTS:
-    // Turn off the presolve reductions and set the CPLEX optimizer
-    // to solve the worker LP with primal simplex method.
-    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
-    cplex.setParam(IloCplex::Param::Preprocessing::Symmetry, 0);
-    cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal); 
-    //preprocesing setting
-    cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
-    // Turn on traditional search for use with control callbacks
-//    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
-    //:DOUBTS
-    //LAZY CONSTRAINTS
-    //thread safe setting
-    cplex.setParam(IloCplex::Param::Threads, 1);
-    // Tweak some CPLEX parameters so that CPLEX has a harder time to
-    // solve the model and our cut separators can actually kick in.
-    cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::MIRCut, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Implied, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Gomory, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::FlowCovers, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::PathCut, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::LiftProj, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::ZeroHalfCut, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Covers, -1);
+    cplex.setParam(IloCplex::Param::Simplex::Tolerances::Optimality, 1e-3);
   } catch (IloException& e) {
     throw e;
   } catch (...) {

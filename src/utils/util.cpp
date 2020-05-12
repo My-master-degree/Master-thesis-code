@@ -132,15 +132,18 @@ Gvrp_instance utils::erdogan_instance_reader(const string file_path){
     ss>>buff;  
   vehicleAverageSpeed = stod(buff.substr(1), NULL);
   //get number of routes 
+  /*
   getline(inFile, line);
   ss.clear();
   ss.str(line);  
   while (!ss.eof())
     ss>>buff;  
   maxRoutes = stoi(buff.substr(1), NULL);
+  */
   inFile.close();
   //save data
   customers_size = customers.size();
+  maxRoutes = customers_size;
   afss_size = afss.size();
   total_size = customers_size + afss_size + 1;
   //calculate distances
@@ -226,6 +229,15 @@ double utils::calculateVrpInstanceMST (const Vrp_instance& vrp_instance) {
     }
   }
   return cost;
+}
+
+double utils::getLongestEdgeUchoaEtAlVrpInstance (const Vrp_instance& vrp_instance) {
+  const size_t sall = vrp_instance.customers.size() + 1;
+  double maxEdge = 0;
+  for (size_t i = 0; i < sall; ++i)
+    for (size_t j = 0; j < sall; ++j)
+      maxEdge = max (maxEdge, vrp_instance.distances[i][j]);
+  return maxEdge;
 }
 
 double utils::calculateCustomerMinRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer) {

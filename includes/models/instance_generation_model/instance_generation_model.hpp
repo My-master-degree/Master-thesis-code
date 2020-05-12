@@ -27,13 +27,15 @@ namespace models {
     class User_constraint;
     class Instance_generation_model : public Cplex_model<Vrp_instance, Gvrp_instance> {
       public:
-        explicit Instance_generation_model(const Vrp_instance& vrp_instance, unsigned int time_limit);
+        explicit Instance_generation_model(const Vrp_instance& vrp_instance, double vehicleFuelCapacity, unsigned int time_limit);
         pair<Gvrp_instance, Mip_solution_info> run();
         Matrix2DVar x;
         Matrix2DVal x_vals;
         IloNumVarArray z;
         IloNumArray z_vals;
         list<User_constraint*> user_constraints;
+        double vehicleFuelCapacity;
+        vector<int> ids;
         size_t sNodes;
         void fillVals();
       private:

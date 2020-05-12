@@ -44,7 +44,6 @@ void EMH_model_tests::run() {
   i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
-//    gvrp_instance->maxRoutes = gvrp_instance->customers.size();
     EMH_model emh_model (*gvrp_instance, execution_time);  
     /*
     emh_model.preprocessings.push_back(new Invalid_edge_preprocessing(emh_model));
@@ -57,7 +56,6 @@ void EMH_model_tests::run() {
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
-    break;
   }
   closeResultFile(resultsFile);
 }

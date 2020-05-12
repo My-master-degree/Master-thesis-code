@@ -40,12 +40,13 @@ void Model_tests::run() {
   i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
-    Instance_generation_model instance_generation_model (*vrp_instance, execution_time);  
-    instance_generation_model.user_constraints.push_back(new Subcycle_user_constraint(instance_generation_model));
+    Instance_generation_model instance_generation_model (*vrp_instance, 10000, execution_time);  
+//    instance_generation_model.user_constraints.push_back(new Subcycle_user_constraint(instance_generation_model));
     execute_model(instance_generation_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     vrp_instance++;
     i++;
+    break;
   }
   closeResultFile(resultsFile);
 }
