@@ -242,7 +242,7 @@ void EMH_model::createModel() {
         for (const pair<int, const Vertex *>& p : all) {
           int i = p.first;
           if (i != j) {
-            expr = t[i] + x[i][j] * ((instance.distances[p.second->id][p1.second->id] / instance.vehicleAverageSpeed) + p1.second->serviceTime) - T * (1 -  x[i][j]);
+            expr = t[i] + x[i][j] * (instance.time(p.second->id, p1.second->id) + p1.second->serviceTime) - T * (1 -  x[i][j]);
             c = IloConstraint (t[j] >= expr);
             c.setName("updating time");
             model.add(c);
@@ -256,10 +256,10 @@ void EMH_model::createModel() {
     for (const pair<int, const Vertex *>& p : all) {
       int j = p.first;
       if (j != depot) {
-        c = IloConstraint (t[j] >= instance.distances[depot][p.second->id] / instance.vehicleAverageSpeed);
+        c = IloConstraint (t[j] >= instance.time(depot, p.second->id));
         c.setName("time variable lb");
         model.add(c);
-        c = IloConstraint (t[j] <= T - instance.distances[p.second->id][depot] / instance.vehicleAverageSpeed);
+        c = IloConstraint (t[j] <= T - instance.time(p.second->id, depot));
         c.setName("time variable ub");
         model.add(c);
       }
@@ -279,7 +279,7 @@ void EMH_model::createModel() {
       for (const pair<int, const Vertex *>& p : all) {
         int i =  p.first;
         if (i != j) {
-          expr = e[i] - x[i][j] * instance.distances[p.second->id][j] * instance.vehicleFuelConsumptionRate + beta * (1 -  x[i][j]);
+          expr = e[i] - x[i][j] * instance.fuel(p.second->id, j) + beta * (1 -  x[i][j]);
           c = IloConstraint (e[j] <= expr);
           c.setName("updating fuel level");
           model.add(c);
@@ -293,7 +293,7 @@ void EMH_model::createModel() {
       int i = p.first;
       for (const pair<int, const Vertex *>& p1 : all) {
         int j = p1.first;
-        expr = instance.distances[p.second->id][p1.second->id] * x[i][j] * instance.vehicleFuelConsumptionRate;
+        expr = instance.fuel(p.second->id, p1.second->id) * x[i][j];
         c = IloConstraint (e[i] >= expr);
         c.setName("disabling infeasible edges");
         model.add(c);

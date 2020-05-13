@@ -30,8 +30,8 @@ using namespace models::gvrp_models;
 using namespace models::gvrp_models::cplex::cubic_model;
 
 Gvrp_instance utils::erdogan_instance_reader(const string file_path){
-  double time_customer = 0.5,
-          time_afss = 0.25;
+  double time_customer = 30,
+          time_afss = 15;
   int id = 0,
       customers_size,
       afss_size,
@@ -123,7 +123,7 @@ Gvrp_instance utils::erdogan_instance_reader(const string file_path){
   ss.str(line);  
   while (!ss.eof())
     ss>>buff;  
-  timeLimit = stod(buff.substr(1), NULL);
+  timeLimit = stod(buff.substr(1), NULL) * 60;
   //get vehicle average speed 
   getline(inFile, line);
   ss.clear();
@@ -172,6 +172,7 @@ Gvrp_instance utils::erdogan_instance_reader(const string file_path){
       //      distances[vertexes[i].id][vertexes[j].id] = sqrt(pow(vertexes[i].x - vertexes[j].x, 2) + pow(vertexes[i].y - vertexes[j].y, 2)); 
     }
   }
+  timeLimit = 10.45 * 60;
   return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, maxRoutes, timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
 }
 

@@ -12,6 +12,7 @@
 
 #include <string>
 #include <list>
+#include <vector>
 #include <iostream>
 
 using namespace std;
@@ -56,6 +57,7 @@ void EMH_model_tests::run() {
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
+    break;
   }
   closeResultFile(resultsFile);
 }
