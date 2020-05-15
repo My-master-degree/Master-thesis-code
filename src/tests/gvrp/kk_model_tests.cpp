@@ -46,11 +46,13 @@ void KK_model_tests::run() {
     cout<<instance<<endl;
 //    gvrp_instance->maxRoutes = gvrp_instance->customers.size();
     KK_model kk_model (*gvrp_instance, execution_time);  
+    /*
     kk_model.preprocessings.push_back(new Invalid_edge_preprocessing(kk_model));
     kk_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(kk_model));
     kk_model.preprocessings.push_back(new Invalid_edge_preprocessing_3(kk_model));
     kk_model.preprocessings.push_back(new Invalid_edge_preprocessing_4(kk_model));
     kk_model.user_constraints.push_back(new Subcycle_user_constraint(kk_model));
+    */
     execute_model(kk_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;

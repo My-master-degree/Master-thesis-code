@@ -59,7 +59,7 @@ namespace models {
                 servedCustomers.insert(curr);
             }
             //for each vertex
-            for (int i = 0; i < route.size() - 1; i++){
+            for (int j = 0; j < route.size() - 1; j++){
               it++;
               next = it->id;
               output<<" "<<next;
@@ -69,10 +69,10 @@ namespace models {
               cost += edgeCost;
               currFuelCapacity -= edgeFuel;
               if (currFuelCapacity < 0)
-                infeasibilities<<"Route "<<i<<": Edge ("<<curr<<","<<next<<") requires fuel capacity greater than the available"<<endl;
+                infeasibilities<<"Route "<<i<<": Edge ("<<curr<<","<<next<<") requires fuel capacity greater than the available "<<currFuelCapacity<<endl;
               if (edgeFuel > beta)
                 infeasibilities<<"Route "<<i<<": Edge ("<<curr<<","<<next<<") requires fuel capacity greater than beta"<<endl;
-              if (afss.count(next))
+              if (afss.count(next) || next == depot)
                 currFuelCapacity = min(max(currFuelCapacity, 0.0) + beta, beta);
               else if (customers.count(next))
                 if (servedCustomers.count(next))

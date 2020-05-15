@@ -5,11 +5,11 @@
 #include "models/gvrp_models/gvrp_solution.hpp"
 #include "models/gvrp_models/gvrp_instance.hpp"
 #include "models/gvrp_models/cplex/gvrp_model.hpp"
-#include "models/gvrp_models/cplex/kk_model/kk_model.hpp"
-#include "models/gvrp_models/cplex/kk_model/preprocessing.hpp"
-#include "models/gvrp_models/cplex/kk_model/extra_constraint.hpp"
-#include "models/gvrp_models/cplex/kk_model/user_constraint.hpp"
-#include "models/gvrp_models/cplex/kk_model/lazy_constraint.hpp"
+#include "models/gvrp_models/cplex/lh_model/lh_model.hpp"
+#include "models/gvrp_models/cplex/lh_model/preprocessing.hpp"
+#include "models/gvrp_models/cplex/lh_model/extra_constraint.hpp"
+#include "models/gvrp_models/cplex/lh_model/user_constraint.hpp"
+#include "models/gvrp_models/cplex/lh_model/lazy_constraint.hpp"
 
 #include <sstream>
 #include <list>
@@ -20,11 +20,11 @@ using namespace models;
 using namespace models::cplex;
 using namespace models::gvrp_models;
 using namespace models::gvrp_models::cplex;
-using namespace models::gvrp_models::cplex::kk_model;
+using namespace models::gvrp_models::cplex::lh_model;
 
 using namespace std;
 
-KK_model::KK_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit) {
+LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //gvrp afs tree
@@ -50,41 +50,33 @@ KK_model::KK_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvr
   }
 } 
 
-double KK_model::time (int i, int f, int j) {
-  return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + f0[f]->serviceTime + instance.time(f0[f]->id, c0[j]->id);
+double LH_model::time (int i, int f, int j) {
+  return instance.time(c0[i]->id, f0[f]->id) + instance.time(f0[f]->id, c0[j]->id);
 }
 
-double KK_model::time(int i, int j) {
-  return c0[i]->serviceTime + instance.time(c0[i]->id, c0[j]->id);
+double LH_model::time(int i, int j) {
+  return instance.time(c0[i]->id, c0[j]->id);
 }
 
-double KK_model::customersFuel(int i, int j) {
+double LH_model::fuel(int i, int j) {
   return instance.fuel(c0[i]->id, c0[j]->id);
 }
 
-double KK_model::afsToCustomerFuel(int f, int i) {
-  return instance.fuel(f0[f]->id, c0[i]->id);
-}
-
-double KK_model::customerToAfsFuel(int i, int f) {
-  return instance.fuel(c0[i]->id, f0[f]->id);
-}
-
-double KK_model::M1(int i, int f, int j) {
+double LH_model::M1(int i, int f, int j) {
   return instance.timeLimit + time(i, j) + time(i, f, j) - time(i, 0) - time(0, j);
 }
 
-double KK_model::M2(int i, int j) {
+double LH_model::M2(int i, int j) {
   double closestIAFS = instance.fuel(f0[0]->id, i),
          closestJAFS = instance.fuel(f0[0]->id, j);
   for (int f = 1; f < f0.size(); ++f) {
     closestIAFS = min(closestIAFS, instance.fuel(f0[f]->id, i));
     closestJAFS = min(closestIAFS, instance.fuel(f0[f]->id, j));
   }
-  return instance.vehicleFuelCapacity + customersFuel(i, j) - closestIAFS - closestJAFS;
+  return instance.vehicleFuelCapacity + fuel(i, j) - closestIAFS - closestJAFS;
 }
 
-pair<Gvrp_solution, Mip_solution_info> KK_model::run(){
+pair<Gvrp_solution, Mip_solution_info> LH_model::run(){
   //setup
   stringstream output_exception;
   Mip_solution_info mipSolInfo;
@@ -125,7 +117,7 @@ pair<Gvrp_solution, Mip_solution_info> KK_model::run(){
   }
 }
 
-void KK_model::createVariables(){
+void LH_model::createVariables(){
   y = Matrix3DVar (env, c0.size());
   x = Matrix2DVar (env, c0.size());
   e = IloNumVarArray (env, instance.customers.size(), 0, instance.vehicleFuelCapacity, IloNumVar::Float);
@@ -173,7 +165,7 @@ void KK_model::createVariables(){
   }
 }
 
-void KK_model::createObjectiveFunction() {
+void LH_model::createObjectiveFunction() {
   //objective function
   try{
     IloExpr fo (env);
@@ -192,7 +184,7 @@ void KK_model::createObjectiveFunction() {
   }
 }
 
-void KK_model::createModel() {
+void LH_model::createModel() {
   try {
     //preprocessing conditions
     for (Preprocessing* preprocessing : preprocessings)
@@ -210,7 +202,7 @@ void KK_model::createModel() {
       for (size_t f = 0; f < f0.size(); ++f)
         model.add(y[i][f][i] == 0);
     //\sum_{v_j \in C_0} (x_{ij} + \sum_{v_f \in F_0} y_{ifj}) = 1, \forall v_i \in C
-    for (size_t i = 1; i < c0.size(); ++i) {
+    for (size_t i = 0; i < c0.size(); ++i) {
       for (size_t j = 0; j < c0.size(); ++j) {
         expr += x[i][j];
         for (size_t f = 0; f < f0.size(); ++f)
@@ -322,8 +314,8 @@ void KK_model::createModel() {
     // e_j - e_i + M2_{ij} * x_{ij} + (M2_{ij} - e_{ij} - e_{ji}) * x_{ji} \leqslant M2_{ij} - e_{ij} \forall v_i, v_j \in C
     for (size_t i = 1; i < c0.size(); ++i) 
       for (size_t j = 1; j < c0.size(); ++j) {
-        expr = e[j - 1] - e[i - 1] + M2(i, j) * x[i][j] + (M2(i, j) - customersFuel(i, j) - customersFuel(j, i)) * x[j][i];
-        c = IloConstraint (expr <= M2(i, j) - customersFuel(i, j));
+        expr = e[j - 1] - e[i - 1] + M2(i, j) * x[i][j] + (M2(i, j) - fuel(i, j) - fuel(j, i)) * x[j][i];
+        c = IloConstraint (expr <= M2(i, j) - fuel(i, j));
         constraintName<<"edge ("<<c0[i]->id<<", "<<c0[j]->id<<") energy";
         c.setName(constraintName.str().c_str());
         model.add(c);
@@ -334,10 +326,10 @@ void KK_model::createModel() {
       }
     // e_j \leqslant \beta - e_{0j} * x_{0j} - \sum_{v_i \in C_0} \sum_{v_f \in F_0} e_{fj} * y_{ifj} \forall v_j \in C
     for (size_t j = 1; j < c0.size(); ++j) {
-      expr = instance.vehicleFuelCapacity - afsToCustomerFuel(0, j) * x[0][j];
+      expr = instance.vehicleFuelCapacity - fuel(0, j) * x[0][j];
       for (size_t i = 0; i < c0.size(); ++i) 
         for (size_t f = 0; f < f0.size(); ++f) 
-          expr -= afsToCustomerFuel(f, j) * y[i][f][j];
+          expr -= fuel(f, j) * y[i][f][j];
       c = IloConstraint (e[j - 1] <= expr);
       constraintName<<"customer "<<c0[j]->id<<" energy ub";
       c.setName(constraintName.str().c_str());
@@ -349,37 +341,12 @@ void KK_model::createModel() {
     }
     // e_j \geqslant e_{j0} * x_{j0} + \sum_{v_i \in C_0} \sum_{v_f \in F_0} e_{jf} * y_{jfi} \forall v_j \in C
     for (size_t j = 1; j < c0.size(); ++j) {
-      expr = customerToAfsFuel(j, 0) * x[j][0];
+      expr = fuel(j, 0) * x[j][0];
       for (size_t i = 0; i < c0.size(); ++i) 
         for (size_t f = 0; f < f0.size(); ++f) 
-          expr += customerToAfsFuel(j, f) * y[j][f][i];
+          expr += fuel(j, f) * y[j][f][i];
       c = IloConstraint (e[j - 1] >= expr);
       constraintName<<"customer "<<c0[j]->id<<" energy ub2";
-      c.setName(constraintName.str().c_str());
-      model.add(c);
-      expr.end();
-      expr = IloExpr(env);
-      constraintName.clear();
-      constraintName.str("");
-    }
-    // y_{jf0} * e_{f0} \leqslant \beta \forall v_j \in C_0, \forall v_f \in F_0
-    for (size_t j = 0; j < c0.size(); ++j) 
-      for (size_t f = 0; f < f0.size(); ++f) {
-        expr = afsToCustomerFuel(f, 0) * y[j][f][0];
-        c = IloConstraint (expr <= instance.vehicleFuelCapacity);
-        constraintName<<"edge ("<<f<<", 0) can only exists if it is possible";
-        c.setName(constraintName.str().c_str());
-        model.add(c);
-        expr.end();
-        expr = IloExpr(env);
-        constraintName.clear();
-        constraintName.str("");
-      }
-    // e_j \geqslant x_{j0} * e_{j0} \forall v_j \in C_0
-    for (size_t j = 1; j < c0.size(); ++j) {
-      expr = customersFuel(j, 0) * x[j][0];
-      c = IloConstraint (e[j - 1] >= expr);
-      constraintName<<"edge ("<<j<<", 0) can only exists if it is possible";
       c.setName(constraintName.str().c_str());
       model.add(c);
       expr.end();
@@ -409,11 +376,11 @@ void KK_model::createModel() {
   }
 }
 
-void KK_model::extraStepsAfterModelCreation() {
+void LH_model::extraStepsAfterModelCreation() {
   //
 }
 
-void KK_model::setCustomParameters(){
+void LH_model::setCustomParameters(){
   try{
     setParameters();
   } catch (IloException& e) {
@@ -423,7 +390,7 @@ void KK_model::setCustomParameters(){
   }
 }
 
-void KK_model::fillVals(){
+void LH_model::fillVals(){
   //getresult
   try{
     x_vals = Matrix2DVal (env, c0.size());
@@ -442,98 +409,40 @@ void KK_model::fillVals(){
   } catch (...) {
     throw string("Error in getting solution");
   }
-  cout<<" ";
-  for (size_t i = 0; i < c0.size(); ++i){
-    cout<<" ";
-    if (i <=9)
-      cout<<" ";
-    cout<<i;
-  }
-  cout<<endl;
-  for (size_t i = 0; i < c0.size(); ++i){
-    cout<<i<<" ";
-    if (i <= 9)
-      cout<<" ";
-    for (size_t j = 0; j < c0.size(); ++j) {
-      cout<<abs(x_vals[i][j])<<"  ";
-    }
-    cout<<endl;
-  }
-  for (size_t f = 0; f < f0.size(); ++f){
-    cout<<"AFS: "<<f<<endl;
-    cout<<" ";
-    for (size_t i = 0; i < c0.size(); ++i){
-      cout<<" ";
-      if (i <=9)
-        cout<<" ";
-      cout<<i;
-    }
-    cout<<endl;
-    for (size_t i = 0; i < c0.size(); ++i){
-      cout<<i<<" ";
-      if (i <= 9)
-        cout<<" ";
-      for (size_t j = 0; j < c0.size(); ++j)
-        cout<<abs(y_vals[i][f][j])<<"  ";
-      cout<<endl;
-    }
-  }
-  for (size_t i = 0; i < c0.size(); ++i)
-    cout<<i<<": "<<c0[i]->id<<endl;
 }
 
-void KK_model::createGvrp_solution(){
+void LH_model::createGvrp_solution(){
   try{
     list<list<Vertex>> routes;
     list<Vertex> route;
-    size_t curr;    
+    int curr = 0;    
+    route.push_back(Vertex(*c0[curr]));
     //checking the depot neighboring
-    while (true) {
-      bool next = false;
-      for (size_t i = 1; i < c0.size() && !next; ++i) {
-        if (x_vals[0][i] > 0) {
-          next = true;
-          route.push_back(Vertex(*c0[0]));
-          x_vals[0][i] = 0;
-        } else
-          for (size_t f = 0; f < f0.size(); ++f)
-            if (y_vals[0][f][i] > 0) {
-              next = true;
-              route.push_back(Vertex(*c0[0]));
-              route.push_back(Vertex(*f0[f]));
-              y_vals[0][f][i] = 0;
-              break;
-            }
-        if (next) {
-          route.push_back(Vertex(*c0[i]));
-          curr = i;
-        }
-      }
-      if (!next)
-        break;
+    for (size_t i = 1; i < c0.size(); ) {
       //dfs
-      while (curr != 0) {
-        for (size_t i = 0; i < c0.size(); ++i) {
-          if (x_vals[curr][i] > 0) {
+      if (x_vals[curr][i] > 0) {
+        route.push_back(Vertex(*c0[i]));
+        x_vals[curr][i] = 0;
+        curr = i;
+      } else
+        for (size_t f = 0; f < f0.size(); ++f)
+          if (y_vals[curr][f][i] > 0) {
+            route.push_back(Vertex(*f0[f]));
             route.push_back(Vertex(*c0[i]));
-            x_vals[curr][i] = 0;
+            y_vals[curr][f][i] = 0;
             curr = i;
             break;
-          } else
-            for (size_t f = 0; f < f0.size(); ++f)
-              if (y_vals[curr][f][i] > 0) {
-                next = true;
-                route.push_back(Vertex(*f0[f]));
-                route.push_back(Vertex(*c0[i]));
-                y_vals[curr][f][i] = 0;
-                curr = i;
-                i = c0.size() - 1;
-                break;
-              }
+          }
+      if (curr == i) {
+        //route ended
+        if (i == 0) {
+          route.push_back(Vertex(*c0[0]));
+          routes.push_back(route);
+          route = list<Vertex> ();
         }
-      }
-      routes.push_back(route);
-      route = list<Vertex> ();
+        i = 0;
+      } else
+        ++i;
     }
     solution = new Gvrp_solution(routes, instance);
   } catch (IloException& e) {
@@ -543,7 +452,7 @@ void KK_model::createGvrp_solution(){
   }
 }
 
-void KK_model::endVars(){
+void LH_model::endVars(){
   for (size_t i = 0; i < c0.size(); ++i) {
     x[i].end();
     for (size_t f = 0; f < f0.size(); ++f) {
