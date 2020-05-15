@@ -442,6 +442,7 @@ void KK_model::fillVals(){
   } catch (...) {
     throw string("Error in getting solution");
   }
+  /*
   cout<<" ";
   for (size_t i = 0; i < c0.size(); ++i){
     cout<<" ";
@@ -480,6 +481,7 @@ void KK_model::fillVals(){
   }
   for (size_t i = 0; i < c0.size(); ++i)
     cout<<i<<": "<<c0[i]->id<<endl;
+    */
 }
 
 void KK_model::createGvrp_solution(){
