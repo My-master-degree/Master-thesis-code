@@ -52,7 +52,9 @@ namespace models {
             vector<const Vertex *> f0;
             double time(int i, int f, int j);
             double time(int i, int j);
-            double fuel(int i, int j);
+            double customersFuel(int i, int j);
+            double customerToAfsFuel(int i, int f);
+            double afsToCustomerFuel(int f, int i);
             double M1(int i, int f, int j);
             double M2(int i, int j);
           protected:

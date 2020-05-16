@@ -279,6 +279,53 @@ list<string> utils::listFilesFromDir(string path) {
   return files; 
 }
 
+vector<vector<int>> utils::read_uchoa_vrp_solution (const string& file_path) {
+  ifstream inFile;
+  //read file
+  inFile.open(file_path);
+  if (!inFile)
+    throw string("Unable to open file ") + string(file_path);
+  //setup
+  int nRoutes, 
+      nVertexes;
+  string buff, 
+         line;
+  stringstream ss;
+  //ignore first line
+  getline(inFile, line);
+  //get # of routes
+  getline(inFile, line);
+  ss.str(line);
+  ss>>buff;
+  ss.clear();
+  nRoutes = stoi(buff, NULL);
+  vector<vector<int>> routes (nRoutes);
+  //ignore two lines
+  getline(inFile, line);
+  getline(inFile, line);
+  //get routes
+  for (size_t j = 0; j < nRoutes; ++j) {
+    getline(inFile, line);
+    ss.str(line);
+    ss>>buff;
+    ss>>buff;
+    ss>>buff;
+    ss>>buff;
+    ss>>buff;
+    ss>>buff;
+    nVertexes = stoi(buff, NULL);
+    vector<int> route (nVertexes);
+    for (int i = 0; i < nVertexes; ++i) {
+      ss>>buff;
+      route[i] = stoi(buff, NULL);
+    }
+    routes[j] = route;
+    ss.clear();
+  }
+  inFile.close();
+  return routes;
+}
+
 Vrp_instance utils::read_uchoa_vrp_instance (const string& file_path) {
   int id = 0,
       nVertexes;

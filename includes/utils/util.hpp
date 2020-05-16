@@ -19,6 +19,7 @@ using namespace std;
 
 namespace utils {
   Vrp_instance read_uchoa_vrp_instance (const string &file_path);    
+  vector<vector<int>> read_uchoa_vrp_solution (const string &file_path);    
   Gvrp_instance erdogan_instance_reader(const string file_path);
   list<string> listFilesFromDir(string path);
   double calculateGvrpInstanceLambda (const Gvrp_instance& gvrp_instance);
