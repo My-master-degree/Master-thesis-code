@@ -172,7 +172,7 @@ Gvrp_instance utils::erdogan_instance_reader(const string file_path){
       //      distances[vertexes[i].id][vertexes[j].id] = sqrt(pow(vertexes[i].x - vertexes[j].x, 2) + pow(vertexes[i].y - vertexes[j].y, 2)); 
     }
   }
-  timeLimit = 10.45 * 60;
+  timeLimit = 645;
   return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, maxRoutes, timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
 }
 

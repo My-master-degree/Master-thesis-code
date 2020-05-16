@@ -65,13 +65,15 @@ namespace models {
               output<<" "<<next;
               double edgeCost = gvrp_solution.gvrp_instance.distances[curr][next],
               edgeFuel = edgeCost * gvrp_solution.gvrp_instance.vehicleFuelConsumptionRate;
-              time += (edgeCost / gvrp_solution.gvrp_instance.vehicleAverageSpeed) + it->serviceTime;
+              time += gvrp_solution.gvrp_instance.time(curr, next) + it->serviceTime;
               cost += edgeCost;
               currFuelCapacity -= edgeFuel;
               if (currFuelCapacity < 0)
                 infeasibilities<<"Route "<<i<<": Edge ("<<curr<<","<<next<<") requires fuel capacity greater than the available "<<currFuelCapacity<<endl;
               if (edgeFuel > beta)
                 infeasibilities<<"Route "<<i<<": Edge ("<<curr<<","<<next<<") requires fuel capacity greater than beta"<<endl;
+              if (time > gvrp_solution.gvrp_instance.timeLimit)
+                infeasibilities<<"Route "<<i<<": In "<<curr<<" time is more than the limit "<<gvrp_solution.gvrp_instance.timeLimit<<endl;
               if (afss.count(next) || next == depot)
                 currFuelCapacity = min(max(currFuelCapacity, 0.0) + beta, beta);
               else if (customers.count(next))

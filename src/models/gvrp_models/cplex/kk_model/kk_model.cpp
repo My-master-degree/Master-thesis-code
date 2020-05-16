@@ -209,6 +209,11 @@ void KK_model::createModel() {
     for (size_t i = 0; i < c0.size(); ++i) 
       for (size_t f = 0; f < f0.size(); ++f)
         model.add(y[i][f][i] == 0);
+    //y_{00i} = y_{i00} = 0, \forall v_i \in C_0
+    for (size_t i = 0; i < c0.size(); ++i) {
+      model.add(y[0][0][i] == 0);
+      model.add(y[i][0][0] == 0);
+    }
     //\sum_{v_j \in C_0} (x_{ij} + \sum_{v_f \in F_0} y_{ifj}) = 1, \forall v_i \in C
     for (size_t i = 1; i < c0.size(); ++i) {
       for (size_t j = 0; j < c0.size(); ++j) {
@@ -294,7 +299,7 @@ void KK_model::createModel() {
     // \tau_j \leqslant T_{max} - (T_{max}^- t_{0j}) * x_{0j} - \sum_{v_f \in F_0} y_{0fj} * (T_{max} - t_{0fj}) \forall v_j \in C
     for (size_t j = 1; j < c0.size(); ++j) {
       expr = instance.timeLimit - (instance.timeLimit - time(0, j)) * x[0][j];
-      for (size_t f = 0; f < f0.size(); ++f) 
+      for (size_t f = 1; f < f0.size(); ++f) 
         expr -= (instance.timeLimit - time(0, f, j)) * y[0][f][j];
       c = IloConstraint (t[j - 1] <= expr);
       constraintName<<"customer "<<c0[j]->id<<" time ub";
@@ -308,8 +313,8 @@ void KK_model::createModel() {
     // \tau_j \leqslant T_{max} - t_{j0} * x_{j0} - \sum_{v_f \in F_0} - t_{jf0} * y_{jf0} \forall v_j \in C
     for (size_t j = 1; j < c0.size(); ++j) {
       expr = instance.timeLimit - time(j, 0) * x[j][0];
-      for (size_t f = 0; f < f0.size(); ++f) 
-        expr -= time(0, f, j) * y[0][f][j];
+      for (size_t f = 1; f < f0.size(); ++f) 
+        expr -= time(j, f, 0) * y[j][f][0];
       c = IloConstraint (t[j - 1] <= expr);
       constraintName<<"customer "<<c0[j]->id<<" time ub 2";
       c.setName(constraintName.str().c_str());
@@ -442,6 +447,9 @@ void KK_model::fillVals(){
   } catch (...) {
     throw string("Error in getting solution");
   }
+  cout<<"Time: "<<endl;
+  for (size_t i = 1; i < c0.size(); ++i)
+    cout<<"\t"<<i<<": "<<t[i - 1]<<endl;
   /*
   cout<<" ";
   for (size_t i = 0; i < c0.size(); ++i){

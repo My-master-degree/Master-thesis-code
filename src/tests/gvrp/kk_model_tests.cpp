@@ -44,7 +44,7 @@ void KK_model_tests::run() {
   i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
-//    gvrp_instance->maxRoutes = gvrp_instance->customers.size();
+    cout<<*gvrp_instance<<endl;
     KK_model kk_model (*gvrp_instance, execution_time);  
     /*
     kk_model.preprocessings.push_back(new Invalid_edge_preprocessing(kk_model));
@@ -57,7 +57,6 @@ void KK_model_tests::run() {
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
-    break;
   }
   closeResultFile(resultsFile);
 }
