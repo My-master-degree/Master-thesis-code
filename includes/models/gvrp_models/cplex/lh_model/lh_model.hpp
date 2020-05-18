@@ -7,10 +7,6 @@
 #include "models/gvrp_models/gvrp_afs_tree.hpp" 
 #include "models/gvrp_models/gvrp_solution.hpp" 
 #include "models/gvrp_models/cplex/gvrp_model.hpp" 
-#include "models/gvrp_models/cplex/lh_model/user_constraint.hpp"
-#include "models/gvrp_models/cplex/lh_model/lazy_constraint.hpp"
-#include "models/gvrp_models/cplex/lh_model/preprocessing.hpp"
-#include "models/gvrp_models/cplex/lh_model/extra_constraint.hpp"
 
 #include <vector>
 #include <map>
@@ -29,23 +25,17 @@ namespace models {
   namespace gvrp_models {
     namespace cplex {
       namespace lh_model { 
-        class User_constraint;
-        class Lazy_constraint;
-        class Preprocessing;
-        class Extra_constraint;
         class LH_model : public Gvrp_model {
           public:
             explicit LH_model(const Gvrp_instance& gvrp_instance, unsigned int time_limit); 
             pair<Gvrp_solution, Mip_solution_info> run();
             Matrix3DVar y;
-            Matrix3DVal y_vals;
             Matrix2DVar x;
+            Matrix2DVar a;
+            Matrix2DVar u;
+            Matrix2DVar v;
+            Matrix3DVal y_vals;
             Matrix2DVal x_vals;
-            IloNumVarArray t;
-            IloNumVarArray e;
-            list<User_constraint*> user_constraints;
-            list<Preprocessing*> preprocessings;
-            list<Extra_constraint*> extra_constraints;
             map<int, int> customersC0Indexes;
             map<int, int> afssF0Indexes;
             vector<const Vertex *> c0;
@@ -55,8 +45,6 @@ namespace models {
             double customersFuel(int i, int j);
             double customerToAfsFuel(int i, int f);
             double afsToCustomerFuel(int f, int i);
-            double M1(int i, int f, int j);
-            double M2(int i, int j);
           protected:
             void createVariables();
             void createObjectiveFunction();

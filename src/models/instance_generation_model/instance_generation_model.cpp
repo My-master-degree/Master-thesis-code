@@ -10,6 +10,7 @@
 #include "models/instance_generation_model/subcycle_user_constraint.hpp"
 
 #include <list>
+#include <float.h>
 #include <stdlib.h>
 #include <exception>
 #include <sstream>
@@ -134,7 +135,6 @@ void Instance_generation_model::createModel() {
       model.add(x[i][i] == 0);
     //\sum_{v_j \in V : v_i \neq v_j} x_{ij} = 1, \forall v_i \in V 
     for (size_t i = 0; i < sNodes; i++) {
-      //setting names
       for (size_t j = 0; j < sNodes; j++)
         if (i != j)
           expr += x[i][j];
@@ -146,7 +146,6 @@ void Instance_generation_model::createModel() {
     }
     //x_{ij} - z_j \leqslant 0, \forall v_i, v_j \in V : v_ \neq v_j
     for (size_t i = 0; i < sNodes; i++) 
-      //setting names
       for (size_t j = 0; j < sNodes; j++)
         if (i != j) {
           expr = x[i][j] - z[j];
@@ -162,7 +161,6 @@ void Instance_generation_model::createModel() {
     model.add(c);
     //(x_{ij} + z_i + z_j - 2) e_{ij} \leqslant \beta, \forall v_i, v_j \in V : v_ \neq v_j
     for (size_t i = 0; i < sNodes; i++) 
-      //setting names
       for (size_t j = 0; j < sNodes; j++)
         if (i != j) {
           expr = (x[i][j] + z[i] + z[j] - 2) * instance.distances[ids[i]][ids[j]];
@@ -174,7 +172,6 @@ void Instance_generation_model::createModel() {
         }
     //(x_{ij} - z_i + z_j - 1) e_{ij} \leqslant \beta/2, \forall v_i, v_j \in V : v_ \neq v_j
     for (size_t i = 0; i < sNodes; i++) 
-      //setting names
       for (size_t j = 0; j < sNodes; j++)
         if (i != j) {
           expr = (x[i][j] - z[i] + z[j] - 1) * instance.distances[ids[i]][ids[j]];
@@ -184,6 +181,17 @@ void Instance_generation_model::createModel() {
           expr.end();
           expr = IloExpr(env);
         }
+    //\sum_{v_j \in V : v_j \neq v_i \wedge e_{ji} \leqslant \beta/2 \wedge e_{0j} \leqslant \beta, \forall v_i \in V\backslash \{v_0\}
+    for (size_t i = 1; i < sNodes; i++) {
+      for (size_t j = 0; j < sNodes; j++)
+        if (i != j && instance.distances[ids[i]][ids[j]] <= vehicleFuelCapacity/2 && instance.distances[ids[j]][ids[0]] <= vehicleFuelCapacity) 
+          expr += z[j];
+      c = IloConstraint (expr >= 1 - z[i]);
+      c.setName("it's required at most one afs visit to visit a customer");
+      model.add(c);
+      expr.end();
+      expr = IloExpr(env);
+    }
     //init
     cplex = IloCplex(model);
     cplex.use(separation_algorithm()); 
@@ -260,8 +268,7 @@ void Instance_generation_model::createGvrp_instance(){
   try{
     list<Vertex> customers,
                  afss;
-    double vehicleFuelCapacity, 
-           timeLimit, 
+    double timeLimit, 
            vehicleFuelConsumptionRate, 
            vehicleAverageSpeed;
     for (const Vertex& v : instance.customers)
@@ -276,12 +283,11 @@ void Instance_generation_model::createGvrp_instance(){
         */
       } else
         customers.push_back(v);
-    //get \beta
-    vehicleFuelCapacity = 60;
-    vehicleFuelConsumptionRate = 0.2;
+    //get consumption rate
+    vehicleFuelConsumptionRate = 1;
     //get T
-    timeLimit = 11; 
-    vehicleAverageSpeed = 40;
+    timeLimit = DBL_MAX; 
+    vehicleAverageSpeed = 1;
     solution = new Gvrp_instance(afss, customers, instance.depot, vehicleFuelCapacity, instance.distances, instance.distances_enum, customers.size(), timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
 //    cout<<*solution<<endl;
   } catch (IloException& e) {
