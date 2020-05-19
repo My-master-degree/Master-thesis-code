@@ -41,10 +41,10 @@ int main (int argc, char **argv)
     //EMH model
   EMH_model_tests emh_model_tests (VERBOSE, execution_time, nIntSol);
   emh_model_tests.run();
+  */
     //KK model
   KK_model_tests kk_model_tests (VERBOSE, execution_time, nIntSol);
   kk_model_tests.run();
-  */
     //KK model
   LH_model_tests lh_model_tests (VERBOSE, execution_time, nIntSol);
   lh_model_tests.run();
