@@ -123,7 +123,7 @@ void LH_model::createVariables(){
       u[i] = IloNumVarArray (env, c0.size(), 0, instance.timeLimit, IloNumVar::Float);
       //a
       if (i > 0) {
-        v[i - 1] = IloNumVarArray (env, c0.size(), 0, instance.vehicleFuelCapacity, IloNumVar::Float);
+        v[i - 1] = IloNumVarArray (env, f0.size(), 0, instance.vehicleFuelCapacity, IloNumVar::Float);
         for (size_t f = 0; f < f0.size(); ++f) {
           nameStream<<"v["<<i - 1<<"]["<<f<<"]=edge("<<c0[i]->id<<","<<f0[f]->id<<")";
           v[i - 1][f].setName(nameStream.str().c_str());
@@ -211,7 +211,7 @@ void LH_model::createModel() {
     for (size_t i = 1; i < c0.size(); ++i) {
       for (size_t j = 0; j < c0.size(); ++j) {
         expr += x[i][j];
-        for (size_t f = 0; f < f0.size(); ++f)
+        for (size_t f = 1; f < f0.size(); ++f)
           expr += y[i][f][j];
       }
       c = IloConstraint (expr == 1);
@@ -227,7 +227,7 @@ void LH_model::createModel() {
     for (size_t i = 1; i < c0.size(); ++i) {
       for (size_t j = 0; j < c0.size(); ++j) {
         expr += x[j][i];
-        for (size_t f = 0; f < f0.size(); ++f)
+        for (size_t f = 1; f < f0.size(); ++f)
           expr += y[j][f][i];
       }
       c = IloConstraint (expr == 1);
@@ -253,9 +253,10 @@ void LH_model::createModel() {
     expr = IloExpr(env);
     constraintName.clear();
     constraintName.str("");
+    //time constraints
     //\sum_{v_i \in C \cup \{v_0\}} u_{ji} = \sum_{v_i \in C \cup \{v_0\}} u_{ij} + \sum_{v_i \in C \cup \{v_0\}} t_{ij} x_{ij} + \sum_{v_i \in C \cup \{v_0\}} \sum_{v_f \in F_0} t_{irj} x_{irj}, \forall v_j \in C
     for (size_t j = 1; j < c0.size(); ++j) {
-      for (size_t i = 0; j < c0.size(); ++j) {
+      for (size_t i = 0; i < c0.size(); ++i) {
         expr += u[j][i] - u[i][j] - time(i, j) * x[i][j];
         for (size_t f = 1; f < f0.size(); ++f)
           expr -= time(i, f, j) * y[i][f][j];
@@ -269,13 +270,12 @@ void LH_model::createModel() {
       constraintName.clear();
       constraintName.str("");
     }
-    //time constraints
     //t_{0j}(x_{j0} + \sum_{v_f \in F} t_{jf0}) \leqslant u_{j0}, \forall v_j \in C
     for (size_t j = 1; j < c0.size(); ++j) {
       expr = x[j][0];
       for (size_t f = 1; f < f0.size(); ++f)
         expr += y[j][f][0];
-      c = IloConstraint (time(j, 0) * expr <= u[j][0]);
+      c = IloConstraint (time(0, j) * expr <= u[j][0]);
       constraintName<<"lb time in customer "<<c0[j]->id<<" to depot";
       c.setName(constraintName.str().c_str());
       model.add(c);
@@ -325,9 +325,9 @@ void LH_model::createModel() {
     //u_{ij} \leqslant max(T - t_{j0} - t_{ij}, T - t_{i0}) x_{ij} + \sum_{v_f \in F} max(T - t_{j0} - t_{ifj}, T - t_{i0}) y_{ifj}, \forall v_i, v_j \in C
     for (size_t i = 1; i < c0.size(); ++i) 
       for (size_t j = 1; j < c0.size(); ++j) {
-        expr = max(instance.timeLimit - time(j, 0) - time(i, j), instance.timeLimit - time(i, 0)) * x[i][j];
+        expr = min(instance.timeLimit - time(j, 0) - time(i, j), instance.timeLimit - time(i, 0)) * x[i][j];
         for (size_t f = 1; f < f0.size(); ++f)
-          expr += max(instance.timeLimit - time(j, 0) - time(i, f, j), instance.timeLimit - time(i, 0)) * y[i][f][j];
+          expr += min(instance.timeLimit - time(j, 0) - time(i, f, j), instance.timeLimit - time(i, 0)) * y[i][f][j];
         c = IloConstraint (u[i][j] <= expr);
         constraintName<<"lb time in "<<c0[i]->id<<" to "<<c0[j]->id;
         c.setName(constraintName.str().c_str());
@@ -358,7 +358,113 @@ void LH_model::createModel() {
       constraintName.clear();
       constraintName.str("");
     }
-    //constriants 91
+    //a_{ij} >= x_{ij} * max (min_{v_f \in F_0} e_{jf}, min_{v_f \in F_0} e_{if} - e_{ij}), \forall v_i, v_j \in C
+    for (size_t j = 1; j < c0.size(); ++j) 
+      for (size_t i = 1; i < c0.size(); ++i) {
+        //min_{v_f \in F_0} e_{jf} and min_{v_f \in F_0} e_{if}
+        double closestAfsToJ = customerToAfsFuel(j, 0),
+               closestAfsToI = customerToAfsFuel(i, 0);
+        for (size_t f = 1; f < f0.size(); ++f) {
+          closestAfsToJ = min(closestAfsToJ, customerToAfsFuel(j, f));
+          closestAfsToI = min(closestAfsToI, customerToAfsFuel(i, f));
+        }
+        c = IloConstraint (a[i - 1][j - 1] >= x[i][j] * max(closestAfsToJ, closestAfsToI - customersFuel(i, j)));
+        constraintName<<"a["<<i - 1<<"]["<<j - 1<<"] lb";
+        c.setName(constraintName.str().c_str());
+        model.add(c);
+        constraintName.clear();
+        constraintName.str("");
+      }
+    //a_{ij} <= x_{ij} * min (\beta - min_{v_f \in F_0} e_{fj}, \beta - min_{v_f \in F_0} e_{fi} - e_{ij}), \forall v_i, v_j \in C
+    for (size_t j = 1; j < c0.size(); ++j) 
+      for (size_t i = 1; i < c0.size(); ++i) {
+        //min_{v_f \in F_0} e_{fj} and min_{v_f \in F_0} e_{fi}
+        double closestAfsToJ = afsToCustomerFuel(0, j),
+               closestAfsToI = afsToCustomerFuel(0, i);
+        for (size_t f = 1; f < f0.size(); ++f) {
+          closestAfsToJ = min(closestAfsToJ, afsToCustomerFuel(f, j));
+          closestAfsToI = min(closestAfsToI, afsToCustomerFuel(f, i));
+        }
+        c = IloConstraint (a[i - 1][j - 1] <= x[i][j] * min(instance.vehicleFuelCapacity - closestAfsToI - customersFuel(i, j), instance.vehicleFuelCapacity - closestAfsToJ));
+        constraintName<<"a["<<i - 1<<"]["<<j - 1<<"] ub";
+        c.setName(constraintName.str().c_str());
+        model.add(c);
+        constraintName.clear();
+        constraintName.str("");
+      }
+    //v_{j0} \geqslant x_{j0} * e_{j0}, \forall v_j \in C
+    for (size_t j = 1; j < c0.size(); ++j) {
+      c = IloConstraint (v[j - 1][0] >= x[j][0] * customersFuel(j, 0));
+      constraintName<<"v["<<j - 1<<"][0] lb";
+      c.setName(constraintName.str().c_str());
+      model.add(c);
+      constraintName.clear();
+      constraintName.str("");
+    }
+    //v_{j0} \leqslant x_{j0} * (\beta - min_{v_f \in F_0} e_{fj}), \forall v_j \in C
+    for (size_t j = 1; j < c0.size(); ++j) {
+      //min_{v_f \in F_0} e_{fj}
+      double closestAfsToJ = afsToCustomerFuel(0, j);
+      for (size_t f = 1; f < f0.size(); ++f) 
+        closestAfsToJ = min(closestAfsToJ, afsToCustomerFuel(f, j));
+      c = IloConstraint (v[j - 1][0] <= x[j][0] * (instance.vehicleFuelCapacity - closestAfsToJ));
+      constraintName<<"v["<<j - 1<<"][0] ub";
+      c.setName(constraintName.str().c_str());
+      model.add(c);
+      constraintName.clear();
+      constraintName.str("");
+    }
+    //v_{jr} \geqslant \sum_{v_i \in C_0} z_{jfi} * e_{jf}, \forall v_j \in C, \forall v_f \in F
+    for (size_t j = 1; j < c0.size(); ++j) {
+      for (size_t f = 1; f < f0.size(); ++f) {
+        for (size_t i = 0; i < c0.size(); ++i) 
+          expr += y[j][f][i];
+        c = IloConstraint (v[j - 1][f] >= expr * customerToAfsFuel(j, f));
+        constraintName<<"v["<<j - 1<<"]["<<f<<"] lb";
+        c.setName(constraintName.str().c_str());
+        model.add(c);
+        expr.end();
+        expr = IloExpr(env);
+        constraintName.clear();
+        constraintName.str("");
+      }
+    }
+    //v_{jr} \leqslant (\beta - min_{v_f \in F_0} e_{fj}) * \sum_{v_i \in C_0} z_{jfi}, \forall v_j \in C, \forall v_f \in F
+    for (size_t j = 1; j < c0.size(); ++j) {
+      for (size_t f = 1; f < f0.size(); ++f) {
+        for (size_t i = 0; i < c0.size(); ++i) 
+          expr += y[j][f][i];
+        //min_{v_f \in F_0} e_{jf}
+        double closestAfsToJ = customerToAfsFuel(j, 0);
+        for (size_t f = 1; f < f0.size(); ++f) 
+          closestAfsToJ = min(closestAfsToJ, customerToAfsFuel(j, f));
+        c = IloConstraint (v[j - 1][f] <= expr * (instance.vehicleFuelCapacity - closestAfsToJ));
+        constraintName<<"v["<<j - 1<<"]["<<f<<"] ub";
+        c.setName(constraintName.str().c_str());
+        model.add(c);
+        expr.end();
+        expr = IloExpr(env);
+        constraintName.clear();
+        constraintName.str("");
+      }
+    }
+    //no 2 subcycles
+    //x_{ij} + x_{ji} + \sum_{v_f \in F} z_{jfi} + z_{ifj} \leqslant 1, \forall v_i, v_j \in C
+    for (size_t j = 1; j < c0.size(); ++j) {
+      for (size_t i = 1; i < c0.size(); ++i) {
+        expr = x[i][j] + x[j][i];
+        for (size_t f = 1; f < f0.size(); ++f) 
+          expr += y[j][f][i] + y[i][f][j];
+        c = IloConstraint (expr <= 1);
+        constraintName<<"no 2 subcyle between customers "<<i<<", and "<<j;
+        c.setName(constraintName.str().c_str());
+        model.add(c);
+        expr.end();
+        expr = IloExpr(env);
+        constraintName.clear();
+        constraintName.str("");
+      }
+    }
     //init
     cplex = IloCplex(model);
     //extra steps
@@ -452,15 +558,27 @@ void LH_model::createGvrp_solution(){
     list<list<Vertex>> routes;
     list<Vertex> route;
     size_t curr;    
+    bool next = false;
     //checking the depot neighboring
     while (true) {
-      bool next = false;
+      next = false;
       for (size_t i = 1; i < c0.size() && !next; ++i) {
         if (x_vals[0][i] > 0) {
           next = true;
           route.push_back(Vertex(*c0[0]));
           x_vals[0][i] = 0;
-        } else
+        } 
+        if (!next)
+          //on y[j][0][i]
+          for (size_t j = 0; j < c0.size(); ++j) 
+            if (y_vals[j][0][i]) {
+              next = true;
+              route.push_back(Vertex(*c0[0]));
+              y_vals[j][0][i] = 0;
+              break;
+            }
+        if (!next)
+          //on y[0][f][i]
           for (size_t f = 0; f < f0.size(); ++f)
             if (y_vals[0][f][i] > 0) {
               next = true;
@@ -479,12 +597,14 @@ void LH_model::createGvrp_solution(){
       //dfs
       while (curr != 0) {
         for (size_t i = 0; i < c0.size(); ++i) {
+          next = false;
           if (x_vals[curr][i] > 0) {
+            next = true;
             route.push_back(Vertex(*c0[i]));
             x_vals[curr][i] = 0;
             curr = i;
             break;
-          } else
+          } else {
             for (size_t f = 0; f < f0.size(); ++f)
               if (y_vals[curr][f][i] > 0) {
                 next = true;
@@ -495,6 +615,12 @@ void LH_model::createGvrp_solution(){
                 i = c0.size() - 1;
                 break;
               }
+          }
+        }
+        //edge case
+        if (!next) {
+          route.push_back(Vertex(*c0[0]));
+          curr = 0;
         }
       }
       routes.push_back(route);

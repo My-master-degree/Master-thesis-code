@@ -367,6 +367,7 @@ void KK_model::createModel() {
       constraintName.clear();
       constraintName.str("");
     }
+    /*
     // y_{jf0} * e_{f0} \leqslant \beta \forall v_j \in C_0, \forall v_f \in F_0
     for (size_t j = 0; j < c0.size(); ++j) 
       for (size_t f = 0; f < f0.size(); ++f) {
@@ -392,6 +393,7 @@ void KK_model::createModel() {
       constraintName.clear();
       constraintName.str("");
     }
+    */
     //extra constraints
     for (Extra_constraint* extra_constraint : extra_constraints) 
       extra_constraint->add();

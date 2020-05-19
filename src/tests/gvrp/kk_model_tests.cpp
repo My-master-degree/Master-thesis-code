@@ -44,7 +44,6 @@ void KK_model_tests::run() {
   i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
-    cout<<*gvrp_instance<<endl;
     KK_model kk_model (*gvrp_instance, execution_time);  
     /*
     kk_model.preprocessings.push_back(new Invalid_edge_preprocessing(kk_model));
