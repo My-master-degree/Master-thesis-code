@@ -3,7 +3,6 @@
 #include "models/gvrp_models/gvrp_solution.hpp"
 #include "models/gvrp_models/gvrp_feasible_solution_heuristic.hpp"
 #include "models/gvrp_models/cplex/lh_model/lh_model.hpp"
-#include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing.hpp"
 #include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing_2.hpp"
 #include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing_3.hpp"
 #include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing_4.hpp"
@@ -45,12 +44,9 @@ void LH_model_tests::run() {
   for (const string& instance : instances) {
     cout<<instance<<endl;
     LH_model lh_model (*gvrp_instance, execution_time);  
-    /*
-    lh_model.preprocessings.push_back(new Invalid_edge_preprocessing(lh_model));
     lh_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(lh_model));
     lh_model.preprocessings.push_back(new Invalid_edge_preprocessing_3(lh_model));
     lh_model.preprocessings.push_back(new Invalid_edge_preprocessing_4(lh_model));
-    */
     execute_model(lh_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;

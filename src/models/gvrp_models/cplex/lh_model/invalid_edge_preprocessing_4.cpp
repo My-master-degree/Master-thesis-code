@@ -17,7 +17,7 @@ Invalid_edge_preprocessing_4::Invalid_edge_preprocessing_4 (LH_model& lh_model) 
 }
 
 void Invalid_edge_preprocessing_4::add () {
-  list<pair<int, int>> edges = get_invalid_edges_4(lh_model.instance, *lh_model.gvrp_afs_tree);
+  list<pair<int, int>> edges = get_invalid_edges_4 (lh_model.instance, *lh_model.gvrp_afs_tree);
   for (auto const& [i, j] : edges) {
     auto f1 = lh_model.afssF0Indexes.find(i),
          f2 = lh_model.afssF0Indexes.find(j);

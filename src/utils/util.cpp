@@ -254,17 +254,6 @@ double utils::calculateCustomerMaxRequiredFuel (const Gvrp_instance& gvrp_instan
   return gvrp_instance.vehicleFuelCapacity - utils::calculateCustomerMinRequiredFuel(gvrp_instance, gvrp_afs_tree, customer);
 }
 
-list<pair<int, int>> utils::get_invalid_edges_1 (const Gvrp_instance& gvrp_instance) {
-  if (gvrp_instance.distances_enum != METRIC)
-    throw string("The preprocessing 'Invalid edge preprocessing 1' only applies for metric instances");
-  list<pair<int, int>> edges;
-  for (size_t i = 0; i < gvrp_instance.distances.size(); i++)
-    for (size_t j = 0; j < gvrp_instance.distances.size(); j++)
-      if (gvrp_instance.distances[i][j] * gvrp_instance.vehicleFuelConsumptionRate > gvrp_instance.vehicleFuelCapacity || gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed > gvrp_instance.timeLimit)
-        edges.push_back(make_pair(i, j));
-  return edges;
-}
-
 list<string> utils::listFilesFromDir(string path) {
   list<string> files;
   struct dirent *entry;
@@ -432,6 +421,16 @@ list<list<Vertex> > utils::getGvrpConnectedComponents (const Gvrp_instance& gvrp
   return components;
 }
 
+list<pair<int, int>> utils::get_invalid_edges_1 (const Gvrp_instance& gvrp_instance) {
+  if (gvrp_instance.distances_enum != METRIC)
+    throw string("The preprocessing 'Invalid edge preprocessing 1' only applies for metric instances");
+  list<pair<int, int>> edges;
+  for (size_t i = 0; i < gvrp_instance.distances.size(); i++)
+    for (size_t j = 0; j < gvrp_instance.distances.size(); j++)
+      if (gvrp_instance.distances[i][j] * gvrp_instance.vehicleFuelConsumptionRate > gvrp_instance.vehicleFuelCapacity || gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed > gvrp_instance.timeLimit)
+        edges.push_back(make_pair(i, j));
+  return edges;
+}
 
 list<pair<int, int>> utils::get_invalid_edges_2 (const Gvrp_instance& gvrp_instance) {
   if (gvrp_instance.distances_enum != METRIC)
@@ -531,5 +530,4 @@ list<pair<int, int>> utils::get_invalid_edges_4 (const Gvrp_instance& gvrp_insta
     }
   return edges;
 }
-
 
