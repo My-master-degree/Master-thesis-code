@@ -98,7 +98,6 @@ pair<Gvrp_solution, Mip_solution_info> KK_model::run(){
     cout<<"Setting parameter"<<endl;
     setCustomParameters();
     cout<<"Solving model"<<endl;
-    time_t start = clock();
     if ( !cplex.solve() ) {
 //      env.error() << "Failed to optimize LP." << endl;
       mipSolInfo = Mip_solution_info(-1, cplex.getStatus(), -1, -1);
@@ -106,14 +105,13 @@ pair<Gvrp_solution, Mip_solution_info> KK_model::run(){
       env.end();
       throw mipSolInfo;
     }
-    double total_time =  (double) (clock() - start) / (double) CLOCKS_PER_SEC;
 //    cplex.exportModel("cplexcpp.lp");
 //    env.out() << "Solution value = " << cplex.getObjValue() << endl;
 //    cout<<"Getting x values"<<endl;
     fillVals();
 //    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
-    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), total_time, cplex.getObjValue());
+    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), cplex.getTime(), cplex.getObjValue());
     endVars();
     env.end();
     return make_pair(*solution, mipSolInfo);

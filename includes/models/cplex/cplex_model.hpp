@@ -27,6 +27,7 @@ namespace models {
             if (!VERBOSE)
               cplex.setOut(env.getNullStream());
             cplex.setParam(IloCplex::Param::TimeLimit, time_limit);
+            cplex.setParam(IloCplex::Param::ClockType, 2);
             cplex.setParam(IloCplex::Param::MIP::Limits::Solutions, max_num_feasible_integer_sol);
           } catch (IloException& e) {
             throw e;

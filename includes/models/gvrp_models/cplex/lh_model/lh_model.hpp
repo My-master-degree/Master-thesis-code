@@ -7,6 +7,7 @@
 #include "models/gvrp_models/gvrp_afs_tree.hpp" 
 #include "models/gvrp_models/gvrp_solution.hpp" 
 #include "models/gvrp_models/cplex/gvrp_model.hpp" 
+#include "models/gvrp_models/cplex/lh_model/preprocessing.hpp"
 
 #include <vector>
 #include <map>
@@ -25,6 +26,7 @@ namespace models {
   namespace gvrp_models {
     namespace cplex {
       namespace lh_model { 
+        class Preprocessing;
         class LH_model : public Gvrp_model {
           public:
             explicit LH_model(const Gvrp_instance& gvrp_instance, unsigned int time_limit); 
@@ -36,6 +38,7 @@ namespace models {
             Matrix2DVar v;
             Matrix3DVal y_vals;
             Matrix2DVal x_vals;
+            list<Preprocessing*> preprocessings;
             map<int, int> customersC0Indexes;
             map<int, int> afssF0Indexes;
             vector<const Vertex *> c0;
