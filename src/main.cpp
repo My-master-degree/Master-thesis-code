@@ -2,6 +2,7 @@
 #include "tests/gvrp/emh_model_tests.hpp"
 #include "tests/gvrp/kk_model_tests.hpp"
 #include "tests/gvrp/lh_model_tests.hpp"
+#include "tests/gvrp/local_searchs_tests.hpp"
 #include "tests/instance_generation/model_tests.hpp"
 #include "tests/bpp/bpp_model_tests.hpp"
 
@@ -31,8 +32,11 @@ int main (int argc, char **argv)
         nIntSol = 2100000000;
     }
   //experiments
-    //cubic model
   /*
+    //local searchs
+  Local_searchs_tests local_searchs_tests;
+  local_searchs_tests.run();
+  //cubic model
   Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);
   cubic_model_tests.run();
     //instance generation model
@@ -45,7 +49,7 @@ int main (int argc, char **argv)
   KK_model_tests kk_model_tests (VERBOSE, execution_time, nIntSol);
   kk_model_tests.run();
   */
-    //KK model
+    //LH model
   LH_model_tests lh_model_tests (VERBOSE, execution_time, nIntSol);
   lh_model_tests.run();
   /*
@@ -53,5 +57,7 @@ int main (int argc, char **argv)
   BPP_model_tests bpp_model_tests (VERBOSE, execution_time, nIntSol);
   bpp_model_tests.run();
   */
+
+
   return 0;
 }

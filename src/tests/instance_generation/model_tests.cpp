@@ -9,6 +9,7 @@
 #include <string>
 #include <list>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 using namespace utils;
@@ -43,7 +44,6 @@ double calculateRouteAverageCost (const vector<vector<int>>& routes, const Vrp_i
   return calculateVRPSolutionCost(routes, vrp_instance) / routes.size();
 }
 
-
 void Model_tests::run() {
   //experiments
     //setup
@@ -72,6 +72,44 @@ void Model_tests::run() {
     stringstream ss (instance);
     getline(ss, instance_part, '.');
     instance_part = PROJECT_SOLUTIONS_PATH + string("UchoaEtAl/") + instance_part + ".sol";
+    /*
+    //custom reading
+    ifstream inFile;
+    //read file
+    inFile.open(instance_part);
+    //setup
+    string buff, 
+           line;
+    stringstream ss_;
+    vector<vector<int>> routes;
+    //get routes
+    while (getline(inFile, line)) {
+      ss_.str(line);
+      ss_>>buff;
+      if (buff == "Cost" || buff == "cost")
+        break;
+      ss_>>buff;
+      vector<int> route;
+      for (ss_>>buff; !ss_.eof(); ss_>>buff) 
+        route.push_back(stoi(buff, NULL));
+      if (route.size() == 0 || route.back() != stoi(buff, NULL)) 
+        route.push_back(stoi(buff, NULL));
+      routes.push_back(route);
+      ss_.clear();
+    }
+    inFile.close();
+    //create new output
+    ofstream solutionFile;
+    solutionFile.open (PROJECT_SOLUTIONS_PATH + ori + ".sol");
+    solutionFile <<endl<<routes.size()<<endl<<endl<<endl;
+    for (const vector<int>& route : routes) {
+      solutionFile<<"0 1 1 - - "<<route.size() + 2<<" 0 ";
+      for (int n : route)
+        solutionFile<<n<<" ";
+      solutionFile<<"0"<<endl;
+    }
+    solutionFile.close(); 
+    */
     routes = read_uchoa_vrp_solution (instance_part);
     //run
     Instance_generation_model instance_generation_model (*vrp_instance, calculateVRPSolutionCost(routes, *vrp_instance)/2, execution_time);  

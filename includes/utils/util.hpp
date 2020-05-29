@@ -18,6 +18,7 @@ using namespace models::gvrp_models::cplex::cubic_model;
 using namespace std;
 
 namespace utils {
+  Gvrp_instance matheus_instance_reader(const string& file_path);
   Vrp_instance read_uchoa_vrp_instance (const string &file_path);    
   vector<vector<int>> read_uchoa_vrp_solution (const string &file_path);    
   Gvrp_instance erdogan_instance_reader(const string file_path);

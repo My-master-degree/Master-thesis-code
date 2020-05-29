@@ -102,6 +102,7 @@ namespace models {
         };
         list<list<Vertex> > routes;
         Gvrp_instance gvrp_instance;
+        double calculateCost();
     };
   }
 }

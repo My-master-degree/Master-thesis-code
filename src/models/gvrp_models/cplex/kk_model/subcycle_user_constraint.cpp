@@ -1,6 +1,7 @@
 #include "models/vertex.hpp"
 #include "models/dsu.hpp"
 #include "models/cplex/mip_depth.hpp"
+#include "models/gvrp_models/cplex/gvrp_lp_kk_heuristic.hpp"
 #include "models/gvrp_models/cplex/kk_model/kk_model.hpp"
 #include "models/gvrp_models/cplex/kk_model/lazy_constraint.hpp"
 #include "models/gvrp_models/cplex/kk_model/subcycle_user_constraint.hpp"
@@ -17,6 +18,7 @@
 using namespace std;
 using namespace models;
 using namespace models::cplex;
+using namespace models::gvrp_models::cplex;
 using namespace models::gvrp_models::cplex::kk_model;
 using namespace lemon;
 using namespace lemon::concepts;
@@ -60,6 +62,62 @@ void Subcycle_user_constraint::main() {
       getValues(y_vals[i][f], kk_model.y[i][f]);
     }
   }
+
+
+
+
+
+
+  Gvrp_lp_kk_heuristic gvrp_lp_kk_heuristic (kk_model, x_vals, y_vals);
+  Gvrp_solution gvrp_solution = gvrp_lp_kk_heuristic.run();
+  if (gvrp_lp_kk_heuristic.valid == true) {
+    cout<<gvrp_solution<<endl;
+    cout<<"workkkkssss"<<endl;
+
+    cout<<" ";
+    for (size_t i = 0; i < kk_model.c0.size(); ++i){
+      cout<<" ";
+      if (i <=9)
+        cout<<" ";
+      cout<<i;
+    }
+    cout<<endl;
+    for (size_t i = 0; i < kk_model.c0.size(); ++i){
+      cout<<i<<" ";
+      if (i <= 9)
+        cout<<" ";
+      for (size_t j = 0; j < kk_model.c0.size(); ++j) {
+        cout<<abs(x_vals[i][j])<<"  ";
+      }
+      cout<<endl;
+    }
+    for (size_t f = 0; f < kk_model.f0.size(); ++f){
+      cout<<"AFS: "<<f<<endl;
+      cout<<" ";
+      for (size_t i = 0; i < kk_model.c0.size(); ++i){
+        cout<<" ";
+        if (i <=9)
+          cout<<" ";
+        cout<<i;
+      }
+      cout<<endl;
+      for (size_t i = 0; i < kk_model.c0.size(); ++i){
+        cout<<i<<" ";
+        if (i <= 9)
+          cout<<" ";
+        for (size_t j = 0; j < kk_model.c0.size(); ++j)
+          cout<<abs(y_vals[i][f][j])<<"  ";
+        cout<<endl;
+      }
+    }
+    for (size_t i = 0; i < kk_model.c0.size(); ++i)
+      cout<<i<<": "<<kk_model.c0[i]->id<<endl;
+
+
+
+    exit(0);
+  }
+  /*
   //creating nodes
   for (size_t i = 0; i < sc0; ++i) 
     nodes[i] = graph.addNode();
@@ -175,4 +233,5 @@ void Subcycle_user_constraint::main() {
   }
   x_vals.end();
   y_vals.end();
+  */
 }

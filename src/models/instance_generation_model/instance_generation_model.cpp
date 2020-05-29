@@ -3,6 +3,8 @@
 #include "models/cplex/depth_node_callback.hpp"
 #include "models/vrp_instance.hpp"
 #include "models/gvrp_models/gvrp_instance.hpp"
+#include "models/gvrp_models/gvrp_solution.hpp"
+#include "models/gvrp_models/gvrp_feasible_solution_heuristic.hpp"
 #include "models/instance_generation_model/instance_generation_model.hpp"
 #include "models/instance_generation_model/lazy_constraint.hpp"
 #include "models/instance_generation_model/subcycle_lazy_constraint.hpp"
@@ -10,6 +12,7 @@
 #include "models/instance_generation_model/subcycle_user_constraint.hpp"
 
 #include <list>
+#include <set>
 #include <float.h>
 #include <stdlib.h>
 #include <exception>
@@ -264,30 +267,55 @@ void Instance_generation_model::fillVals(){
 
 void Instance_generation_model::createGvrp_instance(){
   try{
+    //setup
     list<Vertex> customers,
                  afss;
-    double timeLimit, 
-           vehicleFuelConsumptionRate, 
-           vehicleAverageSpeed;
+    set<int> customersSet;
+    double longestTime = 0, 
+           afsServiceTime, 
+           customerServiceTime,
+           routeTime;
+    int nCustomers;
+    //get nodes
     for (const Vertex& v : instance.customers)
-      if (z_vals[v.id] > 0) {
+      if (z_vals[v.id] > 0) 
         afss.push_back(v);
-        /*
-        cout<<"Facility "<<v.id<<"("<<z_vals[v.id]<<") serve: ";
-        for (size_t i = 0; i < sNodes; i++)
-          if (x_vals[i][v.id] > 0)
-            cout<<i<<" ";
-        cout<<endl;
-        */
-      } else
+      else
         customers.push_back(v);
-    //get consumption rate
-    vehicleFuelConsumptionRate = 1;
-    //get T
-    timeLimit = DBL_MAX; 
-    vehicleAverageSpeed = 1;
-    solution = new Gvrp_instance(afss, customers, instance.depot, vehicleFuelCapacity, instance.distances, instance.distances_enum, customers.size(), timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
-//    cout<<*solution<<endl;
+    //create instance
+    solution = new Gvrp_instance(afss, customers, instance.depot, vehicleFuelCapacity, instance.distances, instance.distances_enum, customers.size(), DBL_MAX, 1, 1);
+    //set average speed
+    size_t sall = customers.size() + afss.size() + 1;
+    for (size_t i = 0; i < sall; ++i)
+      for (size_t j = 0; j < sall; ++j)
+        solution->vehicleAverageSpeed = max(solution->vehicleAverageSpeed, instance.distances[i][j]);
+    //customers service time
+    customerServiceTime = solution->vehicleAverageSpeed / customers.size();
+    //build set of customers
+    for (Vertex& customer : solution->customers) {
+      customersSet.insert(customer.id);
+      customer.serviceTime = customerServiceTime;
+    }
+    //afss service time
+    afsServiceTime = solution->vehicleAverageSpeed / afss.size();
+    for (Vertex& afs : solution->afss) 
+      afs.serviceTime = afsServiceTime;
+    //set time limit
+    Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (*solution);
+    Gvrp_solution gvrp_solution = gvrp_feasible_solution_heuristic.run();
+    for (const list<Vertex>& route : gvrp_solution.routes) {
+      routeTime = 0;
+      nCustomers = 0;
+      for (auto curr = route.begin(); curr != --route.end(); ++curr) {
+        routeTime += solution->time(curr->id, next(curr)->id);
+        if (customersSet.count(curr->id))
+          ++nCustomers;
+      }
+      routeTime += nCustomers * customerServiceTime + (route.size() - nCustomers - 2) * afsServiceTime;
+      longestTime = max(longestTime, routeTime);
+    }
+    solution->timeLimit = 2 * longestTime; 
+    cout<<*solution<<endl;
   } catch (IloException& e) {
     throw e;
   } catch (...) {

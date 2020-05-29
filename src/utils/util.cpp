@@ -29,6 +29,134 @@ using namespace models;
 using namespace models::gvrp_models;
 using namespace models::gvrp_models::cplex::cubic_model;
 
+Gvrp_instance utils::matheus_instance_reader(const string& file_path){
+  string line, token;
+  ifstream inFile;
+  list<Vertex> afss, 
+    customers;
+  Vertex depot;
+  stringstream ss;
+  double vehicleFuelCapacity,
+         vehicleFuelConsumptionRate,
+         timeLimit,
+         vehicleAverageSpeed;
+  int id,
+      x,
+      y;
+  double serviceTime;
+  //read file
+  inFile.open(file_path);
+  if (!inFile)
+    throw string("Unable to open file ") + string(file_path);
+  //ignore header
+  getline(inFile, line);
+  //get vehicle average speed 
+    //ignore header
+  getline(inFile, line);
+  ss.str(line);
+  getline(ss, token, ';');
+  getline(ss, token, ';');
+  ss.clear();
+  vehicleAverageSpeed = stod(token, NULL);
+  //get time limit 
+    //ignore header
+  getline(inFile, line);
+  ss.str(line);
+  getline(ss, token, ';');
+  getline(ss, token, ';');
+  ss.clear();
+  timeLimit = stod(token, NULL);
+  //get vehicle fuel consumption rate 
+    //ignore header
+  getline(inFile, line);
+  ss.str(line);
+  getline(ss, token, ';');
+  getline(ss, token, ';');
+  ss.clear();
+  vehicleFuelConsumptionRate = stod(token, NULL);
+  //get beta
+    //ignore header
+  getline(inFile, line);
+  ss.str(line);
+  getline(ss, token, ';');
+  getline(ss, token, ';');
+  ss.clear();
+  vehicleFuelCapacity = stod(token, NULL);
+  //get depot
+    //ignore headers
+  getline(inFile, line);
+  getline(inFile, line);
+  getline(inFile, line);
+    //get id
+  ss.str(line);
+  getline(ss, token, ';');
+  depot.id = stoi(token, NULL);
+    //get x
+  getline(ss, token, ';');
+  depot.x = stoi(token, NULL);
+    //get y
+  getline(ss, token, ';');
+  depot.y = stoi(token, NULL);
+    //get service time
+  getline(ss, token, ';');
+  depot.serviceTime = stod(token, NULL);
+  ss.clear();
+  //get customers
+    //ignore headers
+  getline(inFile, line);
+  getline(inFile, line);
+  getline(inFile, line);
+  while (line != "AFSs:"){         
+    ss.str(line);
+    getline(ss, token, ';');
+    id = stoi(token, NULL);
+    getline(ss, token, ';');
+    x = stoi(token, NULL);
+    getline(ss, token, ';');
+    y = stoi(token, NULL);
+    getline(ss, token, ';');
+    serviceTime = stod(token, NULL);
+    customers.push_back(Vertex(id, x, y, serviceTime));
+    ss.clear();
+    getline(inFile, line);
+  }
+  //get afss 
+    //ignore header
+  getline(inFile, line);
+  getline(inFile, line);
+  while (line != "Distance matrix:"){         
+    ss.str(line);
+    getline(ss, token, ';');
+    id = stoi(token, NULL);
+    getline(ss, token, ';');
+    x = stoi(token, NULL);
+    getline(ss, token, ';');
+    y = stoi(token, NULL);
+    getline(ss, token, ';');
+    serviceTime = stod(token, NULL);
+    afss.push_back(Vertex(id, x, y, serviceTime));
+    ss.clear();
+    getline(inFile, line);
+  }
+  //get distance matrix
+  size_t sall = customers.size() + afss.size() + 1;
+  vector<vector<double>> distances (sall, vector<double> (sall));
+  getline(inFile, line);
+  for (size_t i = 0; i < sall; ++i) {
+    getline(inFile, line);
+    ss.str(line);
+    //ignore first column
+    getline(ss, token, ';');
+    for (size_t j = 0; j < sall; ++j) {
+      getline(ss, token, ';');
+      distances[i][j] = stod(token, NULL);
+    }
+    ss.clear();
+  }
+  inFile.close();
+  return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, customers.size(), timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
+}
+
 Gvrp_instance utils::erdogan_instance_reader(const string file_path){
   double time_customer = 30,
           time_afss = 15;
@@ -352,6 +480,7 @@ Vrp_instance utils::read_uchoa_vrp_instance (const string& file_path) {
     ss>>x;
     ss>>y;
     vertexes.push_back(Vertex(id++, stod(x, NULL), stod(y, NULL)));
+    ss.clear();
   } 
   //calculate distances
   vector<vector<double> > distances(nVertexes);

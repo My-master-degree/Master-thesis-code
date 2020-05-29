@@ -50,11 +50,11 @@ namespace models {
             map<int, int> afssF0Indexes;
             vector<const Vertex *> c0;
             vector<const Vertex *> f0;
-            double time(int i, int f, int j);
-            double time(int i, int j);
-            double customersFuel(int i, int j);
-            double customerToAfsFuel(int i, int f);
-            double afsToCustomerFuel(int f, int i);
+            double time(int i, int f, int j) const;
+            double time(int i, int j) const;
+            double customersFuel(int i, int j) const;
+            double customerToAfsFuel(int i, int f) const;
+            double afsToCustomerFuel(int f, int i) const;
             double M1(int i, int f, int j);
             double M2(int i, int j);
           protected:

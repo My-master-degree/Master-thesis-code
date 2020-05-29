@@ -61,6 +61,9 @@ pair<Gvrp_solution, Mip_solution_info> Cubic_model::run(){
 //    cout<<"Setting parameters"<<endl;
     setCustomParameters();
 //    cout<<"Solving model"<<endl;
+    struct timespec start, finish;
+    double elapsed;
+    clock_gettime(CLOCK_MONOTONIC, &start);
     if ( !cplex.solve() ) {
 //      env.error() << "Failed to optimize LP." << endl;
       mipSolInfo = Mip_solution_info(-1, cplex.getStatus(), -1, -1);
@@ -68,13 +71,15 @@ pair<Gvrp_solution, Mip_solution_info> Cubic_model::run(){
       env.end();
       throw mipSolInfo;
     }
+    clock_gettime(CLOCK_MONOTONIC, &finish);
+    elapsed = (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 //    cplex.exportModel("cplexcpp.lp");
 //    env.out() << "Solution value = " << cplex.getObjValue() << endl;
 //    cout<<"Getting x values"<<endl;
     fillX_vals();
 //    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
-    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), cplex.getTime(), cplex.getObjValue());
+    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
     endVars();
     env.end();
     return make_pair(*solution, mipSolInfo);

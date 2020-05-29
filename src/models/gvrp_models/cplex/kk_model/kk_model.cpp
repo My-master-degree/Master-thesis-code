@@ -1,7 +1,6 @@
 #include "models/vertex.hpp"
 #include "models/distances_enum.hpp"
 #include "models/cplex/mip_solution_info.hpp"
-#include "models/cplex/depth_node_callback.hpp"
 #include "models/gvrp_models/gvrp_solution.hpp"
 #include "models/gvrp_models/gvrp_instance.hpp"
 #include "models/gvrp_models/cplex/gvrp_model.hpp"
@@ -50,23 +49,23 @@ KK_model::KK_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvr
   }
 } 
 
-double KK_model::time (int i, int f, int j) {
+double KK_model::time (int i, int f, int j) const {
   return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + f0[f]->serviceTime + instance.time(f0[f]->id, c0[j]->id);
 }
 
-double KK_model::time(int i, int j) {
+double KK_model::time(int i, int j) const {
   return c0[i]->serviceTime + instance.time(c0[i]->id, c0[j]->id);
 }
 
-double KK_model::customersFuel(int i, int j) {
+double KK_model::customersFuel(int i, int j) const {
   return instance.fuel(c0[i]->id, c0[j]->id);
 }
 
-double KK_model::afsToCustomerFuel(int f, int i) {
+double KK_model::afsToCustomerFuel(int f, int i) const {
   return instance.fuel(f0[f]->id, c0[i]->id);
 }
 
-double KK_model::customerToAfsFuel(int i, int f) {
+double KK_model::customerToAfsFuel(int i, int f) const {
   return instance.fuel(c0[i]->id, f0[f]->id);
 }
 
@@ -98,6 +97,9 @@ pair<Gvrp_solution, Mip_solution_info> KK_model::run(){
     cout<<"Setting parameter"<<endl;
     setCustomParameters();
     cout<<"Solving model"<<endl;
+    struct timespec start, finish;
+    double elapsed;
+    clock_gettime(CLOCK_MONOTONIC, &start);
     if ( !cplex.solve() ) {
 //      env.error() << "Failed to optimize LP." << endl;
       mipSolInfo = Mip_solution_info(-1, cplex.getStatus(), -1, -1);
@@ -105,13 +107,15 @@ pair<Gvrp_solution, Mip_solution_info> KK_model::run(){
       env.end();
       throw mipSolInfo;
     }
+    clock_gettime(CLOCK_MONOTONIC, &finish);
+    elapsed = (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 //    cplex.exportModel("cplexcpp.lp");
 //    env.out() << "Solution value = " << cplex.getObjValue() << endl;
 //    cout<<"Getting x values"<<endl;
     fillVals();
 //    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
-    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), cplex.getTime(), cplex.getObjValue());
+    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
     endVars();
     env.end();
     return make_pair(*solution, mipSolInfo);
@@ -405,8 +409,6 @@ void KK_model::createModel() {
       cplex.use(user_constraint);
     //extra steps
     extraStepsAfterModelCreation();
-    //depth node callback
-    cplex.use(new Depth_node_callback(env));
   } catch (IloException& e) {
     throw e;
   } catch (string s) {
@@ -447,10 +449,10 @@ void KK_model::fillVals(){
   } catch (...) {
     throw string("Error in getting solution");
   }
+  /*
   cout<<"Time: "<<endl;
   for (size_t i = 1; i < c0.size(); ++i)
     cout<<"\t"<<i<<": "<<t[i - 1]<<endl;
-  /*
   cout<<" ";
   for (size_t i = 0; i < c0.size(); ++i){
     cout<<" ";

@@ -1,7 +1,6 @@
 #include "models/vertex.hpp"
 #include "models/distances_enum.hpp"
 #include "models/cplex/mip_solution_info.hpp"
-#include "models/cplex/depth_node_callback.hpp"
 #include "models/gvrp_models/gvrp_solution.hpp"
 #include "models/gvrp_models/gvrp_instance.hpp"
 #include "models/gvrp_models/cplex/gvrp_model.hpp"
@@ -72,15 +71,18 @@ pair<Gvrp_solution, Mip_solution_info> LH_model::run(){
   stringstream output_exception;
   Mip_solution_info mipSolInfo;
   try {
-    cout<<"Creating variables"<<endl;
+//    cout<<"Creating variables"<<endl;
     createVariables();
-    cout<<"Creating objective function"<<endl;
+//    cout<<"Creating objective function"<<endl;
     createObjectiveFunction();
-    cout<<"Creating model"<<endl;
+//    cout<<"Creating model"<<endl;
     createModel();
-    cout<<"Setting parameter"<<endl;
+//    cout<<"Setting parameter"<<endl;
     setCustomParameters();
-    cout<<"Solving model"<<endl;
+//    cout<<"Solving model"<<endl;
+    struct timespec start, finish;
+    double elapsed;
+    clock_gettime(CLOCK_MONOTONIC, &start);
     if ( !cplex.solve() ) {
 //      env.error() << "Failed to optimize LP." << endl;
       mipSolInfo = Mip_solution_info(-1, cplex.getStatus(), -1, -1);
@@ -88,13 +90,15 @@ pair<Gvrp_solution, Mip_solution_info> LH_model::run(){
       env.end();
       throw mipSolInfo;
     }
+    clock_gettime(CLOCK_MONOTONIC, &finish);
+    elapsed = (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 //    cplex.exportModel("cplexcpp.lp");
 //    env.out() << "Solution value = " << cplex.getObjValue() << endl;
 //    cout<<"Getting x values"<<endl;
     fillVals();
 //    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
-    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), cplex.getTime(), cplex.getObjValue());
+    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
     endVars();
     env.end();
     return make_pair(*solution, mipSolInfo);
@@ -471,8 +475,6 @@ void LH_model::createModel() {
     cplex = IloCplex(model);
     //extra steps
     extraStepsAfterModelCreation();
-    //depth node callback
-    cplex.use(new Depth_node_callback(env));
   } catch (IloException& e) {
     throw e;
   } catch (string s) {

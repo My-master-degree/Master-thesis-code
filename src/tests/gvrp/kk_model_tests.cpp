@@ -28,11 +28,13 @@ void KK_model_tests::run() {
   string solution_name;
   Mip_solution_info mipSolInfo;
     //instance list
-  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
+//  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
+  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("new/"));
   list<Gvrp_instance> gvrp_instances;
   int i = 0;
   for (const string& instance : instances){
-    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
+//    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
+    Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/") + instance);
     gvrp_instances.push_back(gvrp_instance);
   }
     //executions
@@ -45,13 +47,6 @@ void KK_model_tests::run() {
   for (const string& instance : instances) {
     cout<<instance<<endl;
     KK_model kk_model (*gvrp_instance, execution_time);  
-    /*
-    kk_model.preprocessings.push_back(new Invalid_edge_preprocessing(kk_model));
-    kk_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(kk_model));
-    kk_model.preprocessings.push_back(new Invalid_edge_preprocessing_3(kk_model));
-    kk_model.preprocessings.push_back(new Invalid_edge_preprocessing_4(kk_model));
-    kk_model.user_constraints.push_back(new Subcycle_user_constraint(kk_model));
-    */
     execute_model(kk_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
