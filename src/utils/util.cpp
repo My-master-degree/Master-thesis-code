@@ -550,6 +550,7 @@ list<list<Vertex> > utils::getGvrpConnectedComponents (const Gvrp_instance& gvrp
   return components;
 }
 
+
 list<pair<int, int>> utils::get_invalid_edges_1 (const Gvrp_instance& gvrp_instance) {
   if (gvrp_instance.distances_enum != METRIC)
     throw string("The preprocessing 'Invalid edge preprocessing 1' only applies for metric instances");

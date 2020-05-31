@@ -1,5 +1,5 @@
-#ifndef INVALID_EDGE_PREPROCESSING_3_LH_MODEL_CPLEX_HPP_
-#define INVALID_EDGE_PREPROCESSING_3_LH_MODEL_CPLEX_HPP_
+#ifndef INVALID_EDGE_PREPROCESSING_C7_LH_MODEL_CPLEX_HPP_
+#define INVALID_EDGE_PREPROCESSING_C7_LH_MODEL_CPLEX_HPP_
 
 #include "models/gvrp_models/cplex/lh_model/lh_model.hpp"
 #include "models/gvrp_models/cplex/lh_model/preprocessing.hpp"
@@ -8,9 +8,9 @@ namespace models {
   namespace gvrp_models {
     namespace cplex {
       namespace lh_model {
-        class Invalid_edge_preprocessing_3 : public Preprocessing {
+        class Invalid_edge_preprocessing_C7 : public Preprocessing {
           public:
-            explicit Invalid_edge_preprocessing_3 (LH_model& lh_model);
+            explicit Invalid_edge_preprocessing_C7 (LH_model& lh_model);
             void add ();
         };
       }

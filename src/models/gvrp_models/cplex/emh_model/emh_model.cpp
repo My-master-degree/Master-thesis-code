@@ -23,7 +23,7 @@ using namespace models::gvrp_models::cplex::emh_model;
 
 using namespace std;
 
-EMH_model::EMH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit) {
+EMH_model::EMH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), depotDummy(new Vertex(instance.depot.id, instance.depot.x, instance.depot.y, instance.afss.front().serviceTime))  {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //gvrp afs tree
@@ -51,8 +51,8 @@ EMH_model::EMH_model(const Gvrp_instance& instance, unsigned int time_limit) : G
   //depot dummies
   for (size_t i = 0; i < instance.customers.size() + 1; ++i) {
     afs_dummies[instance.depot.id].push_back(++dummy_id);
-    all[dummy_id] = &instance.depot;
-    dummies[dummy_id] = &instance.depot;
+    all[dummy_id] = depotDummy;
+    dummies[dummy_id] = depotDummy;
   }
 } 
 

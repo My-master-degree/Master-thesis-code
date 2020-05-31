@@ -2,6 +2,7 @@
 #include "tests/gvrp/emh_model_tests.hpp"
 #include "tests/gvrp/kk_model_tests.hpp"
 #include "tests/gvrp/lh_model_tests.hpp"
+#include "tests/gvrp/matheus_model_tests.hpp"
 #include "tests/gvrp/local_searchs_tests.hpp"
 #include "tests/instance_generation/model_tests.hpp"
 #include "tests/bpp/bpp_model_tests.hpp"
@@ -53,6 +54,9 @@ int main (int argc, char **argv)
   LH_model_tests lh_model_tests (VERBOSE, execution_time, nIntSol);
   lh_model_tests.run();
   /*
+    //Matheus model
+  Matheus_model_tests matheus_model_tests (VERBOSE, execution_time, nIntSol);
+  matheus_model_tests.run();
     //BBP model
   BPP_model_tests bpp_model_tests (VERBOSE, execution_time, nIntSol);
   bpp_model_tests.run();

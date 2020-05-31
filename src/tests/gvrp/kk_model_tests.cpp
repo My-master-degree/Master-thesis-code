@@ -2,11 +2,6 @@
 #include "models/gvrp_models/gvrp_instance.hpp"
 #include "models/gvrp_models/gvrp_solution.hpp"
 #include "models/gvrp_models/cplex/kk_model/kk_model.hpp"
-#include "models/gvrp_models/cplex/kk_model/invalid_edge_preprocessing.hpp"
-#include "models/gvrp_models/cplex/kk_model/invalid_edge_preprocessing_2.hpp"
-#include "models/gvrp_models/cplex/kk_model/invalid_edge_preprocessing_3.hpp"
-#include "models/gvrp_models/cplex/kk_model/invalid_edge_preprocessing_4.hpp"
-#include "models/gvrp_models/cplex/kk_model/subcycle_user_constraint.hpp"
 #include "utils/util.hpp"
 #include "SampleConfig.h"
 

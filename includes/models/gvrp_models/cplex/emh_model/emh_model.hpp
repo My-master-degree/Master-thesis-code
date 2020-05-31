@@ -37,6 +37,7 @@ namespace models {
             pair<Gvrp_solution, Mip_solution_info> run();
             map<int, list<int>> afs_dummies;
             map<int, const Vertex *> dummies;
+            const Vertex * depotDummy;
             Matrix2DVar x;
             IloNumVarArray t;
             IloNumVarArray e;

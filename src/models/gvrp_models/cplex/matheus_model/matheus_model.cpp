@@ -1,14 +1,23 @@
 #include "models/vertex.hpp"
 #include "models/distances_enum.hpp"
 #include "models/cplex/mip_solution_info.hpp"
+#include "models/cplex/depth_node_callback.hpp"
 #include "models/gvrp_models/gvrp_solution.hpp"
 #include "models/gvrp_models/gvrp_instance.hpp"
 #include "models/gvrp_models/cplex/gvrp_model.hpp"
-#include "models/gvrp_models/cplex/lh_model/lh_model.hpp"
-#include "models/gvrp_models/cplex/lh_model/preprocessing.hpp"
+#include "models/gvrp_models/cplex/matheus_model/matheus_model.hpp"
+#include "models/gvrp_models/cplex/matheus_model/preprocessing.hpp"
+#include "models/gvrp_models/cplex/matheus_model/user_constraint.hpp"
+#include "models/gvrp_models/cplex/matheus_model/lazy_constraint.hpp"
+#include "models/gvrp_models/cplex/matheus_model/subcycle_user_constraint.hpp"
+#include "models/gvrp_models/cplex/matheus_model/invalid_edge_preprocessing.hpp"
+#include "models/gvrp_models/cplex/matheus_model/invalid_edge_preprocessing_2.hpp"
+#include "models/gvrp_models/cplex/matheus_model/invalid_edge_preprocessing_3.hpp"
+#include "models/gvrp_models/cplex/matheus_model/invalid_edge_preprocessing_4.hpp"
 
 #include <sstream>
 #include <list>
+#include <float.h>
 #include <time.h> 
 #include <string> 
 
@@ -16,17 +25,20 @@ using namespace models;
 using namespace models::cplex;
 using namespace models::gvrp_models;
 using namespace models::gvrp_models::cplex;
-using namespace models::gvrp_models::cplex::lh_model;
+using namespace models::gvrp_models::cplex::matheus_model;
 
 using namespace std;
 
-LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit) {
+Matheus_model::Matheus_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nKKGreedyNRoutesLB (0), nMSTNRoutesLB(0), nBPPNRoutesLB (0)  {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
+  //setup
+  const size_t scustomers = instance.customers.size(),
+                safss = instance.afss.size();
   //gvrp afs tree
   gvrp_afs_tree = new Gvrp_afs_tree(instance);
   //c_0
-  c0 = vector<const Vertex *> (instance.customers.size() + 1);
+  c0 = vector<const Vertex *> (scustomers + 1);
   c0[0] = &instance.depot;
   int i = 0;
   for (const Vertex& customer : instance.customers) {
@@ -35,7 +47,7 @@ LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvr
     ++i;
   }
   //f_0
-  f0 = vector<const Vertex *> (instance.afss.size() + 1);
+  f0 = vector<const Vertex *> (safss + 1);
   f0[0] = &instance.depot;
   afssF0Indexes[instance.depot.id] = 0;
   int f = 0;
@@ -44,29 +56,54 @@ LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvr
     afssF0Indexes[afs.id] = f + 1;
     ++f;
   }
+  //closest customers
+  customersClosestCustomerTime = vector<double> (scustomers, DBL_MAX);
+  customersSecondClosestCustomerTime = vector<double> (scustomers, DBL_MAX);
+  for (size_t i = 1; i <= scustomers; ++i) 
+    for (size_t j = 1; j <= scustomers; ++j) 
+      if (i != j) {
+        double cost = time(i, j);
+        if (cost < customersClosestCustomerTime[i - 1]) {
+          customersSecondClosestCustomerTime[i - 1] = customersClosestCustomerTime[i - 1];
+          customersClosestCustomerTime[i - 1] = cost;
+        } else if (cost < customersSecondClosestCustomerTime[i - 1]) 
+          customersSecondClosestCustomerTime[i - 1] = cost;
+      }
+  //user constraints
+  user_constraints.push_back(new Subcycle_user_constraint(*this));
+  //preprocessings
+  preprocessings.push_back(new Invalid_edge_preprocessing(*this));
+  preprocessings.push_back(new Invalid_edge_preprocessing_2(*this));
+  preprocessings.push_back(new Invalid_edge_preprocessing_3(*this));
+  preprocessings.push_back(new Invalid_edge_preprocessing_4(*this));
 } 
 
-double LH_model::time (int i, int f, int j) {
-  return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + (f == 0 ? instance.afss.front().serviceTime : f0[f]->serviceTime) + f0[f]->serviceTime + instance.time(f0[f]->id, c0[j]->id);
+double Matheus_model::kk_greedy_nRoutes_lb(const set<int>& S) {
+  //...
+  return 0;
 }
 
-double LH_model::time(int i, int j) {
+double Matheus_model::time (int i, int f, int j) {
+  return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + f0[f]->serviceTime + instance.time(f0[f]->id, c0[j]->id);
+}
+
+double Matheus_model::time(int i, int j) {
   return c0[i]->serviceTime + instance.time(c0[i]->id, c0[j]->id);
 }
 
-double LH_model::customersFuel(int i, int j) {
+double Matheus_model::customersFuel(int i, int j) {
   return instance.fuel(c0[i]->id, c0[j]->id);
 }
 
-double LH_model::afsToCustomerFuel(int f, int i) {
+double Matheus_model::afsToCustomerFuel(int f, int i) {
   return instance.fuel(f0[f]->id, c0[i]->id);
 }
 
-double LH_model::customerToAfsFuel(int i, int f) {
+double Matheus_model::customerToAfsFuel(int i, int f) {
   return instance.fuel(c0[i]->id, f0[f]->id);
 }
 
-pair<Gvrp_solution, Mip_solution_info> LH_model::run(){
+pair<Gvrp_solution, Mip_solution_info> Matheus_model::run(){
   //setup
   stringstream output_exception;
   Mip_solution_info mipSolInfo;
@@ -110,7 +147,7 @@ pair<Gvrp_solution, Mip_solution_info> LH_model::run(){
   }
 }
 
-void LH_model::createVariables(){
+void Matheus_model::createVariables(){
   y = Matrix3DVar (env, c0.size());
   x = Matrix2DVar (env, c0.size());
   a = Matrix2DVar (env, c0.size());
@@ -172,7 +209,7 @@ void LH_model::createVariables(){
   }
 }
 
-void LH_model::createObjectiveFunction() {
+void Matheus_model::createObjectiveFunction() {
   //objective function
   try{
     IloExpr fo (env);
@@ -191,7 +228,7 @@ void LH_model::createObjectiveFunction() {
   }
 }
 
-void LH_model::createModel() {
+void Matheus_model::createModel() {
   try {
     //preprocessing conditions
     for (Preprocessing* preprocessing : preprocessings)
@@ -471,10 +508,21 @@ void LH_model::createModel() {
         constraintName.str("");
       }
     }
+    //extra constraints
+    for (Extra_constraint* extra_constraint : extra_constraints) 
+      extra_constraint->add();
     //init
     cplex = IloCplex(model);
+    //laxy constraints
+    for (Lazy_constraint* lazy_constraint : lazy_constraints)
+      cplex.use(lazy_constraint);
+    //user cuts
+    for (User_constraint* user_constraint : user_constraints)
+      cplex.use(user_constraint);
     //extra steps
     extraStepsAfterModelCreation();
+    //depth node callback
+    cplex.use(new Depth_node_callback(env));
   } catch (IloException& e) {
     throw e;
   } catch (string s) {
@@ -482,13 +530,39 @@ void LH_model::createModel() {
   }
 }
 
-void LH_model::extraStepsAfterModelCreation() {
+void Matheus_model::extraStepsAfterModelCreation() {
   //
 }
 
-void LH_model::setCustomParameters(){
+void Matheus_model::setCustomParameters(){
   try{
     setParameters();
+    //DOUBTS:
+    // Turn off the presolve reductions and set the CPLEX optimizer
+    // to solve the worker LP with primal simplex method.
+    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
+    cplex.setParam(IloCplex::Param::Preprocessing::Symmetry, 0);
+    cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal); 
+    //preprocesing setting
+    cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
+    // Turn on traditional search for use with control callbacks
+//    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
+    //:DOUBTS
+    //LAZY CONSTRAINTS
+    //thread safe setting
+    cplex.setParam(IloCplex::Param::Threads, 1);
+    // Tweak some CPLEX parameters so that CPLEX has a harder time to
+    // solve the model and our cut separators can actually kick in.
+    cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::MIRCut, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::Implied, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::Gomory, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::FlowCovers, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::PathCut, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::LiftProj, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::ZeroHalfCut, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques, -1);
+    cplex.setParam(IloCplex::Param::MIP::Cuts::Covers, -1);
   } catch (IloException& e) {
     throw e;
   } catch (...) {
@@ -496,7 +570,7 @@ void LH_model::setCustomParameters(){
   }
 }
 
-void LH_model::fillVals(){
+void Matheus_model::fillVals(){
   //getresult
   try{
     x_vals = Matrix2DVal (env, c0.size());
@@ -557,7 +631,7 @@ void LH_model::fillVals(){
     */
 }
 
-void LH_model::createGvrp_solution(){
+void Matheus_model::createGvrp_solution(){
   try{
     list<list<Vertex>> routes;
     list<Vertex> route;
@@ -638,7 +712,7 @@ void LH_model::createGvrp_solution(){
   }
 }
 
-void LH_model::endVars(){
+void Matheus_model::endVars(){
   for (size_t i = 0; i < c0.size(); ++i) {
     if (i > 0) {
       a[i - 1].end();

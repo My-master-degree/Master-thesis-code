@@ -1,7 +1,7 @@
 #include "models/gvrp_models/cplex/lh_model/lh_model.hpp"
 #include "models/gvrp_models/gvrp_feasible_solution_heuristic.hpp"
 #include "models/gvrp_models/cplex/lh_model/preprocessing.hpp"
-#include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing_2.hpp"
+#include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing_C4_C5.hpp"
 #include "utils/util.hpp"
 
 #include <iostream>
@@ -12,12 +12,12 @@ using namespace utils;
 using namespace models::gvrp_models;
 using namespace models::gvrp_models::cplex::lh_model;
 
-Invalid_edge_preprocessing_2::Invalid_edge_preprocessing_2 (LH_model& lh_model) : Preprocessing (lh_model) {
+Invalid_edge_preprocessing_C4_C5::Invalid_edge_preprocessing_C4_C5 (LH_model& lh_model) : Preprocessing (lh_model) {
   if (lh_model.instance.distances_enum != METRIC)
-    throw string("The preprocessing 'Invalid edge preprocessing 3' only applies for metric instances");
+    throw string("The preprocessing 'Invalid edge preprocessing C4 C5' only applies for metric instances");
 }
 
-void Invalid_edge_preprocessing_2::add () {
+void Invalid_edge_preprocessing_C4_C5::add () {
   list<pair<int, int>> edges = get_invalid_edges_2(lh_model.instance);
   for (const auto& [i, j] : edges)
     if (i == lh_model.instance.depot.id)

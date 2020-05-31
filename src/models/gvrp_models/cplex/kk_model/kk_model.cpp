@@ -50,7 +50,7 @@ KK_model::KK_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvr
 } 
 
 double KK_model::time (int i, int f, int j) const {
-  return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + f0[f]->serviceTime + instance.time(f0[f]->id, c0[j]->id);
+  return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + (f == 0 ? instance.afss.front().serviceTime : f0[f]->serviceTime) + instance.time(f0[f]->id, c0[j]->id);
 }
 
 double KK_model::time(int i, int j) const {
@@ -111,11 +111,12 @@ pair<Gvrp_solution, Mip_solution_info> KK_model::run(){
     elapsed = (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 //    cplex.exportModel("cplexcpp.lp");
 //    env.out() << "Solution value = " << cplex.getObjValue() << endl;
-//    cout<<"Getting x values"<<endl;
+    cout<<"Getting x values"<<endl;
     fillVals();
-//    cout<<"Creating GVRP solution"<<endl;
+    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
     mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
+    cout<<"Ending vars"<<endl;
     endVars();
     env.end();
     return make_pair(*solution, mipSolInfo);
@@ -558,11 +559,8 @@ void KK_model::createGvrp_solution(){
 void KK_model::endVars(){
   for (size_t i = 0; i < c0.size(); ++i) {
     x[i].end();
-    for (size_t f = 0; f < f0.size(); ++f) {
-      for (size_t j = 0; j < c0.size(); ++j) 
-        y[i][f][j].end();
+    for (size_t f = 0; f < f0.size(); ++f) 
       y[i][f].end();
-    }
     y[i].end();
   }
   x.end();
