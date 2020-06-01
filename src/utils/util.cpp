@@ -304,6 +304,41 @@ Gvrp_instance utils::erdogan_instance_reader(const string file_path){
   return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, maxRoutes, timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
 }
 
+Gvrp_solution utils::read_gvrp_solution (const string& file_path, Gvrp_instance& gvrp_instance) {
+  //setup
+  map<int, Vertex> ids;
+  string buff, 
+         line;
+  ifstream inFile;
+  list<list<Vertex>> routes;
+  list<Vertex> route;
+  stringstream ss;
+  //build map of ids
+  for (const Vertex& customer : gvrp_instance.customers)
+    ids[customer.id] = customer;
+  for (const Vertex& afs : gvrp_instance.afss)
+    ids[afs.id] = afs;
+  ids[gvrp_instance.depot.id] = gvrp_instance.depot;
+  //read file
+  inFile.open(file_path);
+  if (!inFile)
+    throw string("Unable to open file ") + string(file_path);
+  while (true) {
+    getline(inFile, line);
+    ss.str(line);
+    ss>>buff;
+    if (buff != "Route")
+      break;
+    ss>>buff;
+    //get nodes
+    for (ss>>buff; '0' <= buff[0] && buff[0] <= '9'; ss>>buff) 
+      route.push_back(ids[stoi(buff, NULL)]);
+    routes.push_back(route);
+  }
+  return Gvrp_solution (routes, gvrp_instance);
+  
+}
+
 double utils::calculateGvrpInstanceLambda (const Gvrp_instance& gvrp_instance) {
   if (gvrp_instance.afss.size() > 0){
     //calculate lambda
