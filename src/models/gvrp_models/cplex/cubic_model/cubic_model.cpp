@@ -413,7 +413,7 @@ void Cubic_model::createGvrp_solution(){
         //get new neighborhood
         for (auto it  = all.rbegin(); it != all.rend(); ++it){
           int i = it->first;
-          if (x_vals[k][curr][i] > 0){
+          if (x_vals[k][curr][i] > INTEGRALITY_TOL){
             if (!customers.count(i) && i != depot && !routeAfssSet.count(i)) {
               routeAfssSet.insert(i);
               routeAfss.push(i);
@@ -443,7 +443,7 @@ void Cubic_model::createGvrp_solution(){
             //get new neighborhood
             for (auto it = all.rbegin(); it != all.rend(); ++it) {
               int i = it->first;
-              if (x_vals[k][curr][i] > 0) {
+              if (x_vals[k][curr][i] > INTEGRALITY_TOL) {
                 //check if i is an afs
                 if (!customers.count(i) && i != depot)
                   routeAfss.push(i);

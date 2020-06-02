@@ -34,7 +34,7 @@ void Invalid_edge_preprocessing_C7::add () {
         minFuelJ = min(minFuelJ, lh_model.instance.fuel(j.id, f.id));
       minFuelJ = min(minFuelJ, lh_model.instance.fuel(j.id, lh_model.instance.depot.id));
       for (const Vertex& f : lh_model.instance.afss) 
-        if (minFuelI +  lh_model.instance.fuel(i.id, f.id) > lh_model.instance.vehicleFuelCapacity 
+        if (minFuelI + lh_model.instance.fuel(i.id, f.id) > lh_model.instance.vehicleFuelCapacity 
             || lh_model.instance.fuel(f.id, j.id) + minFuelJ > lh_model.instance.vehicleFuelCapacity 
             || lh_model.instance.time(lh_model.instance.depot.id, i.id) + lh_model.instance.time(i.id, f.id) + i.serviceTime + lh_model.instance.time(f.id, j.id) + f.serviceTime + lh_model.instance.time(j.id, lh_model.instance.depot.id) + j.serviceTime > lh_model.instance.timeLimit) { 
           int fIndex = lh_model.afssF0Indexes[f.id];

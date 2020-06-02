@@ -47,7 +47,7 @@ LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvr
 } 
 
 double LH_model::time (int i, int f, int j) {
-  return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + (f == 0 ? instance.afss.front().serviceTime : f0[f]->serviceTime) + f0[f]->serviceTime + instance.time(f0[f]->id, c0[j]->id);
+  return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + (f == 0 ? instance.afss.front().serviceTime : f0[f]->serviceTime) + instance.time(f0[f]->id, c0[j]->id);
 }
 
 double LH_model::time(int i, int j) {
@@ -567,7 +567,7 @@ void LH_model::createGvrp_solution(){
     while (true) {
       next = false;
       for (size_t i = 1; i < c0.size() && !next; ++i) {
-        if (x_vals[0][i] > 0) {
+        if (x_vals[0][i] > INTEGRALITY_TOL) {
           next = true;
           route.push_back(Vertex(*c0[0]));
           x_vals[0][i] = 0;
@@ -575,7 +575,7 @@ void LH_model::createGvrp_solution(){
         if (!next)
           //on y[j][0][i]
           for (size_t j = 0; j < c0.size(); ++j) 
-            if (y_vals[j][0][i]) {
+            if (y_vals[j][0][i] > INTEGRALITY_TOL) {
               next = true;
               route.push_back(Vertex(*c0[0]));
               y_vals[j][0][i] = 0;
@@ -584,7 +584,7 @@ void LH_model::createGvrp_solution(){
         if (!next)
           //on y[0][f][i]
           for (size_t f = 0; f < f0.size(); ++f)
-            if (y_vals[0][f][i] > 0) {
+            if (y_vals[0][f][i] > INTEGRALITY_TOL) {
               next = true;
               route.push_back(Vertex(*c0[0]));
               route.push_back(Vertex(*f0[f]));
@@ -602,7 +602,7 @@ void LH_model::createGvrp_solution(){
       while (curr != 0) {
         for (size_t i = 0; i < c0.size(); ++i) {
           next = false;
-          if (x_vals[curr][i] > 0) {
+          if (x_vals[curr][i] > INTEGRALITY_TOL) {
             next = true;
             route.push_back(Vertex(*c0[i]));
             x_vals[curr][i] = 0;
@@ -610,7 +610,7 @@ void LH_model::createGvrp_solution(){
             break;
           } else {
             for (size_t f = 0; f < f0.size(); ++f)
-              if (y_vals[curr][f][i] > 0) {
+              if (y_vals[curr][f][i] > INTEGRALITY_TOL) {
                 next = true;
                 route.push_back(Vertex(*f0[f]));
                 route.push_back(Vertex(*c0[i]));

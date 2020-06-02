@@ -364,13 +364,13 @@ void EMH_model::createGvrp_solution(){
       //dfs
       curr = depot;
       next = p.first; 
-      if (x_vals[curr][next] > 0 && curr != next) {
+      if (x_vals[curr][next] > INTEGRALITY_TOL && curr != next) {
         route.push_back(Vertex(*all[curr]));
         for (; next != depot; route.push_back(Vertex(*all[curr]))) {
           curr = next;
           for (const pair<int, const Vertex *>& p1 : all) {
             int j = p1.first;
-            if (x_vals[curr][j] > 0) {
+            if (x_vals[curr][j] > INTEGRALITY_TOL) {
               next = j;
               break;
             }

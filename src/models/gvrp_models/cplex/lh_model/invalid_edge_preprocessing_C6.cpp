@@ -32,7 +32,7 @@ void Invalid_edge_preprocessing_C6::add () {
       minFuelI = min(minFuelI, lh_model.instance.fuel(lh_model.instance.depot.id, i.id));
       minFuelJ = min(minFuelJ, lh_model.instance.fuel(j.id, lh_model.instance.depot.id));
       if (minFuelI + lh_model.instance.fuel(i.id, j.id) + minFuelJ > lh_model.instance.vehicleFuelCapacity || 
-          lh_model.instance.time(lh_model.instance.depot.id, i.id) + i.serviceTime +  lh_model.instance.time(i.id, j.id) + j.serviceTime + lh_model.instance.time(j.id, lh_model.instance.depot.id) > lh_model.instance.timeLimit)  
+          lh_model.instance.time(lh_model.instance.depot.id, i.id) + i.serviceTime + lh_model.instance.time(i.id, j.id) + j.serviceTime + lh_model.instance.time(j.id, lh_model.instance.depot.id) > lh_model.instance.timeLimit)  
         lh_model.model.add(lh_model.x[lh_model.customersC0Indexes[i.id]][lh_model.customersC0Indexes[j.id]] == 0);
     }
 }
