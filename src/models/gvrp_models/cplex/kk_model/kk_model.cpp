@@ -78,7 +78,7 @@ double KK_model::M2(int i, int j) {
          closestJAFS = instance.fuel(f0[0]->id, j);
   for (int f = 1; f < f0.size(); ++f) {
     closestIAFS = min(closestIAFS, instance.fuel(f0[f]->id, i));
-    closestJAFS = min(closestIAFS, instance.fuel(f0[f]->id, j));
+    closestJAFS = min(closestJAFS, instance.fuel(f0[f]->id, j));
   }
   return instance.vehicleFuelCapacity + customersFuel(i, j) - closestIAFS - closestJAFS;
 }

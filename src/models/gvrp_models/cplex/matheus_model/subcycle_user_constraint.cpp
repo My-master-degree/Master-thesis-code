@@ -175,9 +175,12 @@ void Subcycle_user_constraint::main() {
         return get<2>(edge1) > get<2>(edge2);
       };
       priority_queue <tuple<int, int, double>, vector<tuple<int, int, double>>, decltype(comp)> pq (comp); 
-      for (int i : S) 
+      for (int i : S) {
         for (int j : S) 
           pq.push (make_tuple(i, j, matheus_model.instance.time(matheus_model.c0[i]->id, matheus_model.c0[j]->id)));
+        pq.push (make_tuple(i, 0, matheus_model.instance.time(matheus_model.c0[i]->id, matheus_model.c0[0]->id)));
+        pq.push (make_tuple(0, i, matheus_model.instance.time(matheus_model.c0[0]->id, matheus_model.c0[i]->id)));
+      }
       while (!pq.empty()) {
         tuple<int, int, double> edge = pq.top();
         pq.pop();
