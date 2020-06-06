@@ -10,16 +10,19 @@
 #include "models/gvrp_models/cplex/matheus_model/user_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model/lazy_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model/subcycle_user_constraint.hpp"
+#include "models/gvrp_models/cplex/matheus_model/greedy_lp_heuristic.hpp"
 #include "models/gvrp_models/cplex/matheus_model/invalid_edge_preprocessing.hpp"
 #include "models/gvrp_models/cplex/matheus_model/invalid_edge_preprocessing_2.hpp"
 #include "models/gvrp_models/cplex/matheus_model/invalid_edge_preprocessing_3.hpp"
 #include "models/gvrp_models/cplex/matheus_model/invalid_edge_preprocessing_4.hpp"
+#include "models/gvrp_models/gvrp_feasible_solution_heuristic.hpp"
 
 #include <sstream>
 #include <list>
 #include <float.h>
 #include <time.h> 
 #include <string> 
+#include <unordered_set>
 
 using namespace models;
 using namespace models::cplex;
@@ -56,35 +59,24 @@ Matheus_model::Matheus_model(const Gvrp_instance& instance, unsigned int time_li
     afssF0Indexes[afs.id] = f + 1;
     ++f;
   }
-  //closest customers
-  customersClosestCustomerTime = vector<double> (scustomers, DBL_MAX);
-  customersSecondClosestCustomerTime = vector<double> (scustomers, DBL_MAX);
-  for (size_t i = 1; i <= scustomers; ++i) 
-    for (size_t j = 1; j <= scustomers; ++j) 
-      if (i != j) {
-        double cost = time(i, j);
-        if (cost < customersClosestCustomerTime[i - 1]) {
-          customersSecondClosestCustomerTime[i - 1] = customersClosestCustomerTime[i - 1];
-          customersClosestCustomerTime[i - 1] = cost;
-        } else if (cost < customersSecondClosestCustomerTime[i - 1]) 
-          customersSecondClosestCustomerTime[i - 1] = cost;
-      }
   //user constraints
-  user_constraints.push_back(new Subcycle_user_constraint(*this));
+//  user_constraints.push_back(new Subcycle_user_constraint(*this));
   //preprocessings
   preprocessings.push_back(new Invalid_edge_preprocessing(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_2(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_3(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_4(*this));
+  //heuristic callbacks
+//  heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
 } 
 
-double Matheus_model::kk_greedy_nRoutes_lb(const set<int>& S) {
+double Matheus_model::kk_greedy_nRoutes_lb(const unordered_set<int>& S) {
   //...
   return 0;
 }
 
 double Matheus_model::time (int i, int f, int j) {
-  return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + f0[f]->serviceTime + instance.time(f0[f]->id, c0[j]->id);
+  return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + (f == 0 ? instance.afss.front().serviceTime : f0[f]->serviceTime) + instance.time(f0[f]->id, c0[j]->id);
 }
 
 double Matheus_model::time(int i, int j) {
@@ -150,19 +142,19 @@ pair<Gvrp_solution, Mip_solution_info> Matheus_model::run(){
 void Matheus_model::createVariables(){
   y = Matrix3DVar (env, c0.size());
   x = Matrix2DVar (env, c0.size());
-  a = Matrix2DVar (env, c0.size());
+  a = Matrix2DVar (env, c0.size() - 1);
   u = Matrix2DVar (env, c0.size());
   v = Matrix2DVar (env, c0.size() - 1);
   try {
     //setting names
     stringstream nameStream;
     for (size_t i = 0; i < c0.size(); ++i) {
-      //x, u, v, and a vars
+      //x, u vars
       x[i] = IloNumVarArray (env, c0.size(), 0, 1, IloNumVar::Int);
-      a[i] = IloNumVarArray (env, c0.size() - 1, 0, instance.vehicleFuelCapacity, IloNumVar::Float);
       u[i] = IloNumVarArray (env, c0.size(), 0, instance.timeLimit, IloNumVar::Float);
-      //a
+      //v and a
       if (i > 0) {
+        a[i - 1] = IloNumVarArray (env, c0.size() - 1, 0, instance.vehicleFuelCapacity, IloNumVar::Float);
         v[i - 1] = IloNumVarArray (env, f0.size(), 0, instance.vehicleFuelCapacity, IloNumVar::Float);
         for (size_t f = 0; f < f0.size(); ++f) {
           nameStream<<"v["<<i - 1<<"]["<<f<<"]=edge("<<c0[i]->id<<","<<f0[f]->id<<")";
@@ -313,7 +305,7 @@ void Matheus_model::createModel() {
       constraintName.clear();
       constraintName.str("");
     }
-    //t_{0j}(x_{j0} + \sum_{v_f \in F} t_{jf0}) \leqslant u_{j0}, \forall v_j \in C
+    //t_{0j}x_{j0} + \sum_{v_f \in F} t_{jf0}*z_{jf0} \leqslant u_{j0}, \forall v_j \in C
     for (size_t j = 1; j < c0.size(); ++j) {
       expr = x[j][0];
       for (size_t f = 1; f < f0.size(); ++f)
@@ -513,12 +505,15 @@ void Matheus_model::createModel() {
       extra_constraint->add();
     //init
     cplex = IloCplex(model);
-    //laxy constraints
+    //lazy constraints
     for (Lazy_constraint* lazy_constraint : lazy_constraints)
       cplex.use(lazy_constraint);
     //user cuts
     for (User_constraint* user_constraint : user_constraints)
       cplex.use(user_constraint);
+    //heuristic callback
+    for (Heuristic_callback* heuristic_callback : heuristic_callbacks)
+      cplex.use(heuristic_callback);
     //extra steps
     extraStepsAfterModelCreation();
     //depth node callback

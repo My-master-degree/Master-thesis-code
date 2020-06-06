@@ -1,7 +1,9 @@
 #include "tests/gvrp/kk_model_tests.hpp"
 #include "models/gvrp_models/gvrp_instance.hpp"
 #include "models/gvrp_models/gvrp_solution.hpp"
+#include "models/gvrp_models/gvrp_feasible_solution_heuristic.hpp"
 #include "models/gvrp_models/cplex/kk_model/kk_model.hpp"
+#include "models/gvrp_models/cplex/kk_model/mip_start.hpp"
 #include "utils/util.hpp"
 #include "SampleConfig.h"
 
@@ -41,10 +43,12 @@ void KK_model_tests::run() {
   i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
-    KK_model kk_model (*gvrp_instance, execution_time);  
+    Gvrp_feasible_solution_heuristic gfsh (*gvrp_instance);
+    Gvrp_solution gvrp_solution = gfsh.run();
+    Mip_start kk_model (*gvrp_instance, execution_time, gvrp_solution);  
+    //KK_model kk_model (*gvrp_instance, execution_time);  
     execute_model(kk_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
-    gvrp_instance++;
     i++;
   }
   closeResultFile(resultsFile);

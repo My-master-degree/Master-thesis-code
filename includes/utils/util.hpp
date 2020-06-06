@@ -24,7 +24,7 @@ namespace utils {
   vector<vector<int>> read_uchoa_vrp_solution (const string &file_path);    
   Gvrp_instance erdogan_instance_reader(const string file_path);
   list<string> listFilesFromDir(string path);
-  Gvrp_solution read_gvrp_solution (const string& file_path, Gvrp_instance& gvrp_instance);
+  Gvrp_solution read_gvrp_solution (const string& file_path, const Gvrp_instance& gvrp_instance);
   double calculateGvrpInstanceLambda (const Gvrp_instance& gvrp_instance);
   double calculateGvrpInstancePsi (const Gvrp_instance& gvrp_instance);
   double calculateVrpInstanceMST (const Vrp_instance& vrp_instance);

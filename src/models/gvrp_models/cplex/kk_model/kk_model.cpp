@@ -74,11 +74,11 @@ double KK_model::M1(int i, int f, int j) {
 }
 
 double KK_model::M2(int i, int j) {
-  double closestIAFS = instance.fuel(f0[0]->id, i),
-         closestJAFS = instance.fuel(f0[0]->id, j);
+  double closestIAFS = afsToCustomerFuel(0, i),
+         closestJAFS = afsToCustomerFuel(0, j);
   for (int f = 1; f < f0.size(); ++f) {
-    closestIAFS = min(closestIAFS, instance.fuel(f0[f]->id, i));
-    closestJAFS = min(closestJAFS, instance.fuel(f0[f]->id, j));
+    closestIAFS = min(closestIAFS, afsToCustomerFuel(f, i));
+    closestJAFS = min(closestJAFS, afsToCustomerFuel(f, j));
   }
   return instance.vehicleFuelCapacity + customersFuel(i, j) - closestIAFS - closestJAFS;
 }
@@ -88,15 +88,15 @@ pair<Gvrp_solution, Mip_solution_info> KK_model::run(){
   stringstream output_exception;
   Mip_solution_info mipSolInfo;
   try {
-    cout<<"Creating variables"<<endl;
+ //   cout<<"Creating variables"<<endl;
     createVariables();
-    cout<<"Creating objective function"<<endl;
+ //   cout<<"Creating objective function"<<endl;
     createObjectiveFunction();
-    cout<<"Creating model"<<endl;
+ //   cout<<"Creating model"<<endl;
     createModel();
-    cout<<"Setting parameter"<<endl;
+ //   cout<<"Setting parameter"<<endl;
     setCustomParameters();
-    cout<<"Solving model"<<endl;
+ //   cout<<"Solving model"<<endl;
     struct timespec start, finish;
     double elapsed;
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -111,12 +111,12 @@ pair<Gvrp_solution, Mip_solution_info> KK_model::run(){
     elapsed = (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 //    cplex.exportModel("cplexcpp.lp");
 //    env.out() << "Solution value = " << cplex.getObjValue() << endl;
-    cout<<"Getting x values"<<endl;
+ //   cout<<"Getting x values"<<endl;
     fillVals();
-    cout<<"Creating GVRP solution"<<endl;
+ //   cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
     mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
-    cout<<"Ending vars"<<endl;
+//    cout<<"Ending vars"<<endl;
     endVars();
     env.end();
     return make_pair(*solution, mipSolInfo);
@@ -402,9 +402,6 @@ void KK_model::createModel() {
       extra_constraint->add();
     //init
     cplex = IloCplex(model);
-    //lazy cuts
-    for (User_constraint* user_constraint : user_constraints)
-      cplex.use(user_constraint);
     //user cuts
     for (User_constraint* user_constraint : user_constraints)
       cplex.use(user_constraint);

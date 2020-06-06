@@ -304,7 +304,7 @@ Gvrp_instance utils::erdogan_instance_reader(const string file_path){
   return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, maxRoutes, timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
 }
 
-Gvrp_solution utils::read_gvrp_solution (const string& file_path, Gvrp_instance& gvrp_instance) {
+Gvrp_solution utils::read_gvrp_solution (const string& file_path, const Gvrp_instance& gvrp_instance) {
   //setup
   map<int, Vertex> ids;
   string buff, 
@@ -334,6 +334,7 @@ Gvrp_solution utils::read_gvrp_solution (const string& file_path, Gvrp_instance&
     for (ss>>buff; '0' <= buff[0] && buff[0] <= '9'; ss>>buff) 
       route.push_back(ids[stoi(buff, NULL)]);
     routes.push_back(route);
+    route.clear();
   }
   return Gvrp_solution (routes, gvrp_instance);
   

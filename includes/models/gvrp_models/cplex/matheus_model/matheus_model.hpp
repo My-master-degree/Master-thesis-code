@@ -9,13 +9,15 @@
 #include "models/gvrp_models/cplex/gvrp_model.hpp" 
 #include "models/gvrp_models/cplex/matheus_model/user_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model/lazy_constraint.hpp"
+#include "models/gvrp_models/cplex/matheus_model/heuristic_callback.hpp"
 #include "models/gvrp_models/cplex/matheus_model/preprocessing.hpp"
 #include "models/gvrp_models/cplex/matheus_model/extra_constraint.hpp"
 
 #include <vector>
 #include <map>
-#include <set>
+#include <unordered_set>
 #include <ilcplex/ilocplex.h>
+
 ILOSTLBEGIN
 
 typedef IloArray<IloNumVarArray> Matrix2DVar;
@@ -31,6 +33,7 @@ namespace models {
     namespace cplex {
       namespace matheus_model { 
         class User_constraint;
+        class Heuristic_callback;
         class Lazy_constraint;
         class Preprocessing;
         class Extra_constraint;
@@ -43,22 +46,23 @@ namespace models {
             Matrix2DVar a;
             Matrix2DVar u;
             Matrix2DVar v;
+            Matrix2DVar xi;
+            Matrix2DVar nu;
             Matrix3DVal y_vals;
             Matrix2DVal x_vals;
             list<User_constraint*> user_constraints;
             list<Lazy_constraint*> lazy_constraints;
+            list<Heuristic_callback*> heuristic_callbacks;
             list<Preprocessing*> preprocessings;
             list<Extra_constraint*> extra_constraints;
             map<int, int> customersC0Indexes;
             map<int, int> afssF0Indexes;
             vector<const Vertex *> c0;
             vector<const Vertex *> f0;
-            vector<double> customersClosestCustomerTime;
-            vector<double> customersSecondClosestCustomerTime;
             int nKKGreedyNRoutesLB;
             int nMSTNRoutesLB;
             int nBPPNRoutesLB;
-            double kk_greedy_nRoutes_lb(const set<int>& S);
+            double kk_greedy_nRoutes_lb(const unordered_set<int>& S);
             double time(int i, int f, int j);
             double time(int i, int j);
             double customersFuel(int i, int j);

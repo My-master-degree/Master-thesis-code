@@ -8,7 +8,8 @@
 #include "models/bpp_models/bpp_instance.hpp"
 #include "models/bpp_models/cplex/bpp_model.hpp"
 
-#include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include <queue>
 #include <list>
 #include <ilcplex/ilocplex.h>
@@ -54,10 +55,10 @@ void Subcycle_user_constraint::main() {
   IloExpr lhs (env);
   vector<ListGraph::Node> nodes (sc0);
   ListGraph graph;
-  multimap<int, int> subcomponents;
-  set<int> component;
-  set<int> visited;
-  list<set<int>> components;
+  unordered_multimap<int, int> subcomponents (sc0);
+  unordered_set<int> component;
+  vector<bool> visited (sc0, false);
+  list<unordered_set<int>> components;
   queue<int> q;
   //get values
   Matrix2DVal x_vals (env, sc0);
@@ -76,7 +77,7 @@ void Subcycle_user_constraint::main() {
     nodes[i] = graph.addNode();
   //get components
   for (int i = 1; i < sc0; ++i) {
-    if (visited.count(i))
+    if (visited[i])
       continue;
     ListGraph::EdgeMap<double> weight(graph); 
     //bfs
@@ -84,7 +85,7 @@ void Subcycle_user_constraint::main() {
     q.push(i);
     while (!q.empty()) {
       int curr = q.front();
-      visited.insert(curr);
+      visited[curr] = true;
       q.pop();
       for (int j = 0; j < sc0; ++j) {
         double currToJFlow = 0.0, 
@@ -113,7 +114,7 @@ void Subcycle_user_constraint::main() {
           }
         }
         if (flowExists) {
-          if (!visited.count(j)) {
+          if (!visited[j]) {
             component.insert(j);
             q.push(j);
           }
@@ -130,8 +131,8 @@ void Subcycle_user_constraint::main() {
     GomoryHu<ListGraph, ListGraph::EdgeMap<double> > gh (graph, weight);
     gh.run();
     //get subcycles
-    for (int i : component) 
-      for (int j : component) 
+    for (int i : component)
+      for (int j : component)
         if (gh.minCutValue(nodes[j], nodes[j]) >= 2.0) 
           dsu.join(i, j);
         else
@@ -142,7 +143,7 @@ void Subcycle_user_constraint::main() {
   for (int i = 0; i < sc0; ++i) 
     subcomponents.insert(make_pair(dsu.findSet(i), i));
   //store components
-  multimap<int, int>::iterator it = subcomponents.begin();
+  unordered_multimap<int, int>::iterator it = subcomponents.begin();
   int j = it->first;
   for (; it != subcomponents.end(); it++) {
     if (it->first != j) {
@@ -155,12 +156,12 @@ void Subcycle_user_constraint::main() {
   components.push_back(component);
   //end of multimap 
   //inequallitites
-  for (const set<int>& S : components) 
+  for (const unordered_set<int>& S : components) 
     if (!S.count(0)) {
       //\sum_{v_i \in V'\S} \sum_{v_j \in S} x_{ij} + \sum_{v_f \in F_0} y_{ifj} \geqslant 1 
       //lhs
-      for (int i = 0; i < sc0; ++i) 
-        if (!S.count(i))
+      for (size_t i = 0; i < sc0; ++i) 
+        if (!S.count(i)) 
           for (int j : S) {
             lhs += matheus_model.x[i][j];
             for (size_t f = 0; f < sf0; ++f)
@@ -176,8 +177,9 @@ void Subcycle_user_constraint::main() {
       };
       priority_queue <tuple<int, int, double>, vector<tuple<int, int, double>>, decltype(comp)> pq (comp); 
       for (int i : S) {
-        for (int j : S) 
-          pq.push (make_tuple(i, j, matheus_model.instance.time(matheus_model.c0[i]->id, matheus_model.c0[j]->id)));
+        for (int j : S)
+          if (i != j) 
+            pq.push (make_tuple(i, j, matheus_model.instance.time(matheus_model.c0[i]->id, matheus_model.c0[j]->id)));
         pq.push (make_tuple(i, 0, matheus_model.instance.time(matheus_model.c0[i]->id, matheus_model.c0[0]->id)));
         pq.push (make_tuple(0, i, matheus_model.instance.time(matheus_model.c0[0]->id, matheus_model.c0[i]->id)));
       }
@@ -190,12 +192,30 @@ void Subcycle_user_constraint::main() {
         }
       }
       mstNRoutesLB = ceil(mstCost/matheus_model.instance.timeLimit);
+        //calculate ditances
+      vector<double> closestS0Time (sc0);
+      vector<double> secondClosestS0Time (sc0);
+      for (int i : S) {
+        secondClosestS0Time[i] = closestS0Time[i] = matheus_model.instance.time(matheus_model.c0[i]->id, matheus_model.c0[0]->id);
+        for (int j : S) 
+          if (i != j) {
+            double time = matheus_model.instance.time(matheus_model.c0[i]->id, matheus_model.c0[j]->id);
+            if (time < closestS0Time[i]) {
+              secondClosestS0Time[i] = closestS0Time[i];
+              closestS0Time[i] = time;
+            } else if (time < secondClosestS0Time[i]) 
+              secondClosestS0Time[i] = time;
+          }
+      }
+      for (size_t i = 0; i < sc0; ++i)
+        if (S.count(i))
+          cout<<i<<" "<<closestS0Time[i]<<secondClosestS0Time[i]<<endl;
         //bin packing
-      vector<double> items (S.size()); 
-      size_t i = 0;
-      for (int customer : S) {
-        items[i] = matheus_model.c0[customer]->serviceTime + min(matheus_model.customersClosestCustomerTime[customer - 1], matheus_model.time(customer, 0));
-        ++i;
+      vector<double> items (S.size() + 1); 
+      items[0] = matheus_model.c0[0]->serviceTime + (closestS0Time[0] + secondClosestS0Time[0])/2;
+      for (int i : S) {
+        items[j] = matheus_model.c0[i]->serviceTime + (closestS0Time[i] + secondClosestS0Time[i])/2;
+        ++j;
       }
       BPP_instance bpp_instance (items, matheus_model.instance.timeLimit);
       BPP_model bpp_model (bpp_instance, bpp_time_limit);
@@ -215,8 +235,6 @@ void Subcycle_user_constraint::main() {
         ++matheus_model.nKKGreedyNRoutesLB;
         maxNRoutes = kkGreedyNRoutesLB;
       }
-      cout<<"here"<<endl;
-      exit(0);
       lhs -= maxNRoutes;
       try {
         add(lhs >= 0).end();
