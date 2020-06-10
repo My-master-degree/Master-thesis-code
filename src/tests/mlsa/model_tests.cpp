@@ -1,8 +1,8 @@
-#include "tests/instance_generation/model_tests.hpp"
+#include "tests/mlsa/model_tests.hpp"
 #include "models/vrp_instance.hpp"
 #include "models/gvrp_models/gvrp_instance.hpp"
-#include "models/instance_generation_model/instance_generation_model.hpp"
-#include "models/instance_generation_model/subcycle_user_constraint.hpp"
+#include "models/gvrp_models/gvrp_feasible_solution_heuristic.hpp"
+#include "models/mlsa_models/cplex/flow_model.hpp"
 #include "utils/util.hpp"
 #include "SampleConfig.h"
 
@@ -13,7 +13,7 @@
 
 using namespace std;
 using namespace utils;
-using namespace tests::instance_generation;
+using namespace tests::mlsa_flow;
 using namespace models;
 using namespace models::gvrp_models;
 
@@ -38,7 +38,7 @@ void Model_tests::run() {
   string instance_part;
   vector<vector<int>> routes;
       //model only
-  solution_name = "instance_generation_";
+  solution_name = "mlsa_flow_";
   openResultFile(resultsFile, solution_name);
   i = 0;
   for (const string& instance : instances) {
@@ -87,9 +87,9 @@ void Model_tests::run() {
     */
     routes = read_uchoa_vrp_solution (instance_part);
     //run
-    Instance_generation_model instance_generation_model (*vrp_instance, calculateVRPSolutionCost(routes, *vrp_instance)/2, execution_time);  
-    instance_generation_model.user_constraints.push_back(new Subcycle_user_constraint(instance_generation_model));
-    execute_model(instance_generation_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
+//    Flow_model flow_model (*vrp_instance, execution_time, calculateVRPSolutionCost(routes, *vrp_instance)/2);  
+    Flow_model flow_model (*vrp_instance, execution_time, calculateRouteAverageCost(routes, *vrp_instance));  
+    execute_model(flow_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     vrp_instance++;
     i++;
@@ -97,12 +97,12 @@ void Model_tests::run() {
   closeResultFile(resultsFile);
 }
 
-void Model_tests::execute_model(Instance_generation_model& instance_generation_model, const string& instance_name, string& prefix_solution_files, unsigned int nIntSol, bool VERBOSE, Mip_solution_info& mipSolInfo) {
+void Model_tests::execute_model(Flow_model& flow_model, const string& instance_name, string& prefix_solution_files, unsigned int nIntSol, bool VERBOSE, Mip_solution_info& mipSolInfo) {
   try {
-    instance_generation_model.max_num_feasible_integer_sol = nIntSol;
-    instance_generation_model.VERBOSE = VERBOSE;
-    pair<Gvrp_instance, Mip_solution_info > sol = instance_generation_model.run();    
-    sol.first.write_in_csv(PROJECT_INSTANCES_PATH + string("new/") + string(prefix_solution_files)  + to_string(sol.first.customers.size()) + string ("c") + to_string(sol.first.afss.size()) + string ("f") + to_string(instance_generation_model.vehicleFuelCapacity) + string("B-") + instance_name);
+    flow_model.max_num_feasible_integer_sol = nIntSol;
+    flow_model.VERBOSE = VERBOSE;
+    pair<Gvrp_instance, Mip_solution_info > sol = flow_model.run();    
+    sol.first.write_in_csv(PROJECT_INSTANCES_PATH + string("new/") + string(prefix_solution_files)  + to_string(sol.first.customers.size()) + string ("c") + to_string(sol.first.afss.size()) + string ("f") + to_string(flow_model.vehicleFuelCapacity) + string("B-") + instance_name);
     mipSolInfo = sol.second;
   } catch (string s){
     cout<<"Error:"<<s;

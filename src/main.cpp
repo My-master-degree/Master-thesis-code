@@ -4,7 +4,7 @@
 #include "tests/gvrp/lh_model_tests.hpp"
 #include "tests/gvrp/matheus_model_tests.hpp"
 #include "tests/gvrp/local_searchs_tests.hpp"
-#include "tests/instance_generation/model_tests.hpp"
+#include "tests/mlsa/model_tests.hpp"
 #include "tests/bpp/bpp_model_tests.hpp"
 
 #include <string>
@@ -12,7 +12,7 @@
 using namespace std;
 using namespace tests::bpp;
 using namespace tests::gvrp;
-using namespace tests::instance_generation;
+using namespace tests::mlsa_flow;
 
 int main (int argc, char **argv)
 { 

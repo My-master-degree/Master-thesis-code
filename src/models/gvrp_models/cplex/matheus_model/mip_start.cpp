@@ -20,14 +20,16 @@ void Mip_start::extraStepsAfterModelCreation () {
     //setup
     Matrix2DVal a_vals = Matrix2DVal (env, c0.size() - 1),
                 u_vals = Matrix2DVal (env, c0.size()),
-                v_vals = Matrix2DVal (env, c0.size() - 1);
+                v_vals = Matrix2DVal (env, c0.size() - 1),
+                c_vals = Matrix2DVal (env, c0.size());
     x_vals = Matrix2DVal (env, c0.size());
     y_vals = Matrix3DVal (env, c0.size());
     //create vals
     for (size_t i = 0; i < c0.size(); ++i) {
-      //x, u, v, and a vars
+      //x, u, v, c, e, and a vars
       x_vals[i] = IloNumArray (env, c0.size(), 0, 1, IloNumVar::Int);
       u_vals[i] = IloNumArray (env, c0.size(), 0, instance.timeLimit, IloNumVar::Float);
+      c_vals[i] = IloNumArray (env, c0.size(), 0, int(instance.customers.size()) + 1, IloNumVar::Int);
       //v
       if (i > 0) {
           v_vals[i - 1] = IloNumArray (env, f0.size(), 0, instance.vehicleFuelCapacity, IloNumVar::Float);
@@ -36,6 +38,8 @@ void Mip_start::extraStepsAfterModelCreation () {
           v_vals[i - 1][f] = 0.0;
       }
       for (size_t j = 0; j < c0.size(); ++j) {
+        //c
+        c_vals[i][j] = 0;
         //x
         x_vals[i][j] = 0.0;
         //u
@@ -55,9 +59,11 @@ void Mip_start::extraStepsAfterModelCreation () {
     //get values
     double currFuel, 
            currTime;
+    int nAFSs;
     for (const list<Vertex>& route : gvrp_solution.routes) {
       currFuel = instance.vehicleFuelCapacity;
       currTime = 0.0;
+      nAFSs = 0;
       list<Vertex>::const_iterator curr = route.begin(), 
         prev = curr;
       for (++curr; curr != route.end(); prev = curr, ++curr) {
@@ -68,6 +74,7 @@ void Mip_start::extraStepsAfterModelCreation () {
           int j = currIndex->second;
           x_vals[i][j] = 1;
           u_vals[i][j] = currTime;
+          c_vals[i][j] = nAFSs;
           if (i > 0 && j > 0) 
             a_vals[i - 1][j - 1] = currFuel - customersFuel(i, j);
           else if (i > 0) 
@@ -81,10 +88,12 @@ void Mip_start::extraStepsAfterModelCreation () {
           int j = customersC0Indexes[curr->id];
           y_vals[i][f][j] = 1;
           u_vals[i][j] = currTime;
+          c_vals[i][j] = nAFSs;
           if (i > 0) 
             v_vals[i - 1][f] = currFuel;
           currTime += time(i, f, j);
           currFuel = instance.vehicleFuelCapacity - afsToCustomerFuel(f, j);
+          ++nAFSs;
         }
       }
     }
@@ -103,6 +112,9 @@ void Mip_start::extraStepsAfterModelCreation () {
         //x
         startVar.add(x[i][j]);
         startVal.add(x_vals[i][j]);
+        //c
+        startVar.add(c[i][j]);
+        startVal.add(c_vals[i][j]);
         //u
         if (i != j) {
           startVar.add(u[i][j]);
@@ -133,12 +145,14 @@ void Mip_start::extraStepsAfterModelCreation () {
       for (size_t f = 0; f < f0.size(); ++f) 
         y_vals[i][f].end();
       y_vals[i].end();
+      c_vals[i].end();
     }
     x_vals.end();
     y_vals.end();
     a_vals.end();
     u_vals.end();
     v_vals.end();
+    c_vals.end();
     startVar.end();
     startVal.end();
   } catch (IloException& e) {

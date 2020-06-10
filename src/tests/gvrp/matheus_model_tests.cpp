@@ -47,10 +47,11 @@ void Matheus_model_tests::run() {
   openResultFile(resultsFile, solution_name);
   for (const string& instance : instances) {
     cout<<instance<<endl;
-//    Matheus_model matheus_model (*gvrp_instance, execution_time);  
     Gvrp_feasible_solution_heuristic gfsh (*gvrp_instance);
     Gvrp_solution gvrp_solution = gfsh.run();
-    Mip_start matheus_model (*gvrp_instance, execution_time, gvrp_solution);  
+ //   Matheus_model matheus_model (*gvrp_instance, execution_time);  
+   Mip_start matheus_model (*gvrp_instance, execution_time, gvrp_solution);  
+    matheus_model.nLevelsGreedyLPHeuristic = 100000;
     execute_model(matheus_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl<<matheus_model.nKKGreedyNRoutesLB<<matheus_model.nBPPNRoutesLB<<matheus_model.nMSTNRoutesLB;
     gvrp_instance++;

@@ -1,5 +1,5 @@
-#ifndef MATHEUS_MODEL_HPP_
-#define MATHEUS_MODEL_HPP_
+#ifndef _MATHEUS_MODEL_HPP_
+#define _MATHEUS_MODEL_HPP_
 
 #include "models/vertex.hpp" 
 #include "models/cplex/mip_solution_info.hpp" 
@@ -46,8 +46,8 @@ namespace models {
             Matrix2DVar a;
             Matrix2DVar u;
             Matrix2DVar v;
-            Matrix2DVar xi;
-            Matrix2DVar nu;
+            Matrix2DVar e;
+            Matrix2DVar c;
             Matrix3DVal y_vals;
             Matrix2DVal x_vals;
             list<User_constraint*> user_constraints;
@@ -62,6 +62,9 @@ namespace models {
             int nKKGreedyNRoutesLB;
             int nMSTNRoutesLB;
             int nBPPNRoutesLB;
+            int nLevelsGreedyLPHeuristic;
+            double psi;
+            double lambda;
             double kk_greedy_nRoutes_lb(const unordered_set<int>& S);
             double time(int i, int f, int j);
             double time(int i, int j);

@@ -29,6 +29,32 @@ using namespace models;
 using namespace models::gvrp_models;
 using namespace models::gvrp_models::cplex::cubic_model;
 
+
+double utils::calculateVRPSolutionCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance) {
+  const size_t sroutes = routes.size();
+  double cost = 0;
+  for (size_t i = 0; i < sroutes; ++i) 
+    for (size_t j = 1; j < routes[i].size(); ++j) 
+      cost += vrp_instance.distances[routes[i][j]][routes[i][j - 1]];
+  return cost;
+}
+
+double utils::calculateLargestRouteCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance) {
+  const size_t sroutes = routes.size();
+  double largestCost = 0;
+  for (size_t i = 0; i < sroutes; ++i) {
+    double cost = 0;
+    for (size_t j = 1; j < routes[i].size(); ++j) 
+      cost += vrp_instance.distances[routes[i][j]][routes[i][j - 1]];
+    largestCost = max(largestCost, cost);
+  }
+  return largestCost;
+}
+
+double utils::calculateRouteAverageCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance) {
+  return calculateVRPSolutionCost(routes, vrp_instance) / routes.size();
+}
+
 Gvrp_instance utils::matheus_instance_reader(const string& file_path){
   string line, token;
   ifstream inFile;

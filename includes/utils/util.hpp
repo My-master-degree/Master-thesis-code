@@ -19,6 +19,9 @@ using namespace models::gvrp_models::cplex::cubic_model;
 using namespace std;
 
 namespace utils {
+  double calculateVRPSolutionCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance);
+  double calculateLargestRouteCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance); 
+  double calculateRouteAverageCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance);
   Gvrp_instance matheus_instance_reader(const string& file_path);
   Vrp_instance read_uchoa_vrp_instance (const string &file_path);    
   vector<vector<int>> read_uchoa_vrp_solution (const string &file_path);    
