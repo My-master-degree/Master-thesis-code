@@ -59,12 +59,11 @@ namespace models {
             map<int, int> afssF0Indexes;
             vector<const Vertex *> c0;
             vector<const Vertex *> f0;
-            int nKKGreedyNRoutesLB;
-            int nMSTNRoutesLB;
-            int nBPPNRoutesLB;
-            int nLevelsGreedyLPHeuristic;
+            unsigned long int nGreedyLP;
+            long int nLevelsGreedyLPHeuristic;
             double psi;
             double lambda;
+            double alpha;
             double kk_greedy_nRoutes_lb(const unordered_set<int>& S);
             double time(int i, int f, int j);
             double time(int i, int j);

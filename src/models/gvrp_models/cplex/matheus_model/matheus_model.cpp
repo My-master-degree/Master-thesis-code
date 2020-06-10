@@ -34,7 +34,7 @@ using namespace models::gvrp_models::cplex::matheus_model;
 
 using namespace std;
 
-Matheus_model::Matheus_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nKKGreedyNRoutesLB (0), nMSTNRoutesLB(0), nBPPNRoutesLB (0), nLevelsGreedyLPHeuristic(0), psi(calculateGvrpInstancePsi(instance)), lambda(calculateGvrpInstanceLambda(instance)), c0(vector<const Vertex *> (instance.customers.size() + 1)), f0(vector<const Vertex *> (instance.afss.size() + 1))  {
+Matheus_model::Matheus_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nGreedyLP(0), nLevelsGreedyLPHeuristic(0), psi(calculateGvrpInstancePsi(instance)), lambda(calculateGvrpInstanceLambda(instance)), alpha(min(psi, lambda)), c0(vector<const Vertex *> (instance.customers.size() + 1)), f0(vector<const Vertex *> (instance.afss.size() + 1))  {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   gvrp_afs_tree = new Gvrp_afs_tree(instance);
@@ -529,19 +529,65 @@ void Matheus_model::createModel() {
       constraintName.clear();
       constraintName.str("");
     }
-    //e-var_{j0} + e_{j0} x_{j0} + \sum_{v_f \in F} e_{jf0} y_{jf0} \geqslant (c_{j0} - 1) * \psi + 2 * \lambda
-    for (size_t j = 1; j < c0.size(); ++j) {
-      expr = u[j][0] * instance.vehicleAverageSpeed * instance.vehicleFuelConsumptionRate + x[j][0] * (customersFuel(j, 0) - 2 * lambda) - (c[j][0] - 1) * psi;
-      for (size_t f = 0; f < f0.size(); ++f) 
-        expr += y[j][f][0] * (time(j, f, 0) * instance.vehicleAverageSpeed * instance.vehicleFuelConsumptionRate - 2 * lambda);
-      constraint = IloConstraint (expr >= 0);
-      constraintName<<"amount of spent fuel in edge("<<j<<", "<<0<<")";
-      constraint.setName(constraintName.str().c_str());
-      model.add(constraint);
-      expr.end();
-      expr = IloExpr(env);
-      constraintName.clear();
-      constraintName.str("");
+    if (alpha == psi && psi > instance.vehicleFuelCapacity / 2) {
+      //e-var_{j0} + e_{j0} x_{j0} + \sum_{v_f \in F} e_{jf0} y_{jf0} \geqslant (c_{j0} - 1) * \psi + 2 * \lambda
+      for (size_t j = 1; j < c0.size(); ++j) {
+        expr = u[j][0] * instance.vehicleAverageSpeed * instance.vehicleFuelConsumptionRate + x[j][0] * (customersFuel(j, 0) - 2 * lambda) - (c[j][0] - 1) * psi;
+        for (size_t f = 0; f < f0.size(); ++f) 
+          expr += y[j][f][0] * (time(j, f, 0) * instance.vehicleAverageSpeed * instance.vehicleFuelConsumptionRate - 2 * lambda);
+        constraint = IloConstraint (expr >= 0);
+        constraintName<<"amount of spent fuel in edge("<<j<<", "<<0<<")";
+        constraint.setName(constraintName.str().c_str());
+        model.add(constraint);
+        expr.end();
+        expr = IloExpr(env);
+        constraintName.clear();
+        constraintName.str("");
+      }
+    } else if (alpha == lambda && psi <= instance.vehicleFuelCapacity / 2) {
+      //e-var_{j0} + e_{j0} x_{j0} + \sum_{v_f \in F} e_{jf0} y_{jf0} \geqslant c_{j0} * \beta/2 + \alpha
+      for (size_t j = 1; j < c0.size(); ++j) {
+        expr = u[j][0] * instance.vehicleAverageSpeed * instance.vehicleFuelConsumptionRate + x[j][0] * (customersFuel(j, 0) - alpha) - c[j][0] * instance.vehicleFuelCapacity / 2;
+        for (size_t f = 0; f < f0.size(); ++f) 
+          expr += y[j][f][0] * (time(j, f, 0) * instance.vehicleAverageSpeed * instance.vehicleFuelConsumptionRate - alpha);
+        constraint = IloConstraint (expr >= 0);
+        constraintName<<"amount of spent fuel in edge("<<j<<", "<<0<<")";
+        constraint.setName(constraintName.str().c_str());
+        model.add(constraint);
+        expr.end();
+        expr = IloExpr(env);
+        constraintName.clear();
+        constraintName.str("");
+      }
+    } else {
+      //e-var_{j0} + e_{j0} x_{j0} + \sum_{v_f \in F} e_{jf0} y_{jf0} \geqslant (c_{j0} - 1) * \psi + 2 * \lambda
+      for (size_t j = 1; j < c0.size(); ++j) {
+        expr = u[j][0] * instance.vehicleAverageSpeed * instance.vehicleFuelConsumptionRate + x[j][0] * (customersFuel(j, 0) - 2 * lambda) - (c[j][0] - 1) * psi;
+        for (size_t f = 0; f < f0.size(); ++f) 
+          expr += y[j][f][0] * (time(j, f, 0) * instance.vehicleAverageSpeed * instance.vehicleFuelConsumptionRate - 2 * lambda);
+        constraint = IloConstraint (expr >= 0);
+        constraintName<<"amount of spent fuel in edge("<<j<<", "<<0<<")";
+        constraint.setName(constraintName.str().c_str());
+        model.add(constraint);
+        expr.end();
+        expr = IloExpr(env);
+        constraintName.clear();
+        constraintName.str("");
+      }
+      //e-var_{j0} + e_{j0} x_{j0} + \sum_{v_f \in F} e_{jf0} y_{jf0} \geqslant c_{j0} * \beta/2 + \alpha
+      for (size_t j = 1; j < c0.size(); ++j) {
+        expr = u[j][0] * instance.vehicleAverageSpeed * instance.vehicleFuelConsumptionRate + x[j][0] * (customersFuel(j, 0) - alpha) - c[j][0] * instance.vehicleFuelCapacity / 2;
+        for (size_t f = 0; f < f0.size(); ++f) 
+          expr += y[j][f][0] * (time(j, f, 0) * instance.vehicleAverageSpeed * instance.vehicleFuelConsumptionRate - alpha);
+        constraint = IloConstraint (expr >= 0);
+        constraintName<<"amount of spent fuel in edge set 2("<<j<<", "<<0<<")";
+        constraint.setName(constraintName.str().c_str());
+        model.add(constraint);
+        expr.end();
+        expr = IloExpr(env);
+        constraintName.clear();
+        constraintName.str("");
+      }
     }
 
     for (size_t j = 0; j < c0.size(); ++j) 

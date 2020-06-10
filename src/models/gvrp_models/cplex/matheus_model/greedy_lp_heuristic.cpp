@@ -182,6 +182,7 @@ void Greedy_lp_heuristic::main() {
     }
     //better solution found
     if (valid && cost - getIncumbentObjValue() < -1e-6) {
+      ++matheus_model.nGreedyLP;
       cout.precision(17);
       cout<<getIncumbentObjValue()<<" to "<<cost<<endl;
       //set new solution

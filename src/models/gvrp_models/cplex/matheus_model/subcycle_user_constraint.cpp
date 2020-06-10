@@ -223,17 +223,17 @@ void Subcycle_user_constraint::main() {
         //greedy
       kkGreedyNRoutesLB = matheus_model.kk_greedy_nRoutes_lb(S);
       if (mstNRoutesLB >= bppNRoutesLB && mstNRoutesLB >= kkGreedyNRoutesLB) {
-        cout<<"MST with "<<mstNRoutesLB;
-        ++matheus_model.nMSTNRoutesLB;
-        maxNRoutes = mstNRoutesLB;
+        //cout<<"MST with "<<mstNRoutesLB;
+        //++matheus_model.nMSTNRoutesLB;
+        //maxNRoutes = mstNRoutesLB;
       } else if (bppNRoutesLB >= mstNRoutesLB && bppNRoutesLB >= kkGreedyNRoutesLB) {
-        cout<<"BPP with "<<bppNRoutesLB;
-        ++matheus_model.nBPPNRoutesLB;
-        maxNRoutes = bppNRoutesLB;
+        //cout<<"BPP with "<<bppNRoutesLB;
+        //++matheus_model.nBPPNRoutesLB;
+        //maxNRoutes = bppNRoutesLB;
       } else  {
-        cout<<"KK Greedy with "<<bppNRoutesLB;
-        ++matheus_model.nKKGreedyNRoutesLB;
-        maxNRoutes = kkGreedyNRoutesLB;
+        //cout<<"KK Greedy with "<<bppNRoutesLB;
+        //++matheus_model.nKKGreedyNRoutesLB;
+        //maxNRoutes = kkGreedyNRoutesLB;
       }
       lhs -= maxNRoutes;
       try {
