@@ -150,7 +150,7 @@ Gvrp_instance utils::matheus_instance_reader(const string& file_path){
     //ignore header
   getline(inFile, line);
   getline(inFile, line);
-  while (line != "Distance matrix:"){         
+  while (true){         
     ss.str(line);
     getline(ss, token, ';');
     id = stoi(token, NULL);
@@ -162,24 +162,30 @@ Gvrp_instance utils::matheus_instance_reader(const string& file_path){
     serviceTime = stod(token, NULL);
     afss.push_back(Vertex(id, x, y, serviceTime));
     ss.clear();
+    if (inFile.peek() == EOF)
+      break;
     getline(inFile, line);
-  }
-  //get distance matrix
-  size_t sall = customers.size() + afss.size() + 1;
-  vector<vector<double>> distances (sall, vector<double> (sall));
-  getline(inFile, line);
-  for (size_t i = 0; i < sall; ++i) {
-    getline(inFile, line);
-    ss.str(line);
-    //ignore first column
-    getline(ss, token, ';');
-    for (size_t j = 0; j < sall; ++j) {
-      getline(ss, token, ';');
-      distances[i][j] = stod(token, NULL);
-    }
-    ss.clear();
   }
   inFile.close();
+  //calculate distances
+  const size_t sall = customers.size() + afss.size() + 1;
+  vector<vector<double>> distances (sall, vector<double> (sall));
+  for (const Vertex& customer : customers) {
+    distances[depot.id][customer.id] = sqrt(pow(customer.x - depot.x, 2) + pow(customer.y - depot.y, 2));
+    distances[customer.id][depot.id] = sqrt(pow(customer.x - depot.x, 2) + pow(customer.y - depot.y, 2));
+    for (const Vertex& customer_ : customers) 
+      distances[customer.id][customer_.id] = sqrt(pow(customer.x - customer_.x, 2) + pow(customer.y - customer_.y, 2));
+    for (const Vertex& afs : afss) {
+      distances[customer.id][afs.id] = sqrt(pow(customer.x - afs.x, 2) + pow(customer.y - afs.y, 2));
+      distances[afs.id][customer.id] = distances[customer.id][afs.id];
+    }
+  }
+  for (const Vertex& afs : afss) {
+    distances[depot.id][afs.id] = sqrt(pow(afs.x - depot.x, 2) + pow(afs.y - depot.y, 2));
+    distances[afs.id][depot.id] = sqrt(pow(afs.x - depot.x, 2) + pow(afs.y - depot.y, 2));
+    for (const Vertex& afs_ : afss) 
+      distances[afs_.id][afs.id] = sqrt(pow(afs.x - afs_.x, 2) + pow(afs.y - afs_.y, 2));
+  }
   return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, customers.size(), timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
 }
 
