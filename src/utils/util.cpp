@@ -6,6 +6,8 @@
 #include "models/gvrp_models/gvrp_solution.hpp"
 #include "models/gvrp_models/cplex/cubic_model/cubic_model.hpp"
 #include "models/gvrp_models/gvrp_feasible_solution_heuristic.hpp"
+#include "models/bpp_models/bpp_instance.hpp"
+#include "models/bpp_models/cplex/bpp_model.hpp"
 #include "utils/util.hpp"
 
 #include <float.h>
@@ -28,7 +30,43 @@
 using namespace models;
 using namespace models::gvrp_models;
 using namespace models::gvrp_models::cplex::cubic_model;
+using namespace models::bpp_models;
+using namespace models::bpp_models::cplex;
 
+pair<vector<double>, vector<double>> utils::calculateClosestsVRPCustomers (const Vrp_instance& vrp_instance, const vector<const Vertex *>& vertices) {
+  const size_t svertices = vertices.size();
+  vector<double> closest (svertices, DBL_MAX), 
+    secondClosest (svertices, DBL_MAX);
+  for (size_t i = 0; i < svertices; ++i) 
+    for (size_t j = 0; j < svertices; ++j) 
+      if (i != j) {
+        double cost = vrp_instance.distances[vertices[i]->id][vertices[j]->id];
+        if (cost < closest[i]) {
+          secondClosest[i] = closest[i];
+          closest[i] = cost;
+        } else if (cost < secondClosest[i]) 
+          secondClosest[i] = cost;
+      }
+  return make_pair(closest, secondClosest);
+}
+
+int utils::calculateGVRP_BPP_NRoutesLB(const Gvrp_instance& gvrp_instance, const vector<const Vertex *>& vertices, const vector<double>& closest, const vector<double>& secondClosest, unsigned int execution_time_limit) {
+  const size_t svertices = vertices.size();
+  vector<double> items (svertices); 
+  for (size_t i = 0; i < svertices; ++i) 
+    items[i] = vertices[i]->serviceTime + (closest[i] + secondClosest[i])/(2 * gvrp_instance.vehicleAverageSpeed);
+  BPP_instance bpp_instance (items, gvrp_instance.timeLimit);
+  BPP_model bpp_model (bpp_instance, execution_time_limit);
+  return bpp_model.run().first.size();
+}
+
+double utils::calculate_TSP_LB (const vector<const Vertex *>& vertices, const vector<double>& closest, const vector<double>& secondClosest) {
+  const size_t svertices = vertices.size();
+  double lb = 0.0;
+  for (size_t i = 0; i < svertices; ++i) 
+    lb += (closest[i] + secondClosest[i])/2;
+  return lb;
+}
 
 double utils::calculateVRPSolutionCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance) {
   const size_t sroutes = routes.size();
@@ -398,24 +436,18 @@ double utils::calculateGvrpInstancePsi (const Gvrp_instance& gvrp_instance) {
   return 0.0;  
 }
 
-double utils::calculateVrpInstanceMST (const Vrp_instance& vrp_instance) {
-  //build c0 
-  const size_t sc0 = vrp_instance.customers.size() + 1;
+double utils::calculateVrpMST (const Vrp_instance& vrp_instance, const vector<const Vertex *>& vertices) {
+  const size_t svertices = vertices.size();
   auto comp = [](const tuple<int, int, double> & edge1, const tuple<int, int, double> & edge2)
   {
     return get<2>(edge1) > get<2>(edge2);
   };
   priority_queue <tuple<int, int, double>, vector<tuple<int, int, double>>, decltype(comp)> pq (comp); 
-  auto end = vrp_instance.customers.end();
-  int i = 1;
-  for (auto customer_i = vrp_instance.customers.begin(); customer_i != end; ++customer_i, ++i) {
-    pq.push (make_tuple(0, i, vrp_instance.distances[vrp_instance.depot.id][customer_i->id]));
-    int j = i + 1;
-    auto customer_j = customer_i;
-    for (++customer_j; customer_j != end; ++customer_j, ++j) 
-      pq.push (make_tuple(j, i, vrp_instance.distances[customer_i->id][customer_j->id]));
-  }
-  DSU dsu(sc0);
+  for (size_t i = 0; i < svertices; ++i) 
+    for (size_t j = 0; j < svertices; ++j) 
+      if (i != j)
+        pq.push (make_tuple(i, j, vrp_instance.distances[vertices[i]->id][vertices[j]->id]));
+  DSU dsu(svertices);
   double cost = 0;
   while (!pq.empty()) {
     tuple<int, int, double> item = pq.top();

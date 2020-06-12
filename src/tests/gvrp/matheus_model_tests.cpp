@@ -30,13 +30,13 @@ void Matheus_model_tests::run() {
   string solution_name;
   Mip_solution_info mipSolInfo;
     //instance list
-  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
+ list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
  // list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("new/"));
   list<Gvrp_instance> gvrp_instances;
   int i = 0;
   for (const string& instance : instances) {
     Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
-   // Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/") + instance);
+ //  Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/") + instance);
     gvrp_instances.push_back(gvrp_instance);
   }
     //executions
@@ -56,7 +56,6 @@ void Matheus_model_tests::run() {
     resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<matheus_model.nGreedyLP<<endl;
     gvrp_instance++;
     i++;
-    break;
   }
   closeResultFile(resultsFile);
 }

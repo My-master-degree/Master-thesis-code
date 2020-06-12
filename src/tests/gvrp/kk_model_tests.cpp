@@ -43,9 +43,10 @@ void KK_model_tests::run() {
   i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
-    /*
     Gvrp_feasible_solution_heuristic gfsh (*gvrp_instance);
     Gvrp_solution gvrp_solution = gfsh.run();
+    cout<<gvrp_solution<<endl;
+    /*
     Mip_start kk_model (*gvrp_instance, execution_time, gvrp_solution);  
     */
     KK_model kk_model (*gvrp_instance, execution_time);  

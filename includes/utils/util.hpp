@@ -19,6 +19,9 @@ using namespace models::gvrp_models::cplex::cubic_model;
 using namespace std;
 
 namespace utils {
+  pair<vector<double>, vector<double>> calculateClosestsVRPCustomers (const Vrp_instance& vrp_instance, const vector<const Vertex *>& vertices);
+  int calculateGVRP_BPP_NRoutesLB(const Gvrp_instance& gvrp_instance, const vector<const Vertex *>& vertices, const vector<double>& closest, const vector<double>& secondClosest, unsigned int execution_time_limit);
+  double calculate_TSP_LB (const vector<const Vertex *>& vertices, const vector<double>& closest, const vector<double>& closestSecond);
   double calculateVRPSolutionCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance);
   double calculateLargestRouteCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance); 
   double calculateRouteAverageCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance);
@@ -30,7 +33,7 @@ namespace utils {
   Gvrp_solution read_gvrp_solution (const string& file_path, const Gvrp_instance& gvrp_instance);
   double calculateGvrpInstanceLambda (const Gvrp_instance& gvrp_instance);
   double calculateGvrpInstancePsi (const Gvrp_instance& gvrp_instance);
-  double calculateVrpInstanceMST (const Vrp_instance& vrp_instance);
+  double calculateVrpMST (const Vrp_instance& vrp_instance, const vector<const Vertex *>& vertices);
   double getLongestEdgeUchoaEtAlVrpInstance (const Vrp_instance& vrp_instance);
   double calculateCustomerMinRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer);
   double calculateCustomerMaxRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer);

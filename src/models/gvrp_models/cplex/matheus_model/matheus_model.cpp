@@ -55,6 +55,16 @@ Matheus_model::Matheus_model(const Gvrp_instance& instance, unsigned int time_li
     afssF0Indexes[afs.id] = f + 1;
     ++f;
   }
+  //set sol lb
+  double servicesTimes = 0.0;
+  for (size_t i = 0; i < c0.size(); ++i) 
+    servicesTimes += c0[i]->serviceTime;
+  const auto& [closest, secondClosest] = calculateClosestsVRPCustomers(instance, c0);
+  double tspLB = calculate_TSP_LB (c0, closest, secondClosest);
+  double mstLB = calculateVrpMST (instance, c0);
+  solLB = max(tspLB, mstLB);
+  //set n routes lb
+  nRoutesLB = max(calculateGVRP_BPP_NRoutesLB(instance, c0, closest, secondClosest, 100000000), int(max(ceil((servicesTimes + mstLB/instance.vehicleAverageSpeed)/instance.timeLimit), ceil((servicesTimes + tspLB/instance.vehicleAverageSpeed)/instance.timeLimit))));
   //user constraints
 //  user_constraints.push_back(new Subcycle_user_constraint(*this));
   //preprocessings
@@ -65,11 +75,6 @@ Matheus_model::Matheus_model(const Gvrp_instance& instance, unsigned int time_li
   //heuristic callbacks
   heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
 } 
-
-double Matheus_model::kk_greedy_nRoutes_lb(const unordered_set<int>& S) {
-  //...
-  return 0;
-}
 
 double Matheus_model::time (int i, int f, int j) {
   return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + (f == 0 ? instance.afss.front().serviceTime : f0[f]->serviceTime) + instance.time(f0[f]->id, c0[j]->id);
@@ -589,11 +594,32 @@ void Matheus_model::createModel() {
         constraintName.str("");
       }
     }
-
     for (size_t j = 0; j < c0.size(); ++j) 
       for (size_t i = 0; i < c0.size(); ++i) 
         model.add(c[i][j]);
-
+    //solution lb
+    for (size_t i = 0; i < c0.size(); ++i) 
+      for (size_t j = 0; j < c0.size(); ++j) {
+        expr +=  instance.distances[c0[i]->id][c0[j]->id] * x[i][j];
+        for (size_t f = 0; f < f0.size(); ++f)
+          expr += (instance.distances[c0[i]->id][f0[f]->id] + instance.distances[f0[f]->id][c0[j]->id]) * y[i][f][j];
+      }
+    constraint = IloConstraint (expr >= solLB);
+    constraint.setName("solution LB");
+    model.add(constraint);
+    expr.end();
+    expr = IloExpr(env);
+    //n routes LB
+    for (size_t i = 0; i < c0.size(); ++i) {
+      expr += x[0][i];
+      for (size_t f = 0; f < f0.size(); ++f)
+        expr += y[0][f][i];
+    }
+    constraint = IloConstraint (expr >= nRoutesLB);
+    constraint.setName("nRoutes LB");
+    model.add(constraint);
+    expr.end();
+    expr = IloExpr(env);
     //extra constraints
     for (Extra_constraint* extra_constraint : extra_constraints) 
       extra_constraint->add();

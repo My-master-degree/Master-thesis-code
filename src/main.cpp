@@ -40,11 +40,9 @@ int main (int argc, char **argv)
   //cubic model
   Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);
   cubic_model_tests.run();
-  */
     //instance generation model
   Model_tests model_tests (VERBOSE, execution_time, nIntSol);
   model_tests.run();
-  /*
     //EMH model
   EMH_model_tests emh_model_tests (VERBOSE, execution_time, nIntSol);
   emh_model_tests.run();
@@ -54,9 +52,11 @@ int main (int argc, char **argv)
     //LH model
   LH_model_tests lh_model_tests (VERBOSE, execution_time, nIntSol);
   lh_model_tests.run();
+  */
     //Matheus model
   Matheus_model_tests matheus_model_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_tests.run();
+  /*
     //BBP model
   BPP_model_tests bpp_model_tests (VERBOSE, execution_time, nIntSol);
   bpp_model_tests.run();

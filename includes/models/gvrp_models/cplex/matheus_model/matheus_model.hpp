@@ -61,10 +61,11 @@ namespace models {
             vector<const Vertex *> f0;
             unsigned long int nGreedyLP;
             long int nLevelsGreedyLPHeuristic;
+            int nRoutesLB;
+            double solLB;
             double psi;
             double lambda;
             double alpha;
-            double kk_greedy_nRoutes_lb(const unordered_set<int>& S);
             double time(int i, int f, int j);
             double time(int i, int j);
             double customersFuel(int i, int j);

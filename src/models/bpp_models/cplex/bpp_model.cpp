@@ -14,6 +14,7 @@ using namespace models::bpp_models::cplex;
 using namespace std;
 
 BPP_model::BPP_model(const BPP_instance& instance, unsigned int time_limit) : Cplex_model(instance, time_limit), sitems(instance.items.size()) {
+
 } 
 
 pair<BPP_solution, Mip_solution_info> BPP_model::run(){
@@ -21,13 +22,14 @@ pair<BPP_solution, Mip_solution_info> BPP_model::run(){
   stringstream output_exception;
   Mip_solution_info mipSolInfo;
   try {
-    cout<<"Creating variables"<<endl;
+//    cout<<"Creating variables"<<endl;
     createVariables();
-    cout<<"Creating objective function"<<endl;
+//    cout<<"Creating objective function"<<endl;
     createObjectiveFunction();
-    cout<<"Creating model"<<endl;
+//    cout<<"Creating model"<<endl;
     createModel();
-    cout<<"Solving model"<<endl;
+    cplex.setOut(env.getNullStream());
+//    cout<<"Solving model"<<endl;
     if ( !cplex.solve() ) {
 //      env.error() << "Failed to optimize LP." << endl;
       mipSolInfo = Mip_solution_info(-1, cplex.getStatus(), -1, -1);

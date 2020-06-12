@@ -7,6 +7,7 @@
 #include "models/gvrp_models/cplex/matheus_model/subcycle_user_constraint.hpp"
 #include "models/bpp_models/bpp_instance.hpp"
 #include "models/bpp_models/cplex/bpp_model.hpp"
+#include "utils/util.hpp"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -19,6 +20,7 @@
 #include <iostream>
 
 using namespace std;
+using namespace utils;
 using namespace models;
 using namespace models::cplex;
 using namespace models::bpp_models;
@@ -45,10 +47,9 @@ void Subcycle_user_constraint::main() {
   //setup
   const size_t sc0 = matheus_model.c0.size(),
         sf0 = matheus_model.f0.size();
-  unsigned int bpp_time_limit = 10000000;
   int bppNRoutesLB, 
       mstNRoutesLB, 
-      kkGreedyNRoutesLB,
+      tspNRoutesLB,
       maxNRoutes;
   DSU dsu (sc0);
   IloEnv env = getEnv();
@@ -168,65 +169,31 @@ void Subcycle_user_constraint::main() {
               lhs += matheus_model.y[i][f][j];
           }
       //rhs
+      const size_t sS = S.size();
+      vector<const Vertex *> vertices (sS + 1);
+      int j = 0;
+      double serviceTimes = 0.0;
+      for (int i : S) {
+        vertices[j++] = matheus_model.c0[i];
+        serviceTimes += matheus_model.c0[i]->serviceTime;
+      }
+      vertices[j] = matheus_model.c0[0];
         //get mst
-      DSU mstDsu (sc0);
-      double mstCost = 0;
-      auto comp = [](const tuple<int, int, double> & edge1, const tuple<int, int, double> & edge2)
-      {
-        return get<2>(edge1) > get<2>(edge2);
-      };
-      priority_queue <tuple<int, int, double>, vector<tuple<int, int, double>>, decltype(comp)> pq (comp); 
-      for (int i : S) {
-        for (int j : S)
-          if (i != j) 
-            pq.push (make_tuple(i, j, matheus_model.instance.time(matheus_model.c0[i]->id, matheus_model.c0[j]->id)));
-        pq.push (make_tuple(i, 0, matheus_model.instance.time(matheus_model.c0[i]->id, matheus_model.c0[0]->id)));
-        pq.push (make_tuple(0, i, matheus_model.instance.time(matheus_model.c0[0]->id, matheus_model.c0[i]->id)));
-      }
-      while (!pq.empty()) {
-        tuple<int, int, double> edge = pq.top();
-        pq.pop();
-        if (dsu.findSet(get<0>(edge)) != dsu.findSet(get<1>(edge))) {
-          dsu.join(get<0>(edge), get<1>(edge));
-          mstCost += get<2> (edge);
-        }
-      }
-      mstNRoutesLB = ceil(mstCost/matheus_model.instance.timeLimit);
+      mstNRoutesLB = ceil(calculateVrpMST(matheus_model.instance, vertices)/matheus_model.instance.timeLimit);
         //calculate ditances
-      vector<double> closestS0Time (sc0);
-      vector<double> secondClosestS0Time (sc0);
-      for (int i : S) {
-        secondClosestS0Time[i] = closestS0Time[i] = matheus_model.instance.time(matheus_model.c0[i]->id, matheus_model.c0[0]->id);
-        for (int j : S) 
-          if (i != j) {
-            double time = matheus_model.instance.time(matheus_model.c0[i]->id, matheus_model.c0[j]->id);
-            if (time < closestS0Time[i]) {
-              secondClosestS0Time[i] = closestS0Time[i];
-              closestS0Time[i] = time;
-            } else if (time < secondClosestS0Time[i]) 
-              secondClosestS0Time[i] = time;
-          }
-      }
-      for (size_t i = 0; i < sc0; ++i)
-        if (S.count(i))
-          cout<<i<<" "<<closestS0Time[i]<<secondClosestS0Time[i]<<endl;
+      const auto& [closest, secondClosest] = calculateClosestsVRPCustomers(matheus_model.instance, vertices);
+      for (size_t i = 0; i < sS; ++i)
+        cout<<matheus_model.customersC0Indexes[vertices[i]->id]<<" "<<closest[i]<<" "<<secondClosest[i]<<endl;
         //bin packing
-      vector<double> items (S.size() + 1); 
-      items[0] = matheus_model.c0[0]->serviceTime + (closestS0Time[0] + secondClosestS0Time[0])/2;
-      for (int i : S) {
-        items[j] = matheus_model.c0[i]->serviceTime + (closestS0Time[i] + secondClosestS0Time[i])/2;
-        ++j;
-      }
-      BPP_instance bpp_instance (items, matheus_model.instance.timeLimit);
-      BPP_model bpp_model (bpp_instance, bpp_time_limit);
-      bppNRoutesLB = bpp_model.run().first.size();
+//      bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(matheus_model.instance, vertices, closest, secondClosest, matheus_model.bpp_time_limit);
+      bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(matheus_model.instance, vertices, closest, secondClosest, 100000000);
         //greedy
-      kkGreedyNRoutesLB = matheus_model.kk_greedy_nRoutes_lb(S);
-      if (mstNRoutesLB >= bppNRoutesLB && mstNRoutesLB >= kkGreedyNRoutesLB) {
+      tspNRoutesLB = ceil(calculate_TSP_LB(vertices, closest, secondClosest)/matheus_model.instance.timeLimit);
+      if (mstNRoutesLB >= bppNRoutesLB && mstNRoutesLB >= tspNRoutesLB) {
         //cout<<"MST with "<<mstNRoutesLB;
         //++matheus_model.nMSTNRoutesLB;
         //maxNRoutes = mstNRoutesLB;
-      } else if (bppNRoutesLB >= mstNRoutesLB && bppNRoutesLB >= kkGreedyNRoutesLB) {
+      } else if (bppNRoutesLB >= mstNRoutesLB && bppNRoutesLB >= tspNRoutesLB) {
         //cout<<"BPP with "<<bppNRoutesLB;
         //++matheus_model.nBPPNRoutesLB;
         //maxNRoutes = bppNRoutesLB;
