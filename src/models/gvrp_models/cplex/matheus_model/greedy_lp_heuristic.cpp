@@ -189,14 +189,12 @@ void Greedy_lp_heuristic::main() {
       //reset all the values
       Matrix2DVal a_vals = Matrix2DVal (matheus_model.env, sc0 - 1),
                   u_vals = Matrix2DVal (matheus_model.env, sc0),
-                  v_vals = Matrix2DVal (matheus_model.env, sc0 - 1),
-                  c_vals = Matrix2DVal (matheus_model.env, sc0);
+                  v_vals = Matrix2DVal (matheus_model.env, sc0 - 1);
       matheus_model.x_vals = Matrix2DVal (matheus_model.env, sc0);
       matheus_model.y_vals = Matrix3DVal (matheus_model.env, sc0);
       //create vals
       for (size_t i = 0; i < sc0; ++i) {
-        //x, u, v, c, and a vars
-        c_vals[i] = IloNumArray (matheus_model.env, sc0, 0, 1, IloNumVar::Int);
+        //x, u, v, and a vars
         matheus_model.x_vals[i] = IloNumArray (matheus_model.env, sc0, 0, 1, IloNumVar::Int);
         u_vals[i] = IloNumArray (matheus_model.env, sc0, 0, matheus_model.instance.timeLimit, IloNumVar::Float);
         //v
@@ -209,8 +207,6 @@ void Greedy_lp_heuristic::main() {
         for (size_t j = 0; j < sc0; ++j) {
           //x
           matheus_model.x_vals[i][j] = 0.0;
-          //c
-          c_vals[i][j] = 0.0;
           //u
           u_vals[i][j] = 0.0;
           //a
@@ -230,11 +226,9 @@ void Greedy_lp_heuristic::main() {
       IloNumArray vals (matheus_model.env);
       double currFuel, 
              currTime;
-      int nAFSs;
       for (const list<Vertex>& route : routes) {
         currFuel = matheus_model.instance.vehicleFuelCapacity;
         currTime = 0.0;
-        nAFSs = 0;
         list<Vertex>::const_iterator curr = route.begin(), 
           prev = curr;
         for (++curr; curr != route.end(); prev = curr, ++curr) {
@@ -245,7 +239,6 @@ void Greedy_lp_heuristic::main() {
             int j = currIndex->second;
             matheus_model.x_vals[i][j] = 1;
             u_vals[i][j] = currTime;
-            c_vals[i][j] = nAFSs;
             if (i > 0 && j > 0) 
               a_vals[i - 1][j - 1] = currFuel - matheus_model.customersFuel(i, j);
             else if (i > 0) 
@@ -259,12 +252,10 @@ void Greedy_lp_heuristic::main() {
             int j = matheus_model.customersC0Indexes[curr->id];
             matheus_model.y_vals[i][f][j] = 1;
             u_vals[i][j] = currTime;
-            c_vals[i][j] = nAFSs;
             if (i > 0) 
               v_vals[i - 1][f] = currFuel;
             currTime += matheus_model.time(i, f, j);
             currFuel = matheus_model.instance.vehicleFuelCapacity - matheus_model.afsToCustomerFuel(f, j);
-            ++nAFSs;
           }
         }
       }
@@ -280,9 +271,6 @@ void Greedy_lp_heuristic::main() {
           //x
           vars.add(matheus_model.x[i][j]);
           vals.add(matheus_model.x_vals[i][j]);
-          //c
-          vars.add(matheus_model.c[i][j]);
-          vals.add(c_vals[i][j]);
           //u
           if (i != j) {
             vars.add(matheus_model.u[i][j]);
@@ -313,14 +301,12 @@ void Greedy_lp_heuristic::main() {
         for (size_t f = 0; f < sf0; ++f) 
           matheus_model.y_vals[i][f].end();
         matheus_model.y_vals[i].end();
-        c_vals[i].end();
       }
       matheus_model.x_vals.end();
       matheus_model.y_vals.end();
       a_vals.end();
       u_vals.end();
       v_vals.end();
-      c_vals.end();
       vars.end();
       vals.end();
     } 
