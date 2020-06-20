@@ -8,7 +8,6 @@
 #include "models/gvrp_models/cplex/kk_model/preprocessing.hpp"
 #include "models/gvrp_models/cplex/kk_model/extra_constraint.hpp"
 #include "models/gvrp_models/cplex/kk_model/user_constraint.hpp"
-#include "models/gvrp_models/cplex/kk_model/lazy_constraint.hpp"
 
 #include <sstream>
 #include <list>
@@ -48,6 +47,15 @@ KK_model::KK_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvr
     ++f;
   }
 } 
+
+KK_model::~KK_model() {
+  for (Preprocessing * preprocessing : preprocessings)
+    delete preprocessing;  
+  for (User_constraint * user_constraint : user_constraints)
+    delete user_constraint;  
+  for (Extra_constraint * extra_constraint : extra_constraints)
+    delete extra_constraint;  
+}
 
 double KK_model::time (int i, int f, int j) const {
   return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + (f == 0 ? instance.afss.front().serviceTime : f0[f]->serviceTime) + instance.time(f0[f]->id, c0[j]->id);

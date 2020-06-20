@@ -40,6 +40,7 @@ namespace models {
         class Matheus_model : public Gvrp_model {
           public:
             explicit Matheus_model(const Gvrp_instance& gvrp_instance, unsigned int time_limit); 
+            ~Matheus_model(); 
             pair<Gvrp_solution, Mip_solution_info> run();
             Matrix3DVar y;
             Matrix2DVar x;

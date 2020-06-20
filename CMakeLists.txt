@@ -8,6 +8,12 @@ set (Sample_VERSION_PATCH 1)
 set (Project_PATH "${PROJECT_SOURCE_DIR}")
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/support/cmake)
 set (BUILD_SHARED_LIBS On)
+set(CPPCHECK_XML_OUTPUT "${PROJECT_BINARY_DIR}/analysis/cppcheck/cppcheck_analysis.xml")
+
+set(CPPCHECK_EXCLUDES
+  ${CMAKE_SOURCE_DIR}/3rd_party
+  ${CMAKE_BINARY_DIR}/
+  )
 #SET(GCC_COVERAGE_COMPILE_FLAGS "-fprofile-arcs -ftest-coverage")
 #SET(GCC_COVERAGE_LINK_FLAGS "ldl -lconcert -lilocplex -lcplex -lm -lpthread")
 #SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
@@ -18,10 +24,11 @@ set (BUILD_SHARED_LIBS On)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fopenmp")
 
-##### Additional páckages 
+##### Additional packages 
 
 find_package (CPLEX)
 find_package (LEMON)
+find_package (CPPCHECK)
 
 ##### Config files 
 

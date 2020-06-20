@@ -34,8 +34,6 @@ using namespace models::gvrp_models::cplex::cubic_model;
 Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit): Gvrp_model(instance, time_limit), ub_edge_visit(1) {
   if (instance.distances_enum != SYMMETRIC && instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
-  //gvrp afs tree
-  gvrp_afs_tree = new Gvrp_afs_tree(instance);
   //fill all and customers
   for (const Vertex& customer : instance.customers) {
     all[customer.id] = &customer;

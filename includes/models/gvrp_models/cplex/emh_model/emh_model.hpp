@@ -34,6 +34,7 @@ namespace models {
         class EMH_model : public Gvrp_model {
           public:
             explicit EMH_model(const Gvrp_instance& gvrp_instance, unsigned int time_limit); 
+            ~EMH_model(); 
             pair<Gvrp_solution, Mip_solution_info> run();
             map<int, list<int>> afs_dummies;
             map<int, const Vertex *> dummies;

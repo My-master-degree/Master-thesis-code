@@ -36,6 +36,7 @@ namespace models {
         class KK_model : public Gvrp_model {
           public:
             explicit KK_model(const Gvrp_instance& gvrp_instance, unsigned int time_limit); 
+            ~KK_model(); 
             pair<Gvrp_solution, Mip_solution_info> run();
             Matrix3DVar y;
             Matrix3DVal y_vals;

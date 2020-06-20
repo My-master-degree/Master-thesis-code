@@ -8,7 +8,6 @@
 #include "models/gvrp_models/cplex/emh_model/preprocessing.hpp"
 #include "models/gvrp_models/cplex/emh_model/extra_constraint.hpp"
 #include "models/gvrp_models/cplex/emh_model/user_constraint.hpp"
-#include "models/gvrp_models/cplex/emh_model/lazy_constraint.hpp"
 
 #include <sstream>
 #include <list>
@@ -26,8 +25,6 @@ using namespace std;
 EMH_model::EMH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), depotDummy(new Vertex(instance.depot.id, instance.depot.x, instance.depot.y, instance.afss.front().serviceTime))  {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
-  //gvrp afs tree
-  gvrp_afs_tree = new Gvrp_afs_tree(instance);
   //populating all map and customers set
   all[instance.depot.id] = &instance.depot;
   for (const Vertex& customer: instance.customers) {
@@ -55,6 +52,16 @@ EMH_model::EMH_model(const Gvrp_instance& instance, unsigned int time_limit) : G
     dummies[dummy_id] = depotDummy;
   }
 } 
+
+EMH_model::~EMH_model() {
+  for (Preprocessing * preprocessing : preprocessings)
+    delete preprocessing;  
+  for (User_constraint * user_constraint : user_constraints)
+    delete user_constraint;  
+  for (Extra_constraint * extra_constraint : extra_constraints)
+    delete extra_constraint;  
+  delete depotDummy;
+}
 
 pair<Gvrp_solution, Mip_solution_info> EMH_model::run(){
   //setup
@@ -307,7 +314,6 @@ void EMH_model::createModel() {
     for (Extra_constraint* extra_constraint : extra_constraints)
       extra_constraint->add();
     //init
-    //lazy cuts
     //user cuts
     for (User_constraint* user_constraint : user_constraints)
       cplex.use(user_constraint);

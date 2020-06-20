@@ -27,3 +27,6 @@ Gvrp_model::Gvrp_model(const Gvrp_instance& instance, unsigned int time_limit) :
     all[afs.id] = &afs;
 } 
 
+Gvrp_model::~Gvrp_model() {
+  delete gvrp_afs_tree;
+}

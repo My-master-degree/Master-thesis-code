@@ -23,8 +23,6 @@ using namespace std;
 LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
-  //gvrp afs tree
-  gvrp_afs_tree = new Gvrp_afs_tree(instance);
   //c_0
   c0 = vector<const Vertex *> (instance.customers.size() + 1);
   c0[0] = &instance.depot;
@@ -45,6 +43,11 @@ LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvr
     ++f;
   }
 } 
+
+LH_model::~LH_model() {
+  for (Preprocessing * preprocessing : preprocessings)
+    delete preprocessing;  
+}
 
 double LH_model::time (int i, int f, int j) {
   return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + (f == 0 ? instance.afss.front().serviceTime : f0[f]->serviceTime) + instance.time(f0[f]->id, c0[j]->id);

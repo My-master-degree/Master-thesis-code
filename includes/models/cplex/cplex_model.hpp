@@ -2,8 +2,10 @@
 #define CPLEX_MODEL_HPP_
 
 #include "models/cplex/mip_solution_info.hpp" 
+#include "models/cplex/depth_node_callback.hpp"
 
 #include <ilcplex/ilocplex.h>
+#include <iostream>
 
 ILOSTLBEGIN
 
@@ -11,7 +13,13 @@ namespace models {
   namespace cplex {
     template <class I, class S> class Cplex_model {
       public:
-        explicit Cplex_model(const I& instance_, unsigned int time_limit_) : instance(instance_), time_limit(time_limit_), max_num_feasible_integer_sol(2100000000), VERBOSE(true) {} 
+        explicit Cplex_model(const I& instance_, unsigned int time_limit_) : instance(instance_), solution(nullptr), time_limit(time_limit_), max_num_feasible_integer_sol(2100000000), VERBOSE(true), depth_node_callback(nullptr) {} 
+        ~Cplex_model() {
+          if (depth_node_callback != nullptr) 
+            delete depth_node_callback;
+          if (solution != nullptr) 
+            delete solution; 
+        } 
         virtual pair<S, Mip_solution_info> run() = 0;
         const I& instance;
         static constexpr double INTEGRALITY_TOL = 1e-5;
@@ -21,6 +29,7 @@ namespace models {
         bool VERBOSE;
         IloEnv env;
         IloModel model;
+        Depth_node_callback * depth_node_callback;
       protected:
         IloCplex cplex;
         void setParameters() {

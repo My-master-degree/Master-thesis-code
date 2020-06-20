@@ -34,10 +34,9 @@ using namespace models::gvrp_models::cplex::matheus_model;
 
 using namespace std;
 
-Matheus_model::Matheus_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nGreedyLP(0), nLevelsGreedyLPHeuristic(0), psi(calculateGvrpInstancePsi(instance)), lambda(calculateGvrpInstanceLambda(instance)), alpha(min(psi, lambda)), c0(vector<const Vertex *> (instance.customers.size() + 1)), f0(vector<const Vertex *> (instance.afss.size() + 1))  {
+Matheus_model::Matheus_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), f0(vector<const Vertex *> (instance.afss.size() + 1)), nGreedyLP(0), nLevelsGreedyLPHeuristic(0) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
-  gvrp_afs_tree = new Gvrp_afs_tree(instance);
   //c_0
   c0[0] = &instance.depot;
   int i = 0;
@@ -75,6 +74,19 @@ Matheus_model::Matheus_model(const Gvrp_instance& instance, unsigned int time_li
   //heuristic callbacks
   heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
 } 
+
+Matheus_model::~Matheus_model() {
+  for (Preprocessing * preprocessing : preprocessings)
+    delete preprocessing;  
+  for (User_constraint * user_constraint : user_constraints)
+    delete user_constraint;  
+  for (Lazy_constraint * lazy_constraint : lazy_constraints)
+    delete lazy_constraint;  
+  for (Extra_constraint * extra_constraint : extra_constraints)
+    delete extra_constraint;  
+  for (Heuristic_callback * heuristic_callback : heuristic_callbacks)
+    delete heuristic_callback;  
+}
 
 double Matheus_model::time (int i, int f, int j) {
   return c0[i]->serviceTime + instance.time(c0[i]->id, f0[f]->id) + (f == 0 ? instance.afss.front().serviceTime : f0[f]->serviceTime) + instance.time(f0[f]->id, c0[j]->id);
@@ -122,7 +134,7 @@ pair<Gvrp_solution, Mip_solution_info> Matheus_model::run(){
     }
     clock_gettime(CLOCK_MONOTONIC, &finish);
     elapsed = (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
-//    cplex.exportModel("cplexcpp.lp");
+    cplex.exportModel("cplexcpp.lp");
 //    env.out() << "Solution value = " << cplex.getObjValue() << endl;
 //    cout<<"Getting x values"<<endl;
     fillVals();
@@ -542,7 +554,8 @@ void Matheus_model::createModel() {
     //extra steps
     extraStepsAfterModelCreation();
     //depth node callback
-    cplex.use(new Depth_node_callback(env));
+    depth_node_callback = new Depth_node_callback(env);
+    cplex.use(depth_node_callback);
   } catch (IloException& e) {
     throw e;
   } catch (string s) {
