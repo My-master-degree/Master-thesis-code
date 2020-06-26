@@ -5,6 +5,7 @@
 #include "utils/util.hpp"
 
 #include <list>
+#include <float.h>
 
 using namespace std;
 using namespace utils;
@@ -17,17 +18,29 @@ Invalid_edge_preprocessing_4::Invalid_edge_preprocessing_4 (Matheus_model_2& mat
 }
 
 void Invalid_edge_preprocessing_4::add () {
-  list<pair<int, int>> edges = get_invalid_edges_4 (matheus_model_2.instance, *matheus_model_2.gvrp_afs_tree);
-  for (auto const& [i, j] : edges) {
-    auto f1 = matheus_model_2.afssF0Indexes.find(i),
-         f2 = matheus_model_2.afssF0Indexes.find(j);
-    //first is afs and second is customer
-    if (f1 != matheus_model_2.afssF0Indexes.end()) 
-      for (size_t k = 0; k < matheus_model_2.c0.size(); ++k)
-        matheus_model_2.model.add(matheus_model_2.y[matheus_model_2.customersC0Indexes[j]][f1->second][k] == 0);
-    //first is customer and second is afs 
-    else if (f2 != matheus_model_2.afssF0Indexes.end()) 
-      for (size_t k = 0; k < matheus_model_2.c0.size(); ++k)
-        matheus_model_2.model.add(matheus_model_2.y[matheus_model_2.customersC0Indexes[i]][f2->second][k] == 0);
+  for (size_t i = 0; i < matheus_model_2.c0.size(); ++i) {
+    const Vertex * vertexI = matheus_model_2.c0[i];
+    for (size_t j = 0; j < matheus_model_2.c0.size(); ++j) {
+      const Vertex * vertexJ = matheus_model_2.c0[j];
+      for (size_t f_ = 0; f_ < matheus_model_2.f0.size(); ++f_) {
+        bool valid = false;
+        for (size_t f = 0; f < matheus_model_2.f0.size(); ++f) {
+          const Vertex * vertexF = matheus_model_2.f0[f];
+          for (size_t r = 0; r < matheus_model_2.f0.size(); ++r) {
+            const Vertex * vertexR = matheus_model_2.f0[r];
+            if (matheus_model_2.afsToCustomerFuel(f, i) + matheus_model_2.customerToAfsFuel(i, f_) <= matheus_model_2.instance.vehicleFuelCapacity 
+                && matheus_model_2.afsToCustomerFuel(f_, j) + matheus_model_2.customerToAfsFuel(j, r) <= matheus_model_2.instance.vehicleFuelCapacity                      && matheus_model_2.gvrp_afs_tree->times[f] + matheus_model_2.instance.time(vertexF->id, vertexI->id) + matheus_model_2.time(i, f_, j) + vertexJ->serviceTime + matheus_model_2.instance.time(vertexJ->id, vertexR->id) + matheus_model_2.gvrp_afs_tree->times[r] <= matheus_model_2.instance.timeLimit) { 
+              valid = true;
+              f = matheus_model_2.f0.size();
+              break;
+            }
+          }
+        }
+        if (!valid) {
+          matheus_model_2.model.add(matheus_model_2.y[i][f_][j] == 0);
+          ++matheus_model_2.nPreprocessings4;
+        }
+      }
+    }
   }
 }

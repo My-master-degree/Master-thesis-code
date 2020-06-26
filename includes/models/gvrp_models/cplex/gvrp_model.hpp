@@ -27,7 +27,7 @@ namespace models {
       class Gvrp_model : public Cplex_model<Gvrp_instance, Gvrp_solution> {
         public:
           explicit Gvrp_model(const Gvrp_instance& gvrp_instance, unsigned int time_limit); 
-          ~Gvrp_model(); 
+          virtual ~Gvrp_model(); 
           virtual pair<Gvrp_solution, Mip_solution_info> run() = 0;
           set<int> customers;
           IDVertex all;

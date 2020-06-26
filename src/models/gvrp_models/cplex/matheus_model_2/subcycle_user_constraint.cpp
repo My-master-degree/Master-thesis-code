@@ -49,7 +49,7 @@ void Subcycle_user_constraint::main() {
         sf0 = matheus_model_2.f0.size();
   int bppNRoutesLB, 
       mstNRoutesLB, 
-      tspNRoutesLB,
+      gvrpNRoutesLB,
       maxNRoutes;
   DSU dsu (sc0);
   IloEnv env = getEnv();
@@ -136,8 +136,6 @@ void Subcycle_user_constraint::main() {
       for (int j : component)
         if (gh.minCutValue(nodes[j], nodes[j]) >= 2.0) 
           dsu.join(i, j);
-        else
-          cout<<"ooooopssss "<<i<<" and "<<j<<endl;
     component.clear();
   }
   //get subcomponents
@@ -159,6 +157,7 @@ void Subcycle_user_constraint::main() {
   //inequallitites
   for (const unordered_set<int>& S : components) 
     if (!S.count(0)) {
+      ++matheus_model_2.nSubcycleCallbacks;
       //\sum_{v_i \in V'\S} \sum_{v_j \in S} x_{ij} + \sum_{v_f \in F_0} y_{ifj} \geqslant 1 
       //lhs
       for (size_t i = 0; i < sc0; ++i) 
@@ -181,25 +180,23 @@ void Subcycle_user_constraint::main() {
         //get mst
       mstNRoutesLB = ceil(calculateVrpMST(matheus_model_2.instance, vertices)/matheus_model_2.instance.timeLimit);
         //calculate ditances
-      const auto& [closest, secondClosest] = calculateClosestsVRPCustomers(matheus_model_2.instance, vertices);
-      for (size_t i = 0; i < sS; ++i)
-        cout<<matheus_model_2.customersC0Indexes[vertices[i]->id]<<" "<<closest[i]<<" "<<secondClosest[i]<<endl;
+      const auto& [closest, secondClosest] = calculateClosestsGVRPCustomers(matheus_model_2.instance, *matheus_model_2.gvrp_afs_tree, vertices);
         //bin packing
       bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(matheus_model_2.instance, vertices, closest, secondClosest, matheus_model_2.BPPTimeLimit);
         //greedy
-      tspNRoutesLB = ceil(calculate_TSP_LB(vertices, closest, secondClosest)/matheus_model_2.instance.timeLimit);
-      if (mstNRoutesLB >= bppNRoutesLB && mstNRoutesLB >= tspNRoutesLB) {
-        cout<<"MST with "<<mstNRoutesLB;
+      gvrpNRoutesLB = ceil(calculate_GVRP_LBs(vertices, closest, secondClosest).second/matheus_model_2.instance.timeLimit);
+      maxNRoutes = max(mstNRoutesLB, max(bppNRoutesLB, gvrpNRoutesLB));
+      if (mstNRoutesLB == maxNRoutes) {
+//        cout<<"MST with "<<mstNRoutesLB;
         ++matheus_model_2.nMSTNRoutesLB;
-        maxNRoutes = mstNRoutesLB;
-      } else if (bppNRoutesLB >= mstNRoutesLB && bppNRoutesLB >= tspNRoutesLB) {
-        cout<<"BPP with "<<bppNRoutesLB;
+      } 
+      if (bppNRoutesLB == maxNRoutes) {
+//        cout<<"BPP with "<<bppNRoutesLB;
         ++matheus_model_2.nBPPNRoutesLB;
-        maxNRoutes = bppNRoutesLB;
-      } else  {
-        cout<<"TSP with "<<bppNRoutesLB;
-        ++matheus_model_2.nTSPNRoutesLB;
-        maxNRoutes = tspNRoutesLB;
+      } 
+      if (gvrpNRoutesLB == maxNRoutes) {
+//        cout<<"GVRP with "<<bppNRoutesLB;
+        ++matheus_model_2.nGVRPNRoutesLB;
       }
       lhs -= maxNRoutes;
       try {

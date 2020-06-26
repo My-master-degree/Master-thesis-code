@@ -5,3 +5,5 @@ using namespace models::gvrp_models::cplex::matheus_model;
 
 Extra_constraint::Extra_constraint (Matheus_model& matheus_model_) : matheus_model (matheus_model_) {
 }
+
+Extra_constraint::~Extra_constraint () {}

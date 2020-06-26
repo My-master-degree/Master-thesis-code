@@ -18,6 +18,7 @@ Invalid_edge_preprocessing_3::Invalid_edge_preprocessing_3 (Matheus_model& mathe
 
 void Invalid_edge_preprocessing_3::add () {
   list<pair<int, int>> edges = get_invalid_edges_3 (matheus_model.instance, *matheus_model.gvrp_afs_tree);
+  matheus_model.nPreprocessings3 = edges.size();
   for (const auto& [i, j] : edges)
     matheus_model.model.add(matheus_model.x[matheus_model.customersC0Indexes[i]][matheus_model.customersC0Indexes[j]] == 0);
 }

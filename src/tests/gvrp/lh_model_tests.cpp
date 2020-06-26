@@ -50,7 +50,7 @@ void LH_model_tests::run() {
     lh_model.preprocessings.push_back(new Invalid_edge_preprocessing_C6(lh_model));
     lh_model.preprocessings.push_back(new Invalid_edge_preprocessing_C7(lh_model));
     execute_model(lh_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
-    resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
+    resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<lh_model.nPreprocessings1<<";"<<lh_model.nPreprocessings2<<";"<<lh_model.nPreprocessings3<<endl;
     gvrp_instance++;
     i++;
   }
@@ -75,7 +75,7 @@ void LH_model_tests::execute_model(LH_model& lh_model, const string& instance_na
 
 void LH_model_tests::openResultFile (ofstream& resultsFile, string fileName) {
   resultsFile.open (fileName + string("lh_results.csv"));
-  resultsFile<<"Instance,Solution,GAP,Cost,Time,Status"<<endl;
+  resultsFile<<"Instance;Solution;GAP;Cost;Time;Status;preprocessings1;preprocessings2;preprocessings3"<<endl;
 }
 
 void LH_model_tests::closeResultFile (ofstream& resultsFile) {

@@ -34,7 +34,7 @@ using namespace models::gvrp_models::cplex::matheus_model_2;
 
 using namespace std;
 
-Matheus_model_2::Matheus_model_2(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nGreedyLP(0), nLevelsGreedyLPHeuristic(0), psi(calculateGvrpInstancePsi(instance)), lambda(calculateGvrpInstanceLambda(instance)), alpha(min(psi, lambda)), c0(vector<const Vertex *> (instance.customers.size() + 1)), f0(vector<const Vertex *> (instance.afss.size() + 1)), BPPTimeLimit(100000000), nMSTNRoutesLB(0), nBPPNRoutesLB(0), nTSPNRoutesLB(0) {
+Matheus_model_2::Matheus_model_2(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nGreedyLP(0), nLevelsGreedyLPHeuristic(0), psi(calculateGvrpInstancePsi(instance)), lambda(calculateGvrpInstanceLambda(instance)), alpha(min(psi, lambda)), c0(vector<const Vertex *> (instance.customers.size() + 1)), f0(vector<const Vertex *> (instance.afss.size() + 1)), BPPTimeLimit(100000000), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nSubcycleCallbacks(0), nMSTNRoutesLB(0), nBPPNRoutesLB(0), nGVRPNRoutesLB(0) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   gvrp_afs_tree = new Gvrp_afs_tree(instance);
@@ -59,12 +59,12 @@ Matheus_model_2::Matheus_model_2(const Gvrp_instance& instance, unsigned int tim
   double servicesTimes = 0.0;
   for (size_t i = 0; i < c0.size(); ++i) 
     servicesTimes += c0[i]->serviceTime;
-  const auto& [closest, secondClosest] = calculateClosestsVRPCustomers(instance, c0);
-  double tspLB = calculate_TSP_LB (c0, closest, secondClosest);
+  const auto& [closest, secondClosest] = calculateClosestsGVRPCustomers(instance, *gvrp_afs_tree, c0);
+  pair<double, double> gvrpLB = calculate_GVRP_LBs (c0, closest, secondClosest);
   double mstLB = calculateVrpMST (instance, c0);
-  solLB = max(tspLB, mstLB);
+  solLB = max(gvrpLB.first, mstLB);
   //set n routes lb
-  nRoutesLB = max(calculateGVRP_BPP_NRoutesLB(instance, c0, closest, secondClosest, BPPTimeLimit), int(max(ceil((servicesTimes + mstLB/instance.vehicleAverageSpeed)/instance.timeLimit), ceil((servicesTimes + tspLB/instance.vehicleAverageSpeed)/instance.timeLimit))));
+  nRoutesLB = max(calculateGVRP_BPP_NRoutesLB(instance, c0, closest, secondClosest, BPPTimeLimit), int(max(ceil((servicesTimes + mstLB/instance.vehicleAverageSpeed)/instance.timeLimit), ceil((gvrpLB.second/instance.vehicleAverageSpeed)/instance.timeLimit))));
   //user constraints
   user_constraints.push_back(new Subcycle_user_constraint(*this));
   //preprocessings
@@ -74,6 +74,15 @@ Matheus_model_2::Matheus_model_2(const Gvrp_instance& instance, unsigned int tim
   preprocessings.push_back(new Invalid_edge_preprocessing_4(*this));
   //heuristic callbacks
   heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
+  //customer min required fuel
+  customersMinRequiredFuel = vector<double> (c0.size()- 1);
+  for (size_t i = 1; i < c0.size(); ++i)
+    customersMinRequiredFuel[i - 1] = calculateCustomerMinRequiredFuel(instance, *gvrp_afs_tree, *c0[i]);
+  //customer min required time 
+  customersMinRequiredTime = vector<double> (c0.size());
+  for (size_t i = 1; i < c0.size(); ++i)
+    customersMinRequiredTime[i] = calculateCustomerMinRequiredTime(instance, *gvrp_afs_tree, *c0[i]);
+  customersMinRequiredTime[0] = 0.0;
 } 
 
 double Matheus_model_2::time (int i, int f, int j) {
@@ -97,17 +106,11 @@ double Matheus_model_2::customerToAfsFuel(int i, int f) {
 }
 
 double Matheus_model_2::M1(int i, int f, int j) {
-  return instance.timeLimit + time(i, j) + time(i, f, j) - time(i, 0) - time(0, j);
+  return instance.timeLimit + time(i, j) + time(i, f, j) - c0[i]->serviceTime - customersMinRequiredTime[i] - customersMinRequiredTime[j];
 }
 
 double Matheus_model_2::M2(int i, int j) {
-  double closestIAFS = afsToCustomerFuel(0, i),
-         closestJAFS = afsToCustomerFuel(0, j);
-  for (int f = 1; f < f0.size(); ++f) {
-    closestIAFS = min(closestIAFS, afsToCustomerFuel(f, i));
-    closestJAFS = min(closestJAFS, afsToCustomerFuel(f, j));
-  }
-  return instance.vehicleFuelCapacity + customersFuel(i, j) - closestIAFS - closestJAFS;
+  return instance.vehicleFuelCapacity + customersFuel(i, j) - customersMinRequiredFuel[i - 1] - customersMinRequiredFuel[j - 1];
 }
 
 pair<Gvrp_solution, Mip_solution_info> Matheus_model_2::run(){
@@ -115,7 +118,7 @@ pair<Gvrp_solution, Mip_solution_info> Matheus_model_2::run(){
   stringstream output_exception;
   Mip_solution_info mipSolInfo;
   try {
-//////////////////    cout<<"Creating variables"<<endl;
+//    cout<<"Creating variables"<<endl;
     createVariables();
 //    cout<<"Creating objective function"<<endl;
     createObjectiveFunction();
@@ -131,7 +134,7 @@ pair<Gvrp_solution, Mip_solution_info> Matheus_model_2::run(){
 //      env.error() << "Failed to optimize LP." << endl;
       mipSolInfo = Mip_solution_info(-1, cplex.getStatus(), -1, -1);
       endVars();
-      env.end();
+//      env.end();
       throw mipSolInfo;
     }
     clock_gettime(CLOCK_MONOTONIC, &finish);
@@ -144,7 +147,7 @@ pair<Gvrp_solution, Mip_solution_info> Matheus_model_2::run(){
     createGvrp_solution();
     mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
     endVars();
-    env.end();
+//    env.end();
     return make_pair(*solution, mipSolInfo);
   } catch (IloException& e) {
     output_exception<<"Concert exception caught: " << e<<endl;
@@ -353,6 +356,10 @@ void Matheus_model_2::createModel() {
       constraintName.clear();
       constraintName.str("");
     }
+    // \tau_j 
+    for (size_t j = 1; j < c0.size(); ++j) {
+      model.add(customersMinRequiredTime[j] <= t[j - 1] <= instance.timeLimit - customersMinRequiredTime[j] - c0[j]->serviceTime);
+    }
     // e_j - e_i + M2_{ij} * x_{ij} + (M2_{ij} - e_{ij} - e_{ji}) * x_{ji} \leqslant M2_{ij} - e_{ij} \forall v_i, v_j \in C
     for (size_t i = 1; i < c0.size(); ++i) 
       for (size_t j = 1; j < c0.size(); ++j) {
@@ -388,11 +395,29 @@ void Matheus_model_2::createModel() {
         for (size_t f = 0; f < f0.size(); ++f) 
           expr += customerToAfsFuel(j, f) * y[j][f][i];
       c = IloConstraint (e[j - 1] >= expr);
-      constraintName<<"customer "<<c0[j]->id<<" energy ub2";
+      constraintName<<"customer "<<c0[j]->id<<" energy lb";
       c.setName(constraintName.str().c_str());
       model.add(c);
       expr.end();
       expr = IloExpr(env);
+      constraintName.clear();
+      constraintName.str("");
+    }
+    // e_j \geqslant E^{LB}_j \forall v_j \in C
+    for (size_t j = 1; j < c0.size(); ++j) {
+      c = IloConstraint (e[j - 1] >= customersMinRequiredFuel[j - 1]);
+      constraintName<<"customer "<<c0[j]->id<<" energy lb2";
+      c.setName(constraintName.str().c_str());
+      model.add(c);
+      constraintName.clear();
+      constraintName.str("");
+    }
+    // e_j \leqslant \beta - E^{LB}_j \forall v_j \in C
+    for (size_t j = 1; j < c0.size(); ++j) {
+      c = IloConstraint (e[j - 1] <= instance.vehicleFuelCapacity - customersMinRequiredFuel[j - 1]);
+      constraintName<<"customer "<<c0[j]->id<<" energy ub2";
+      c.setName(constraintName.str().c_str());
+      model.add(c);
       constraintName.clear();
       constraintName.str("");
     }

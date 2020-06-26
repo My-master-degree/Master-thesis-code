@@ -19,7 +19,7 @@ Energy_ub_constraint::Energy_ub_constraint (KK_model& kk_model) : Extra_constrai
 void Energy_ub_constraint::add () {
   IloConstraint c;
   for (size_t i = 1; i < kk_model.c0.size(); ++i){
-    c = IloConstraint (kk_model.e[i - 1] <= calculateCustomerMaxRequiredFuel(kk_model.instance, *kk_model.gvrp_afs_tree, *kk_model.c0[i]));
+    c = IloConstraint (kk_model.e[i - 1] <= calculateCustomerMaxAllowedFuel(kk_model.instance, *kk_model.gvrp_afs_tree, *kk_model.c0[i]));
     c.setName("Energy level UB");
     kk_model.model.add(c);
     c.end();

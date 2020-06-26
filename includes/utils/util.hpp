@@ -19,9 +19,9 @@ using namespace models::gvrp_models::cplex::cubic_model;
 using namespace std;
 
 namespace utils {
-  pair<vector<double>, vector<double>> calculateClosestsVRPCustomers (const Vrp_instance& vrp_instance, const vector<const Vertex *>& vertices);
-  int calculateGVRP_BPP_NRoutesLB(const Gvrp_instance& gvrp_instance, const vector<const Vertex *>& vertices, const vector<double>& closest, const vector<double>& secondClosest, unsigned int execution_time_limit);
-  double calculate_TSP_LB (const vector<const Vertex *>& vertices, const vector<double>& closest, const vector<double>& closestSecond);
+  pair<vector<pair<double, double>>, vector<pair<double, double>>> calculateClosestsGVRPCustomers (const Gvrp_instance& vrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const vector<const Vertex *>& vertices);
+  int calculateGVRP_BPP_NRoutesLB(const Gvrp_instance& gvrp_instance, const vector<const Vertex *>& vertices, const vector<pair<double, double>>& closest, const vector<pair<double, double>>& secondClosest, unsigned int execution_time_limit);
+  pair<double, double> calculate_GVRP_LBs (const vector<const Vertex *>& vertices, const vector<pair<double, double>>& closest, const vector<pair<double, double>>& closestSecond);
   double calculateVRPSolutionCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance);
   double calculateLargestRouteCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance); 
   double calculateRouteAverageCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance);
@@ -36,7 +36,8 @@ namespace utils {
   double calculateVrpMST (const Vrp_instance& vrp_instance, const vector<const Vertex *>& vertices);
   double getLongestEdgeUchoaEtAlVrpInstance (const Vrp_instance& vrp_instance);
   double calculateCustomerMinRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer);
-  double calculateCustomerMaxRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer);
+  double calculateCustomerMinRequiredTime (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer);
+  double calculateCustomerMaxAllowedFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer);
   list<list<Vertex> > getGvrpConnectedComponents (const Gvrp_instance& gvrp_instance);
   list<pair<int, int>> get_invalid_edges_1 (const Gvrp_instance& gvrp_instance);
   list<pair<int, int>> get_invalid_edges_2 (const Gvrp_instance& gvrp_instance);

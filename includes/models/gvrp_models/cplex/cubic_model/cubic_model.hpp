@@ -40,7 +40,6 @@ namespace models {
             IDVertex all;
             Matrix3DVar x;
             IloNumVarArray e;
-            int ub_edge_visit;
             list<User_constraint*> user_constraints;
             list<Preprocessing*> preprocessings;
             list<Extra_constraint*> extra_constraints;

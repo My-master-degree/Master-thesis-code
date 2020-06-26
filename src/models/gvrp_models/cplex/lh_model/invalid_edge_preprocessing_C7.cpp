@@ -39,6 +39,7 @@ void Invalid_edge_preprocessing_C7::add () {
             || lh_model.instance.time(lh_model.instance.depot.id, i.id) + lh_model.instance.time(i.id, f.id) + i.serviceTime + lh_model.instance.time(f.id, j.id) + f.serviceTime + lh_model.instance.time(j.id, lh_model.instance.depot.id) + j.serviceTime > lh_model.instance.timeLimit) { 
           int fIndex = lh_model.afssF0Indexes[f.id];
           lh_model.model.add(lh_model.y[lh_model.customersC0Indexes[i.id]][fIndex][lh_model.customersC0Indexes[j.id]] == 0);
+          ++lh_model.nPreprocessings3;
         }
     }
   }

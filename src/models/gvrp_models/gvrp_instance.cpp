@@ -17,7 +17,8 @@ Gvrp_instance::Gvrp_instance(list<Vertex> afss_, list<Vertex> customers_, Vertex
 }
 
 double Gvrp_instance::time(int i, int j) const {
-  return distances[i][j] * 60 / vehicleAverageSpeed;
+  //return distances[i][j] * 60 / vehicleAverageSpeed;
+  return distances[i][j] / vehicleAverageSpeed;
 }
 
 double Gvrp_instance::fuel(int i, int j) const {

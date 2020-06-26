@@ -33,39 +33,122 @@ using namespace models::gvrp_models::cplex::cubic_model;
 using namespace models::bpp_models;
 using namespace models::bpp_models::cplex;
 
-pair<vector<double>, vector<double>> utils::calculateClosestsVRPCustomers (const Vrp_instance& vrp_instance, const vector<const Vertex *>& vertices) {
+pair<vector<pair<double, double>>, vector<pair<double, double>>> utils::calculateClosestsGVRPCustomers (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const vector<const Vertex *>& vertices) {
+  int depotId = gvrp_instance.depot.id;
   const size_t svertices = vertices.size();
-  vector<double> closest (svertices, DBL_MAX), 
-    secondClosest (svertices, DBL_MAX);
-  for (size_t i = 0; i < svertices; ++i) 
-    for (size_t j = 0; j < svertices; ++j) 
-      if (i != j) {
-        double cost = vrp_instance.distances[vertices[i]->id][vertices[j]->id];
-        if (cost < closest[i]) {
-          secondClosest[i] = closest[i];
-          closest[i] = cost;
-        } else if (cost < secondClosest[i]) 
-          secondClosest[i] = cost;
+  bool closestFound, 
+       secondClosestFound;
+  vector<pair<double, double>> closest (svertices, make_pair(DBL_MAX, DBL_MAX)), 
+    secondClosest (svertices, make_pair(DBL_MAX, DBL_MAX));
+  for (size_t i = 0; i < svertices; ++i) {
+    const Vertex * customerI = vertices[i];
+    //direct travel
+    closestFound = false;
+    secondClosestFound = false;
+    //orifin afs
+    for (size_t f = 0; f < gvrp_afs_tree.f0.size(); f++) {
+      int fId = gvrp_afs_tree.f0[f]->id;
+      double spentTime = gvrp_afs_tree.times[f] + gvrp_instance.time(fId, customerI->id) + customerI->serviceTime;
+      if (spentTime + gvrp_instance.time(customerI->id, depotId) < gvrp_instance.timeLimit) {
+        //second customers
+        for (size_t j = 0; j < svertices; ++j) 
+          if (i != j) {
+            const Vertex * customerJ = vertices[j];
+            double spentFuel = gvrp_instance.fuel(fId, customerI->id) + gvrp_instance.fuel(customerI->id, customerJ->id);
+            if (spentFuel < gvrp_instance.vehicleFuelCapacity && spentTime + gvrp_instance.time(customerI->id, customerJ->id) + gvrp_instance.time(customerJ->id, depotId) <= gvrp_instance.timeLimit) 
+              //destiny afs
+              for (size_t r = 0; r < gvrp_afs_tree.f0.size(); r++) {
+                int rId = gvrp_afs_tree.f0[r]->id;
+                if (spentFuel + gvrp_instance.fuel(customerJ->id, rId) <= gvrp_instance.vehicleFuelCapacity && spentTime + gvrp_instance.time(customerI->id, customerJ->id) + gvrp_instance.time(customerJ->id, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) {
+                  double cost = gvrp_instance.distances[customerI->id][customerJ->id];
+                  if (cost < closest[i].first) {
+                    if (closestFound)
+                      secondClosestFound = true;
+                    closestFound = true;
+                    secondClosest[i] = closest[i];
+                    closest[i] = make_pair(cost, cost/gvrp_instance.vehicleAverageSpeed);
+                  } else if (cost < secondClosest[i].first) {
+                    secondClosestFound = true;
+                    secondClosest[i] = make_pair(cost, cost/gvrp_instance.vehicleAverageSpeed);
+                  }
+                }
+              }
+          }
       }
+    }
+    //intermediate travel for both the closest and secondClosest
+    if (!closestFound || !secondClosestFound) {
+      //origin afs
+      for (size_t f = 0; f < gvrp_afs_tree.f0.size(); f++) {
+        int fId = gvrp_afs_tree.f0[f]->id;
+        double spentTime = gvrp_afs_tree.times[f] + gvrp_instance.time(fId, customerI->id) + customerI->serviceTime;
+        if (spentTime + gvrp_instance.time(customerI->id, depotId) < gvrp_instance.timeLimit) 
+          //intermediate afs origin
+          for (size_t f_ = 0; f_ < gvrp_afs_tree.f0.size(); f_++) {
+            int f_Id = gvrp_afs_tree.f0[f_]->id;
+            //fuel and time feasible
+            if (gvrp_instance.fuel (fId, customerI->id) + gvrp_instance.fuel (customerI->id, f_Id) <= gvrp_instance.vehicleFuelCapacity && spentTime + gvrp_instance.time(customerI->id, f_Id) + gvrp_afs_tree.f0[f_]->serviceTime + gvrp_instance.time(f_Id, gvrp_instance.depot.id) < gvrp_instance.timeLimit) 
+              //intermediate afs destiny
+              for (size_t r_ = 0; r_ < gvrp_afs_tree.f0.size(); r_++) {
+                int r_Id = gvrp_afs_tree.f0[r_]->id;
+                //time feasible
+                if (spentTime + gvrp_instance.time(customerI->id, f_Id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, depotId) < gvrp_instance.timeLimit) 
+                  //second customers
+                  for (size_t j = 0; j < svertices; ++j) {
+                    if (i != j) {
+                      const Vertex * customerJ = vertices[j];
+                      //time and fuel feasible
+                      if (gvrp_instance.fuel (r_Id, customerJ->id) < gvrp_instance.vehicleFuelCapacity && spentTime + gvrp_instance.time(customerI->id, f_Id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, customerJ->id) + customerJ->serviceTime + gvrp_instance.time(customerJ->id, depotId) <= gvrp_instance.timeLimit) 
+                        //destiny afs
+                        for (size_t r = 0; r < gvrp_afs_tree.f0.size(); r++) {
+                          int rId = gvrp_afs_tree.f0[r]->id;
+                          //time and fuel feasible
+                          double partTime = gvrp_instance.time(customerI->id, f_Id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, customerJ->id);
+                          if (gvrp_instance.fuel(r_Id, customerJ->id) + gvrp_instance.fuel (customerJ->id, rId) <= gvrp_instance.vehicleFuelCapacity && spentTime + partTime + customerJ->serviceTime + gvrp_instance.time(customerJ->id, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) {
+                            double cost = gvrp_instance.distances[customerI->id][f_Id] + gvrp_afs_tree.pairCosts[f_][r_] + gvrp_instance.distances[r_Id][customerJ->id];
+                            if (cost < closest[i].first) {
+                              if (closestFound)
+                                secondClosestFound = true;
+                              closestFound = true;
+                              secondClosest[i] = closest[i];
+                              closest[i] = make_pair(cost, partTime);
+                            } else if (cost < secondClosest[i].first) {
+                              secondClosestFound = true;
+                              secondClosest[i] = make_pair(cost, partTime);
+                            }
+                          }
+                        }
+                    }
+                  }
+              }
+          }
+      }
+    }
+      //second closest
+    if (!secondClosestFound)
+      secondClosest = closest;
+  } 
   return make_pair(closest, secondClosest);
 }
 
-int utils::calculateGVRP_BPP_NRoutesLB(const Gvrp_instance& gvrp_instance, const vector<const Vertex *>& vertices, const vector<double>& closest, const vector<double>& secondClosest, unsigned int execution_time_limit) {
+int utils::calculateGVRP_BPP_NRoutesLB(const Gvrp_instance& gvrp_instance, const vector<const Vertex *>& vertices, const vector<pair<double, double>>& closest, const vector<pair<double, double>>& secondClosest, unsigned int execution_time_limit) {
   const size_t svertices = vertices.size();
   vector<double> items (svertices); 
   for (size_t i = 0; i < svertices; ++i) 
-    items[i] = vertices[i]->serviceTime + (closest[i] + secondClosest[i])/(2 * gvrp_instance.vehicleAverageSpeed);
+    items[i] = vertices[i]->serviceTime + (closest[i].second + secondClosest[i].second)/(2 * gvrp_instance.vehicleAverageSpeed);
   BPP_instance bpp_instance (items, gvrp_instance.timeLimit);
   BPP_model bpp_model (bpp_instance, execution_time_limit);
   return bpp_model.run().first.size();
 }
 
-double utils::calculate_TSP_LB (const vector<const Vertex *>& vertices, const vector<double>& closest, const vector<double>& secondClosest) {
+pair<double, double> utils::calculate_GVRP_LBs (const vector<const Vertex *>& vertices, const vector<pair<double, double>>& closest, const vector<pair<double, double>>& secondClosest) {
   const size_t svertices = vertices.size();
-  double lb = 0.0;
-  for (size_t i = 0; i < svertices; ++i) 
-    lb += (closest[i] + secondClosest[i])/2;
-  return lb;
+  pair<double, double> lbs = {0.0, 0.0};
+  for (size_t i = 0; i < svertices; ++i) {
+    lbs.first += (closest[i].first + secondClosest[i].first)/2.0;
+    lbs.second += vertices[i]->serviceTime + (closest[i].second + secondClosest[i].first)/2;
+  }
+  return lbs;
 }
 
 double utils::calculateVRPSolutionCost (const vector<vector<int>>& routes, const Vrp_instance& vrp_instance) {
@@ -371,6 +454,7 @@ Gvrp_instance utils::erdogan_instance_reader(const string file_path){
     }
   }
   timeLimit = 645;
+  vehicleAverageSpeed = vehicleAverageSpeed/60.0;
   return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, maxRoutes, timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
 }
 
@@ -469,16 +553,33 @@ double utils::getLongestEdgeUchoaEtAlVrpInstance (const Vrp_instance& vrp_instan
   return maxEdge;
 }
 
-double utils::calculateCustomerMinRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer) {
-  //min_{v_f \in F : s_i + t_{if} + t_{T[f]}} c_{fi} = minAfsFuel 
-  double minAfsFuel = DBL_MAX;
+double utils::calculateCustomerMinRequiredTime (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer) {
+  //min_{v_f, v_r \in F : t_{T[r]} + t_{fi} + s_i + t_{ir} + t_{T[r]} && e_{fi} + e_{ir} <= \beta} min(min(t_{T[f]} + t_{fi}, t_{ir} + t_{T[r]})) = minAfsFuel 
+  double minAfsTime = DBL_MAX;
   for (size_t f = 0; f < gvrp_afs_tree.f0.size(); f++) 
-    if (customer.serviceTime + (gvrp_instance.distances[customer.id][gvrp_afs_tree.f0[f]->id]/gvrp_instance.vehicleAverageSpeed) + gvrp_afs_tree.times[f] < gvrp_instance.timeLimit && gvrp_instance.distances[customer.id][gvrp_afs_tree.f0[f]->id] < minAfsFuel) 
-      minAfsFuel = gvrp_instance.distances[customer.id][gvrp_afs_tree.f0[f]->id];    
-  return minAfsFuel * gvrp_instance.vehicleFuelConsumptionRate;
+    for (size_t r = 0; r < gvrp_afs_tree.f0.size(); r++) {
+      double partI = gvrp_afs_tree.times[f] + gvrp_instance.time(gvrp_afs_tree.f0[f]->id, customer.id),
+             partII = gvrp_instance.time(customer.id, gvrp_afs_tree.f0[r]->id) + gvrp_afs_tree.times[r];
+      if (partI + customer.serviceTime + partII <= gvrp_instance.timeLimit && gvrp_instance.fuel(gvrp_afs_tree.f0[f]->id, customer.id) + gvrp_instance.fuel(customer.id, gvrp_afs_tree.f0[r]->id) <= gvrp_instance.vehicleFuelCapacity) 
+        minAfsTime = min(minAfsTime, min(partI, partII));    
+    }
+  return minAfsTime;
 }
 
-double utils::calculateCustomerMaxRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer) {
+double utils::calculateCustomerMinRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer) {
+  //min_{v_f, v_r \in F : t_{T[r]} + t_{fi} + s_i + t_{ir} + t_{T[r]} && e_{fi} + e_{ir} <= \beta} min(e_{fi}, e_{ri}) = minAfsFuel 
+  double minAfsFuel = DBL_MAX;
+  for (size_t f = 0; f < gvrp_afs_tree.f0.size(); f++) 
+    for (size_t r = 0; r < gvrp_afs_tree.f0.size(); r++) {
+      double partI = gvrp_instance.fuel(customer.id, gvrp_afs_tree.f0[r]->id),
+             partII = gvrp_instance.fuel(customer.id, gvrp_afs_tree.f0[f]->id);
+      if (gvrp_afs_tree.times[f] + gvrp_instance.time(gvrp_afs_tree.f0[f]->id, customer.id) + customer.serviceTime + gvrp_instance.time(customer.id, gvrp_afs_tree.f0[r]->id) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit && partI + partII <= gvrp_instance.vehicleFuelCapacity) 
+        minAfsFuel = min(minAfsFuel, min(partI, partII));    
+    }
+  return minAfsFuel;
+}
+
+double utils::calculateCustomerMaxAllowedFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer) {
   return gvrp_instance.vehicleFuelCapacity - utils::calculateCustomerMinRequiredFuel(gvrp_instance, gvrp_afs_tree, customer);
 }
 

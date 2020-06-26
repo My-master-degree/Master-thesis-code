@@ -9,9 +9,12 @@ namespace models {
       public:
         explicit Gvrp_afs_tree (const Gvrp_instance& gvrp_instance);
         vector<const Vertex *> f0; 
+        vector<double> times;
         vector<size_t> pred;
         vector<double> fuels;
-        vector<double> times;
+        vector<vector<double>> pairCosts;
+        vector<vector<double>> pairTimes;
+        vector<vector<size_t>> pairPreds;
     };
   }
 }

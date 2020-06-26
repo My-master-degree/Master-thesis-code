@@ -4,3 +4,5 @@
 using namespace models::gvrp_models::cplex::matheus_model;
 
 Preprocessing::Preprocessing (Matheus_model& matheus_model_) : matheus_model(matheus_model_) {}
+
+Preprocessing::~Preprocessing () {}

@@ -20,6 +20,7 @@ Invalid_edge_preprocessing::Invalid_edge_preprocessing (Matheus_model_2& matheus
 void Invalid_edge_preprocessing::add () {
   //invalid edges
   list<pair<int, int>> edges = get_invalid_edges_1(matheus_model_2.instance);
+  matheus_model_2.nPreprocessings1 = edges.size();
   for (auto const& [i, j] : edges) {
     auto c1 = matheus_model_2.customersC0Indexes.find(i),
          c2 = matheus_model_2.customersC0Indexes.find(j);

@@ -34,7 +34,7 @@ pair<Gvrp_instance, Mip_solution_info> Flow_model::run () {
 //      env.error() << "Failed to optimize LP." << endl;
       mipSolInfo = Mip_solution_info(-1, cplex.getStatus(), -1, -1);
       endVars();
-      env.end();
+//      env.end();
       throw mipSolInfo;
     }
 //    cplex.exportModel("cplexcpp.lp");
@@ -45,7 +45,7 @@ pair<Gvrp_instance, Mip_solution_info> Flow_model::run () {
     createGvrp_instance();
     mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), cplex.getTime(), cplex.getObjValue());
     endVars();
-    env.end();
+//    env.end();
     return make_pair(*solution, mipSolInfo);
   } catch (IloException& e) {
     output_exception<<"Concert exception caught: " << e<<endl;

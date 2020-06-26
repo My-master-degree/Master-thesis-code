@@ -1,5 +1,6 @@
 #include "models/vertex.hpp"
 #include "models/cplex/mip_depth.hpp"
+#include "models/gvrp_models/gvrp_solution.hpp"
 #include "models/gvrp_models/cplex/matheus_model/matheus_model.hpp"
 #include "models/gvrp_models/cplex/matheus_model/greedy_lp_heuristic.hpp"
 #include "models/gvrp_models/cplex/gvrp_lp_kk_heuristic.hpp"
@@ -17,6 +18,7 @@ ILOSTLBEGIN
 using namespace std;
 using namespace models;
 using namespace models::cplex;
+using namespace models::gvrp_models;
 using namespace models::gvrp_models::cplex;
 using namespace models::gvrp_models::cplex::matheus_model;
 
@@ -259,6 +261,57 @@ void Greedy_lp_heuristic::main() {
           }
         }
       }
+
+
+
+      /*
+      Gvrp_solution gvrp_solution (routes, matheus_model.instance);
+      cout<<gvrp_solution<<endl;
+      cout<<" ";
+      for (size_t i = 0; i < matheus_model.c0.size(); ++i){
+        cout<<" ";
+        if (i <=9)
+          cout<<" ";
+        cout<<i;
+      }
+      cout<<endl;
+      for (size_t i = 0; i < matheus_model.c0.size(); ++i){
+        cout<<i<<" ";
+        if (i <= 9)
+          cout<<" ";
+        for (size_t j = 0; j < matheus_model.c0.size(); ++j) {
+          cout<<abs(matheus_model.x_vals[i][j])<<"  ";
+        }
+        cout<<endl;
+      }
+      for (size_t f = 0; f < matheus_model.f0.size(); ++f){
+        cout<<"AFS: "<<f<<endl;
+        cout<<" ";
+        for (size_t i = 0; i < matheus_model.c0.size(); ++i){
+          cout<<" ";
+          if (i <=9)
+            cout<<" ";
+          cout<<i;
+        }
+        cout<<endl;
+        for (size_t i = 0; i < matheus_model.c0.size(); ++i){
+          cout<<i<<" ";
+          if (i <= 9)
+            cout<<" ";
+          for (size_t j = 0; j < matheus_model.c0.size(); ++j)
+            cout<<abs(matheus_model.y_vals[i][f][j])<<"  ";
+          cout<<endl;
+        }
+      }
+      for (size_t i = 0; i < matheus_model.c0.size(); ++i)
+        cout<<i<<": "<<matheus_model.c0[i]->id<<endl;
+    */
+
+
+
+
+
+
       //set values
       for (size_t i = 0; i < sc0; ++i) {
         //v
@@ -272,10 +325,8 @@ void Greedy_lp_heuristic::main() {
           vars.add(matheus_model.x[i][j]);
           vals.add(matheus_model.x_vals[i][j]);
           //u
-          if (i != j) {
-            vars.add(matheus_model.u[i][j]);
-            vals.add(u_vals[i][j]);
-          }
+          vars.add(matheus_model.u[i][j]);
+          vals.add(u_vals[i][j]);
           //a
           if (j > 0 && i > 0) {
             vars.add(matheus_model.a[i - 1][j - 1]);

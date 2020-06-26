@@ -13,6 +13,7 @@ namespace models {
             Matheus_model& matheus_model;
           public:
             explicit Extra_constraint (Matheus_model& matheus_model);
+            virtual ~Extra_constraint ();
             virtual void add() = 0; 
         };
       }

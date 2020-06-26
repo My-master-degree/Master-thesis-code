@@ -20,7 +20,7 @@ using namespace models::gvrp_models::cplex::lh_model;
 
 using namespace std;
 
-LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit) {
+LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //c_0
@@ -90,7 +90,7 @@ pair<Gvrp_solution, Mip_solution_info> LH_model::run(){
 //      env.error() << "Failed to optimize LP." << endl;
       mipSolInfo = Mip_solution_info(-1, cplex.getStatus(), -1, -1);
       endVars();
-      env.end();
+//      env.end();
       throw mipSolInfo;
     }
     clock_gettime(CLOCK_MONOTONIC, &finish);
@@ -103,7 +103,7 @@ pair<Gvrp_solution, Mip_solution_info> LH_model::run(){
     createGvrp_solution();
     mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
     endVars();
-    env.end();
+//    env.end();
     return make_pair(*solution, mipSolInfo);
   } catch (IloException& e) {
     output_exception<<"Concert exception caught: " << e<<endl;

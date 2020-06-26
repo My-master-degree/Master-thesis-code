@@ -112,7 +112,7 @@ pair<Gvrp_solution, Mip_solution_info> KK_model::run(){
 //      env.error() << "Failed to optimize LP." << endl;
       mipSolInfo = Mip_solution_info(-1, cplex.getStatus(), -1, -1);
       endVars();
-      env.end();
+//      env.end();
       throw mipSolInfo;
     }
     clock_gettime(CLOCK_MONOTONIC, &finish);
@@ -126,7 +126,7 @@ pair<Gvrp_solution, Mip_solution_info> KK_model::run(){
     mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
 //    cout<<"Ending vars"<<endl;
     endVars();
-    env.end();
+//    env.end();
     return make_pair(*solution, mipSolInfo);
   } catch (IloException& e) {
     output_exception<<"Concert exception caught: " << e<<endl;

@@ -17,17 +17,29 @@ Invalid_edge_preprocessing_4::Invalid_edge_preprocessing_4 (Matheus_model& mathe
 }
 
 void Invalid_edge_preprocessing_4::add () {
-  list<pair<int, int>> edges = get_invalid_edges_4 (matheus_model.instance, *matheus_model.gvrp_afs_tree);
-  for (auto const& [i, j] : edges) {
-    auto f1 = matheus_model.afssF0Indexes.find(i),
-         f2 = matheus_model.afssF0Indexes.find(j);
-    //first is afs and second is customer
-    if (f1 != matheus_model.afssF0Indexes.end()) 
-      for (size_t k = 0; k < matheus_model.c0.size(); ++k)
-        matheus_model.model.add(matheus_model.y[matheus_model.customersC0Indexes[j]][f1->second][k] == 0);
-    //first is customer and second is afs 
-    else if (f2 != matheus_model.afssF0Indexes.end()) 
-      for (size_t k = 0; k < matheus_model.c0.size(); ++k)
-        matheus_model.model.add(matheus_model.y[matheus_model.customersC0Indexes[i]][f2->second][k] == 0);
+  for (size_t i = 0; i < matheus_model.c0.size(); ++i) {
+    const Vertex * vertexI = matheus_model.c0[i];
+    for (size_t j = 0; j < matheus_model.c0.size(); ++j) {
+      const Vertex * vertexJ = matheus_model.c0[j];
+      for (size_t f_ = 0; f_ < matheus_model.f0.size(); ++f_) {
+        bool valid = false;
+        for (size_t f = 0; f < matheus_model.f0.size(); ++f) {
+          const Vertex * vertexF = matheus_model.f0[f];
+          for (size_t r = 0; r < matheus_model.f0.size(); ++r) {
+            const Vertex * vertexR = matheus_model.f0[r];
+            if (matheus_model.afsToCustomerFuel(f, i) + matheus_model.customerToAfsFuel(i, f_) <= matheus_model.instance.vehicleFuelCapacity 
+                && matheus_model.afsToCustomerFuel(f_, j) + matheus_model.customerToAfsFuel(j, r) <= matheus_model.instance.vehicleFuelCapacity                      && matheus_model.gvrp_afs_tree->times[f] + matheus_model.instance.time(vertexF->id, vertexI->id) + matheus_model.time(i, f_, j) + vertexJ->serviceTime + matheus_model.instance.time(vertexJ->id, vertexR->id) + matheus_model.gvrp_afs_tree->times[r] <= matheus_model.instance.timeLimit) { 
+              valid = true;
+              f = matheus_model.f0.size();
+              break;
+            }
+          }
+        }
+        if (!valid) {
+          matheus_model.model.add(matheus_model.y[i][f_][j] == 0);
+          ++matheus_model.nPreprocessings4;
+        }
+      }
+    }
   }
 }

@@ -44,6 +44,9 @@ namespace models {
             map<int, int> afssF0Indexes;
             vector<const Vertex *> c0;
             vector<const Vertex *> f0;
+            int nPreprocessings1;
+            int nPreprocessings2;
+            int nPreprocessings3;
             double time(int i, int f, int j);
             double time(int i, int j);
             double customersFuel(int i, int j);

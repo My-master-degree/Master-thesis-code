@@ -13,6 +13,7 @@ namespace models {
             Matheus_model& matheus_model;
           public:
             explicit Preprocessing (Matheus_model& matheus_model);
+            virtual ~Preprocessing ();
             virtual void add () = 0;
         };
       }

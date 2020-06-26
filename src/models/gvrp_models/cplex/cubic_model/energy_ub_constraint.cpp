@@ -17,7 +17,7 @@ Energy_ub_constraint::Energy_ub_constraint (Cubic_model& cubic_model) : Extra_co
 void Energy_ub_constraint::add () {
   IloConstraint c;
   for (const Vertex& customer : cubic_model.instance.customers){
-    c = IloConstraint (cubic_model.e[customer.id] <= calculateCustomerMaxRequiredFuel(cubic_model.instance, *cubic_model.gvrp_afs_tree, customer));
+    c = IloConstraint (cubic_model.e[customer.id] <= calculateCustomerMaxAllowedFuel(cubic_model.instance, *cubic_model.gvrp_afs_tree, customer));
     c.setName("Eneergy level UB");
     cubic_model.model.add(c);
     c.end();

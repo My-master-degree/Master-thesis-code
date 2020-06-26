@@ -49,7 +49,7 @@ void Subcycle_user_constraint::main() {
         sf0 = matheus_model.f0.size();
   int bppNRoutesLB, 
       mstNRoutesLB, 
-      tspNRoutesLB,
+      gvrpNRoutesLB,
       maxNRoutes;
   DSU dsu (sc0);
   IloEnv env = getEnv();
@@ -181,19 +181,19 @@ void Subcycle_user_constraint::main() {
         //get mst
       mstNRoutesLB = ceil(calculateVrpMST(matheus_model.instance, vertices)/matheus_model.instance.timeLimit);
         //calculate ditances
-      const auto& [closest, secondClosest] = calculateClosestsVRPCustomers(matheus_model.instance, vertices);
+      const auto& [closest, secondClosest] = calculateClosestsGVRPCustomers(matheus_model.instance, *matheus_model.gvrp_afs_tree, vertices);
       for (size_t i = 0; i < sS; ++i)
-        cout<<matheus_model.customersC0Indexes[vertices[i]->id]<<" "<<closest[i]<<" "<<secondClosest[i]<<endl;
+        cout<<matheus_model.customersC0Indexes[vertices[i]->id]<<" "<<closest[i].first<<" "<<secondClosest[i].first<<endl;
         //bin packing
-//      bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(matheus_model.instance, vertices, closest, secondClosest, matheus_model.bpp_time_limit);
+//       bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(matheus_model.instance, vertices, closest, secondClosest, matheus_model.bpp_time_limit);
       bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(matheus_model.instance, vertices, closest, secondClosest, 100000000);
         //greedy
-      tspNRoutesLB = ceil(calculate_TSP_LB(vertices, closest, secondClosest)/matheus_model.instance.timeLimit);
-      if (mstNRoutesLB >= bppNRoutesLB && mstNRoutesLB >= tspNRoutesLB) {
+      gvrpNRoutesLB = ceil(calculate_GVRP_LBs(vertices, closest, secondClosest).second/matheus_model.instance.timeLimit);
+      if (mstNRoutesLB >= bppNRoutesLB && mstNRoutesLB >= gvrpNRoutesLB) {
         //cout<<"MST with "<<mstNRoutesLB;
         //++matheus_model.nMSTNRoutesLB;
         //maxNRoutes = mstNRoutesLB;
-      } else if (bppNRoutesLB >= mstNRoutesLB && bppNRoutesLB >= tspNRoutesLB) {
+      } else if (bppNRoutesLB >= mstNRoutesLB && bppNRoutesLB >= gvrpNRoutesLB) {
         //cout<<"BPP with "<<bppNRoutesLB;
         //++matheus_model.nBPPNRoutesLB;
         //maxNRoutes = bppNRoutesLB;
