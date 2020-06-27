@@ -10,6 +10,7 @@
 #include <list>
 #include <iostream>
 #include <fstream>
+#include <ilcplex/ilocplex.h>
 
 using namespace std;
 using namespace utils;
@@ -23,11 +24,12 @@ void Model_tests::run() {
   //experiments
     //setup
   string solution_name = "mlsa_flow_";
+  double afssRatio[] = {0.10, 0.20, 0.30};
   ofstream resultsFile;
   string instance_part;
   vector<vector<int>> routes;
   resultsFile.open (solution_name + string("results.csv"));
-  resultsFile<<"Instance,Solution,C,F,Beta,T,C service time, F service time,GAP,Cost,Time,Status"<<endl;
+  resultsFile<<"Instance;Solution;C;F;Beta;T;C service time; F service time;GAP;Cost;Time;Status;Ratio"<<endl;
   list<Vrp_instance> vrp_instances;
   int i = 0;
   list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("UchoaEtAl/"));
@@ -52,23 +54,46 @@ void Model_tests::run() {
     for (size_t i = 0; i < vrp_instance->customers.size() + 1; ++i)
       for (size_t j = 0; j < vrp_instance->customers.size() + 1; ++j)
         longestEdge = max(vrp_instance->distances[i][j], longestEdge);
-    Flow_model flow_model (*vrp_instance, execution_time, longestEdge/2);  
-    try {
-      flow_model.max_num_feasible_integer_sol = nIntSol;
-      flow_model.VERBOSE = VERBOSE;
-      pair<Gvrp_instance, Mip_solution_info > sol = flow_model.run();    
-      string sol_file_name = solution_name + to_string(sol.first.customers.size()) + string ("c") + to_string(sol.first.afss.size()) + string ("f") + to_string(flow_model.vehicleFuelCapacity) + string("B-") + instance;
-      sol.first.write_in_csv(PROJECT_INSTANCES_PATH + string("new/") + sol_file_name);
-      resultsFile<<instance<<";"<<sol_file_name<<";"<<sol.first.customers.size()<<";"<<sol.first.afss.size()<<";"<<sol.first.vehicleFuelCapacity<<";"<<sol.first.timeLimit<<";"<<sol.first.customers.front().serviceTime<<";"<<sol.first.afss.front().serviceTime<<";"<<sol.second.gap<<";"<<int(sol.second.cost)<<"."<<int(sol.second.cost*100)%100<<";"<<sol.second.elapsed_time<<";"<<sol.second.status<<endl;
-    } catch (string s){
-      cout<<"Error:"<<s;
-    } catch (const Mip_solution_info& excSolInfo){
-      resultsFile<<instance<<";-;-;-;-;-;-;-;"<<excSolInfo.gap<<";"<<excSolInfo.cost<<";"<<excSolInfo.elapsed_time<<";"<<excSolInfo.status<<endl;
-    } catch (...) {
-      cout<<"Another error"<<endl;
+    for (double ratio : afssRatio) {
+      Mip_solution_info mip_solution_info;
+      Gvrp_instance * gvrp_instance = nullptr;
+      double vehicleFuelCapacity = 0.0;
+      //bs
+      for (double l = 0.0, r = longestEdge, m = r/2.0; l <= r; m = l + (r - l)/2.0) {
+        int afssLB = vrp_instance->customers.size() * ratio;
+        try {
+          Flow_model flow_model (*vrp_instance, execution_time, m);  
+          flow_model.max_num_feasible_integer_sol = nIntSol;
+          flow_model.VERBOSE = VERBOSE;
+          pair<Gvrp_instance, Mip_solution_info > sol = flow_model.run();    
+          if (sol.first.afss.size() >= afssLB) {
+            gvrp_instance = new Gvrp_instance (sol.first);
+            mip_solution_info = sol.second;
+            vehicleFuelCapacity = m;
+            if (sol.first.afss.size() == afssLB)
+              break;
+            l = m + 1.0;
+          } else 
+            r = m - 1.0;
+        } catch (string s){
+          cout<<"Error:"<<s;
+        } catch (...) {
+          cout<<"Another error"<<endl;
+        }
+      }
+      //write in file
+      if (gvrp_instance == nullptr)
+          resultsFile<<instance<<";-;-;-;-;-;-;-;"<<mip_solution_info.gap<<";"<<mip_solution_info.cost<<";"<<mip_solution_info.elapsed_time<<";"<<mip_solution_info.status<<";"<<ratio<<endl;
+      else {
+        string sol_file_name = solution_name + to_string(gvrp_instance->customers.size()) + string ("c") + to_string(gvrp_instance->afss.size()) + string ("f") + to_string(vehicleFuelCapacity) + string("B-") + instance;
+        gvrp_instance->write_in_csv(PROJECT_INSTANCES_PATH + string("new/") + sol_file_name);
+        resultsFile<<instance<<";"<<sol_file_name<<";"<<gvrp_instance->customers.size()<<";"<<gvrp_instance->afss.size()<<";"<<gvrp_instance->vehicleFuelCapacity<<";"<<gvrp_instance->timeLimit<<";"<<gvrp_instance->customers.front().serviceTime<<";"<<gvrp_instance->afss.front().serviceTime<<";"<<mip_solution_info.gap<<";"<<int(mip_solution_info.cost)<<"."<<int(mip_solution_info.cost*100)%100<<";"<<mip_solution_info.elapsed_time<<";"<<mip_solution_info.status<<";"<<ratio<<endl;
+        delete gvrp_instance;
+      }
     }
     vrp_instance++;
     i++;
+    break;
   }
   resultsFile.close();
   resultsFile.clear();

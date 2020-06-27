@@ -31,7 +31,7 @@ using namespace models::gvrp_models;
 using namespace models::gvrp_models::cplex;
 using namespace models::gvrp_models::cplex::cubic_model;
 
-Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit): Gvrp_model(instance, time_limit), ub_edge_visit(1) {
+Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit): Gvrp_model(instance, time_limit) {
   if (instance.distances_enum != SYMMETRIC && instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
   //fill all and customers
@@ -42,6 +42,15 @@ Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit
   for (const Vertex& afs : instance.afss) 
     all[afs.id] = &afs;
   all[instance.depot.id] = &instance.depot;
+  //lazies
+  lazy_constraints.push_back(new Subcycle_lazy_constraint(*this));
+}
+
+Cubic_model::~Cubic_model() {
+  for (Lazy_constraint * lazy_constraint : lazy_constraints)
+    delete lazy_constraint;
+  for (User_constraint * user_constraint : user_constraints)
+    delete user_constraint;
 }
 
 pair<Gvrp_solution, Mip_solution_info> Cubic_model::run(){
@@ -108,7 +117,7 @@ void Cubic_model::createVariables(){
       x[k] = IloArray<IloNumVarArray> (env, all.size());
       for (const pair<int, const Vertex *>& p : all){
         int i = p.first;
-        x[k][i] = IloNumVarArray(env, all.size(), 0, ub_edge_visit, IloNumVar::Int);
+        x[k][i] = IloNumVarArray(env, all.size(), 0, 1, IloNumVar::Int);
         //setting names
         for (const pair<int, const Vertex *>& p1 : all){
           int j = p1.first;
@@ -288,16 +297,17 @@ void Cubic_model::createModel() {
       extra_constraint->add();
     //init
     cplex = IloCplex(model);
-    //\sum_{(v_i, v_j) \in \delta(S)} x_{ij}^k \geq 2, \forall k \in M, \forall S \subseteq V \backlash \{v_0\} : |C \wedge S| \geq 1 \wedge |S \wedge F| \geq 1
-    //cplex.use(Subcycle_constraint(env, x, instance, all, ub_edge_visit));
-    cplex.use(separation_algorithm()); 
+    //lazy constraints
+    for (Lazy_constraint * lazy_constraint : lazy_constraints)
+      cplex.use(lazy_constraint);
     //user cuts
-    for (User_constraint* user_constraint : user_constraints)
+    for (User_constraint * user_constraint : user_constraints)
       cplex.use(user_constraint);
     //extra steps
     extraStepsAfterModelCreation();
     //depth node callback
-    cplex.use(new Depth_node_callback(env));
+    depth_node_callback = new Depth_node_callback(env);
+    cplex.use(depth_node_callback);
   } catch (IloException& e) {
     throw e;
   } catch (string s) {
@@ -307,10 +317,6 @@ void Cubic_model::createModel() {
 
 void Cubic_model::extraStepsAfterModelCreation() {
   //
-}
-
-Lazy_constraint* Cubic_model::separation_algorithm(){
-  return new Subcycle_lazy_constraint(*this);
 }
 
 void Cubic_model::setCustomParameters(){
@@ -357,7 +363,7 @@ void Cubic_model::fillX_vals(){
       x_vals[k] = IloArray<IloNumArray> (env, all.size());
       for (const pair<int, const Vertex *>& p : all){
         int i = p.first;
-        x_vals[k][i] = IloNumArray (env, all.size(), 0, ub_edge_visit, IloNumVar::Int);
+        x_vals[k][i] = IloNumArray (env, all.size(), 0, 1, IloNumVar::Int);
         cplex.getValues(x_vals[k][i], x[k][i]);
       }
     }

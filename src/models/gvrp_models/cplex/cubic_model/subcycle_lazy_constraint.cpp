@@ -28,7 +28,7 @@ void Subcycle_lazy_constraint::main() {
     x_vals[k] = IloArray<IloNumArray> (env, cubic_model.all.size());
     for (const pair<int, const Vertex *>& p : cubic_model.all) {
       int i = p.first;
-      x_vals[k][i] = IloNumArray (env, cubic_model.all.size(), 0, cubic_model.ub_edge_visit, IloNumVar::Int);
+      x_vals[k][i] = IloNumArray (env, cubic_model.all.size(), 0, 1, IloNumVar::Int);
       getValues(x_vals[k][i], cubic_model.x[k][i]);
     }
   }

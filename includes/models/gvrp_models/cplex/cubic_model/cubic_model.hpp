@@ -36,16 +36,17 @@ namespace models {
         class Cubic_model : public Gvrp_model {
           public:
             Cubic_model(const Gvrp_instance& gvrp_instance, unsigned int time_limit); 
+            ~Cubic_model(); 
             pair<Gvrp_solution, Mip_solution_info> run();
             IDVertex all;
             Matrix3DVar x;
             IloNumVarArray e;
+            list<Lazy_constraint*> lazy_constraints;
             list<User_constraint*> user_constraints;
             list<Preprocessing*> preprocessings;
             list<Extra_constraint*> extra_constraints;
           protected:
             Matrix3DVal x_vals;
-            Lazy_constraint* separation_algorithm();
             void createVariables();
             void createObjectiveFunction();
             void createModel();

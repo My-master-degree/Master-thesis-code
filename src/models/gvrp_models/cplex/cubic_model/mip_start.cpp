@@ -25,7 +25,7 @@ void Mip_start::extraStepsAfterModelCreation () {
       x_vals[k] = IloArray<IloNumArray> (env, all.size());
       for (const pair<int, const Vertex *>& p : all){
         int i = p.first;
-        x_vals[k][i] = IloNumArray (env, all.size(), 0, ub_edge_visit, IloNumVar::Int);
+        x_vals[k][i] = IloNumArray (env, all.size(), 0, 1, IloNumVar::Int);
         for (const pair<int, const Vertex *>& p1 : all)
           x_vals[k][i][p1.first] = 0;
       }
