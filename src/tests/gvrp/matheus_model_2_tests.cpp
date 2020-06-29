@@ -50,7 +50,8 @@ void Matheus_model_2_tests::run() {
     Gvrp_solution gvrp_solution = gfsh.run();
     Matheus_model_2 matheus_model_2 (*gvrp_instance, execution_time);  
     //  Mip_start matheus_model_2 (*gvrp_instance, execution_time, gvrp_solution);  
-    matheus_model_2.nLevelsGreedyLPHeuristic = 10000000;
+    matheus_model_2.levelGreedyLPHeuristic = 10000000;
+    matheus_model_2.levelSubcycleCallback = 0;
     execute_model(matheus_model_2, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model_2.nGreedyLP<<";"<<matheus_model_2.nSubcycleCallbacks<<";"<<matheus_model_2.nBPPNRoutesLB<<";"<<matheus_model_2.nMSTNRoutesLB<<";"<<matheus_model_2.nGVRPNRoutesLB<<";"<<matheus_model_2.nPreprocessings1<<";"<<matheus_model_2.nPreprocessings2<<";"<<matheus_model_2.nPreprocessings3<<";"<<matheus_model_2.nPreprocessings4<<endl;
     ++gvrp_instance;

@@ -60,7 +60,8 @@ namespace models {
             vector<double> customersMinRequiredTime;
             unsigned long int nGreedyLP;
             unsigned int BPPTimeLimit;
-            long int nLevelsGreedyLPHeuristic;
+            long int levelSubcycleCallback;
+            long int levelGreedyLPHeuristic;
             int nRoutesLB;
             int nPreprocessings1;
             int nPreprocessings2;

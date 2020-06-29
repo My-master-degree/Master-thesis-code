@@ -34,7 +34,7 @@ using namespace models::gvrp_models::cplex::matheus_model;
 
 using namespace std;
 
-Matheus_model::Matheus_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), f0(vector<const Vertex *> (instance.afss.size() + 1)), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nGreedyLP(0), nLevelsGreedyLPHeuristic(0) {
+Matheus_model::Matheus_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), f0(vector<const Vertex *> (instance.afss.size() + 1)), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nGreedyLP(0), levelGreedyLPHeuristic(0) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //c_0
@@ -521,6 +521,68 @@ void Matheus_model::createModel() {
       }
     constraint = IloConstraint (expr >= solLB);
     constraint.setName("solution LB");
+    model.add(constraint);
+    expr.end();
+    expr = IloExpr(env);
+    //solution fuel lb alpha 1
+    for (size_t i = 0; i < c0.size(); ++i) {
+      for (size_t f = 0; f < f0.size(); ++f)
+        expr -= alpha * y[0][f][i];
+      for (size_t j = 0; j < c0.size(); ++j) {
+        expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
+        for (size_t f = 0; f < f0.size(); ++f)
+          expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - instance.vehicleFuelCapacity/2.0) * y[i][f][j];
+      }
+    }
+    constraint = IloConstraint (expr >= 0);
+    constraint.setName("solution fuel LB alpha 1");
+    model.add(constraint);
+    expr.end();
+    expr = IloExpr(env);
+    //solution fuel lb alpha 2
+    for (size_t i = 0; i < c0.size(); ++i) {
+      for (size_t f = 0; f < f0.size(); ++f)
+        expr -= alpha * y[i][f][0];
+      for (size_t j = 0; j < c0.size(); ++j) {
+        expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
+        for (size_t f = 0; f < f0.size(); ++f)
+          expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - instance.vehicleFuelCapacity/2.0) * y[i][f][j];
+      }
+    }
+    constraint = IloConstraint (expr >= 0);
+    constraint.setName("solution fuel LB alpha 2");
+    model.add(constraint);
+    expr.end();
+    expr = IloExpr(env);
+    //solution fuel lb lambda 1
+    for (size_t i = 0; i < c0.size(); ++i) {
+      for (size_t f = 0; f < f0.size(); ++f)
+        expr -= 2 * lambda * y[0][f][i];
+      for (size_t j = 0; j < c0.size(); ++j) {
+        expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
+        for (size_t f = 0; f < f0.size(); ++f)
+          expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - psi) * y[i][f][j];
+      }
+    }
+    expr -= psi;
+    constraint = IloConstraint (expr >= 0);
+    constraint.setName("solution fuel LB lambda 1");
+    model.add(constraint);
+    expr.end();
+    expr = IloExpr(env);
+    //solution fuel lb lambda 2
+    for (size_t i = 0; i < c0.size(); ++i) {
+      for (size_t f = 0; f < f0.size(); ++f)
+        expr -= 2 * lambda * y[i][f][0];
+      for (size_t j = 0; j < c0.size(); ++j) {
+        expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
+        for (size_t f = 0; f < f0.size(); ++f)
+          expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - psi) * y[i][f][j];
+      }
+    }
+    expr -= psi;
+    constraint = IloConstraint (expr >= 0);
+    constraint.setName("solution fuel LB lambda 2");
     model.add(constraint);
     expr.end();
     expr = IloExpr(env);

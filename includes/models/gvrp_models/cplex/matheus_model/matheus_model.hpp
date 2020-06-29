@@ -69,7 +69,7 @@ namespace models {
             int nPreprocessings3;
             int nPreprocessings4;
             unsigned long int nGreedyLP;
-            long int nLevelsGreedyLPHeuristic;
+            long int levelGreedyLPHeuristic;
             int nRoutesLB;
             double solLB;
             double psi;

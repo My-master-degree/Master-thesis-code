@@ -40,9 +40,9 @@ void Subcycle_user_constraint::main() {
   //node callback
   Depth const* const d = (Depth *) getNodeData();
   IloInt depth = d ? d->depth : 0;
-  if (depth > 0) {
-//    abortCutLoop();
-//    return;
+  if (depth > matheus_model_2.levelSubcycleCallback) {
+    abortCutLoop();
+    return;
   }
   //setup
   const size_t sc0 = matheus_model_2.c0.size(),
