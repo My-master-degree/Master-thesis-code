@@ -25,11 +25,13 @@ void Local_searchs_tests::run() {
   string solution_name;
   Mip_solution_info mipSolInfo;
     //instance list
-  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
+//  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
+  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("new/"));
   list<Gvrp_instance> gvrp_instances;
   int i = 0;
   for (const string& instance : instances){
-    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
+//    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
+    Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/") + instance);
     gvrp_instances.push_back(gvrp_instance);
   }
     //executions
@@ -48,20 +50,22 @@ void Local_searchs_tests::run() {
     struct timespec start, finish;
     double elapsed;
     clock_gettime(CLOCK_MONOTONIC, &start);
+    /*
+    cout<<gvrp_solution<<endl;
     Merge merge (*gvrp_instance, gvrp_solution, BEST_IMPROVEMENT);  
-    Gvrp_solution newSolution = merge.run();    
-    Swap swap (*gvrp_instance, newSolution, BEST_IMPROVEMENT);  
-    //newSolution = swap.run();    
-    cout<<newSolution<<endl;
+    gvrp_solution = merge.run();    
+    Swap swap (*gvrp_instance, gvrp_solution, BEST_IMPROVEMENT);  
+    gvrp_solution = swap.run();    
+    */
+//    cout<<gvrp_solution<<endl;
     clock_gettime(CLOCK_MONOTONIC, &finish);
     elapsed = (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
-    double cost = newSolution.calculateCost();
+    double cost = gvrp_solution.calculateCost();
     //write
-    newSolution.write_in_file(PROJECT_SOLUTIONS_PATH + string("LS/ls_") + instance);
+    gvrp_solution.write_in_file(PROJECT_SOLUTIONS_PATH + string("LS/ls_") + instance);
     resultsFile<<instance<<";"<<solution_name<<";"<<int(cost)<<"."<<int(cost*100)%100<<";"<<elapsed<<endl;
     gvrp_instance++;
     i++;
-    break;
   }
   closeResultFile(resultsFile);
 }

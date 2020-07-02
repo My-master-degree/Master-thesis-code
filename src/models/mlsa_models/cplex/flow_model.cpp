@@ -6,6 +6,7 @@
 #include "models/cplex/cplex_model.hpp"
 
 #include <set> 
+#include <queue> 
 #include <sstream> 
 #include <float.h> 
 
@@ -38,7 +39,7 @@ pair<Gvrp_instance, Mip_solution_info> Flow_model::run () {
       throw mipSolInfo;
     }
 //    cplex.exportModel("cplexcpp.lp");
- //   env.out() << "Solution value = " << cplex.getObjValue() << endl;
+//    env.out() << "Solution value = " << cplex.getObjValue() << endl;
 //    cout<<"Getting values"<<endl;
     fillVals();
     //cout<<"Creating VRP instance"<<endl;
@@ -136,7 +137,7 @@ void Flow_model::createModel() {
     //\sum_{v_j \in V} x_{ji} - \sum_{v_k \in V \backslash \{v_r\}} x_{ik} = 1, \forall v_i \in V' \backslash \{v_r, v_t\}
     for (size_t i = 1; i < n; i++) {
       for (size_t j = 0; j < n; j++) 
-        expr += x[j][i] - x[i][j];
+        expr += x[j][i - 1] - x[i][j];
       constraintName<<"decrease the incoming amount of flow by 1 in "<<i;
       c = IloConstraint (expr == 1);
       c.setName(constraintName.str().c_str());
@@ -160,11 +161,25 @@ void Flow_model::createModel() {
       constraintName.clear();
       constraintName.str("");
     }
+    //x_{ij} = 0, \forall v_i \in V \backslash \{v_t\}, \forall v_j \in V \backslash \{v_t, v_r\}: e_{ij} > \beta
+    for (size_t i = 0; i < n; i++) {
+      for (size_t j = 0; j < n - 1; j++) {
+        if (instance.distances[i][j + 1] > vehicleFuelCapacity) {
+          constraintName<<"edge ("<<i<<", "<<j + 1<<") preprocessing";
+          c = IloConstraint (x[i][j] == 0.0);
+          c.setName(constraintName.str().c_str());
+          model.add(c);
+          constraintName.clear();
+          constraintName.str("");
+        }
+      }
+    }
     //\sum_{v_j \in V : e_{ij} \leqslant \beta/2 && e_{jr} \leqslant \beta} 1 - x_{jt} \geqslant x_{it}, \forall v_i \in V' \backslash \{v_r, v_t\} : e_{ir} > \beta/2
     for (size_t i = 1; i < n; ++i) {
       if (instance.distances[0][i] > vehicleFuelCapacity/2.0) {
         for (size_t j = 0; j < n - 1; ++j) 
-          if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0 && instance.distances[j + 1][0] <= vehicleFuelCapacity) 
+          if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0) 
+          //if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0 && instance.distances[j + 1][0] <= vehicleFuelCapacity) 
             expr += 1 - x[j + 1][n - 1];
         constraintName<<"if "<<i<<" is a sink then must exists a branch node respecting the EMH constraints";
         c = IloConstraint (expr >= x[i][n - 1]);
@@ -215,8 +230,7 @@ void Flow_model::fillVals(){
     x_vals = Matrix2DVal (env, n);
     for (size_t i = 0; i < n; i++) {
       x_vals[i] = IloNumArray (env, n - 1, 0, 1, IloNumVar::Float);
-      IloInt t;
-      x_vals[i].add(t);
+      x_vals[i].add(IloInt ());
       cplex.getValues(x_vals[i], x[i]);
     }
   } catch (IloException& e) {
@@ -243,7 +257,6 @@ void Flow_model::createGvrp_instance(){
         customers.push_back(v);
       else
         afss.push_back(v);
-    //cout<<afss.size()<<endl;
     //create instance
     solution = new Gvrp_instance(afss, customers, instance.depot, vehicleFuelCapacity, instance.distances, instance.distances_enum, customers.size(), DBL_MAX, 1, 1);
     //set average speed
@@ -264,6 +277,34 @@ void Flow_model::createGvrp_instance(){
       afs.serviceTime = afsServiceTime;
     //set time limit
     Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (*solution);
+
+
+    
+        /*
+    cout<<vehicleFuelCapacity<<endl;
+    for (size_t i = 1; i < gvrp_feasible_solution_heuristic.gvrp_afs_tree->pred.size(); ++i)
+      if (i == gvrp_feasible_solution_heuristic.gvrp_afs_tree->pred[i]) {
+        int id = gvrp_feasible_solution_heuristic.gvrp_afs_tree->f0[i]->id;
+        cout<<id<<" disconnected "<<endl;
+        for (size_t j = 0; j < n - 1; ++j) 
+          if (x_vals[id][j] > 0)
+            cout<<"\tto "<<j + 1<<" with "<<x_vals[id][j]<<" where edge is "<<instance.distances[id][j + 1]<<endl;
+        for (size_t k = 0; k < n; ++k) 
+          if (x_vals[k][id - 1] > 0)
+            cout<<"\tfrom "<<k<<" with "<<x_vals[k][id - 1]<<" where edge is "<<instance.distances[k][id]<<endl;
+        if (instance.distances[id][0] <= vehicleFuelCapacity)
+          cout<<"\tbut connected to "<<0<<endl;
+        for (const Vertex& afs : afss) {
+          if (id != afs.id && instance.distances[id][afs.id] <= vehicleFuelCapacity)
+            cout<<"\tbut connected to "<<afs.id<<" "<<x_vals[id][afs.id - 1]<<endl;
+        }
+      }
+    cout<<endl;
+
+        */
+
+
+
     Gvrp_solution gvrp_solution = gvrp_feasible_solution_heuristic.run();
     //cout<<gvrp_solution<<endl;
     for (const list<Vertex>& route : gvrp_solution.routes) {
@@ -287,8 +328,9 @@ void Flow_model::createGvrp_instance(){
 }
 
 void Flow_model::endVars(){
-  for (size_t i = 0; i < n; i++)
+  for (size_t i = 0; i < n; i++) {
     x[i].end();
+  }
   x.end();
 }
 

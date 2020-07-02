@@ -61,6 +61,7 @@ void Model_tests::run() {
       //bs
       for (double l = 0.0, r = longestEdge, m = r/2.0; l <= r; m = l + (r - l)/2.0) {
         int afssLB = vrp_instance->customers.size() * ratio;
+        cout<<l<<" "<<m<<" "<<r<<endl;
         try {
           Flow_model flow_model (*vrp_instance, execution_time, m);  
           flow_model.max_num_feasible_integer_sol = nIntSol;
@@ -77,8 +78,9 @@ void Model_tests::run() {
             r = m - 1.0;
         } catch (string s){
           cout<<"Error:"<<s;
-        } catch (...) {
-          cout<<"Another error"<<endl;
+        } catch (const Mip_solution_info exc) {
+//          cout<<"Invalid solution "<<exc<<endl;
+          l = m + 1.0;
         }
       }
       //write in file
