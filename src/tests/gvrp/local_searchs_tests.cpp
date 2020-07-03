@@ -43,9 +43,20 @@ void Local_searchs_tests::run() {
   i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
+    /*
+       for (const Vertex& customer : gvrp_instance->customers)
+       if (customer.id == 87) {
+       cout<<gvrp_instance->vehicleFuelCapacity<<endl;
+       cout<<"0 "<<gvrp_instance->fuel(29, 0)<<endl;
+       for (const Vertex& afs : gvrp_instance->afss) 
+       cout<<afs.id<<gvrp_instance->fuel(29, afs.id)<<endl;
+       }
+      */
     //get solution
     Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (*gvrp_instance);
     Gvrp_solution gvrp_solution = gvrp_feasible_solution_heuristic.run();
+    if (gvrp_solution.getInfeasibilities().size() > 0)
+      cout<<"oooopppsss"<<endl;
     //local searchs
     struct timespec start, finish;
     double elapsed;

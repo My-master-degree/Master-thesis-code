@@ -178,8 +178,8 @@ void Flow_model::createModel() {
     for (size_t i = 1; i < n; ++i) {
       if (instance.distances[0][i] > vehicleFuelCapacity/2.0) {
         for (size_t j = 0; j < n - 1; ++j) 
-          if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0) 
-          //if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0 && instance.distances[j + 1][0] <= vehicleFuelCapacity) 
+         // if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0) 
+          if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0 && instance.distances[j + 1][0] <= vehicleFuelCapacity) 
             expr += 1 - x[j + 1][n - 1];
         constraintName<<"if "<<i<<" is a sink then must exists a branch node respecting the EMH constraints";
         c = IloConstraint (expr >= x[i][n - 1]);
@@ -191,20 +191,6 @@ void Flow_model::createModel() {
         constraintName.str("");
       }
     }
-    //preprocessings
-    //removing edges with energy greater than \beta
-    for (size_t i = 0; i < n; ++i)
-      for (size_t j = 0; j < n - 1; ++j)
-        if (instance.distances[i][j + 1] > vehicleFuelCapacity) {
-          constraintName<<"edge("<<i<<", "<<j + 1<<") is an invalid edge";
-          c = IloConstraint (x[i][j] == 0);
-          c.setName(constraintName.str().c_str());
-          model.add(c);
-          expr.end();
-          expr = IloExpr(env);
-          constraintName.clear();
-          constraintName.str("");
-        }
     //init
     cplex = IloCplex(model);
   } catch (IloException& e) {
@@ -253,7 +239,7 @@ void Flow_model::createGvrp_instance(){
     int nCustomers;
     //get nodes
     for (const Vertex& v : instance.customers)
-      if (x_vals[v.id][n - 1] > 0) 
+      if (x_vals[v.id][n - 1] > INTEGRALITY_TOL) 
         customers.push_back(v);
       else
         afss.push_back(v);

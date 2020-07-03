@@ -61,7 +61,7 @@ void Model_tests::run() {
       //bs
       for (double l = 0.0, r = longestEdge, m = r/2.0; l <= r; m = l + (r - l)/2.0) {
         int afssLB = vrp_instance->customers.size() * ratio;
-        cout<<l<<" "<<m<<" "<<r<<endl;
+//        cout<<l<<" "<<m<<" "<<r<<endl;
         try {
           Flow_model flow_model (*vrp_instance, execution_time, m);  
           flow_model.max_num_feasible_integer_sol = nIntSol;
@@ -88,6 +88,21 @@ void Model_tests::run() {
           resultsFile<<instance<<";-;-;-;-;-;-;-;"<<mip_solution_info.gap<<";"<<mip_solution_info.cost<<";"<<mip_solution_info.elapsed_time<<";"<<mip_solution_info.status<<";"<<ratio<<endl;
       else {
         string sol_file_name = solution_name + to_string(gvrp_instance->customers.size()) + string ("c") + to_string(gvrp_instance->afss.size()) + string ("f") + to_string(vehicleFuelCapacity) + string("B-") + instance;
+
+
+
+
+
+
+        Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (*gvrp_instance);
+        Gvrp_solution gvrp_solution = gvrp_feasible_solution_heuristic.run();
+        gvrp_solution.write_in_file("./" + sol_file_name);
+
+
+
+
+
+
         gvrp_instance->write_in_csv(PROJECT_INSTANCES_PATH + string("new/") + sol_file_name);
         resultsFile<<instance<<";"<<sol_file_name<<";"<<gvrp_instance->customers.size()<<";"<<gvrp_instance->afss.size()<<";"<<gvrp_instance->vehicleFuelCapacity<<";"<<gvrp_instance->timeLimit<<";"<<gvrp_instance->customers.front().serviceTime<<";"<<gvrp_instance->afss.front().serviceTime<<";"<<mip_solution_info.gap<<";"<<int(mip_solution_info.cost)<<"."<<int(mip_solution_info.cost*100)%100<<";"<<mip_solution_info.elapsed_time<<";"<<mip_solution_info.status<<";"<<ratio<<endl;
         delete gvrp_instance;
@@ -95,7 +110,6 @@ void Model_tests::run() {
     }
     vrp_instance++;
     i++;
-    break;
   }
   resultsFile.close();
   resultsFile.clear();

@@ -35,9 +35,6 @@ int main (int argc, char **argv)
     }
   //experiments
   /*
-    //local searchs
-  Local_searchs_tests local_searchs_tests;
-  local_searchs_tests.run();
   //cubic model
   Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);
   cubic_model_tests.run();
@@ -46,6 +43,9 @@ int main (int argc, char **argv)
   Model_tests model_tests (VERBOSE, execution_time, nIntSol);
   model_tests.run();
   /*
+    //local searchs
+  Local_searchs_tests local_searchs_tests;
+  local_searchs_tests.run();
     //EMH model
   EMH_model_tests emh_model_tests (VERBOSE, execution_time, nIntSol);
   emh_model_tests.run();
