@@ -14,7 +14,10 @@ using namespace models::mlsa_models::cplex;
 using namespace models::gvrp_models;
 using namespace std;
 
-Flow_model::Flow_model (const Vrp_instance& vrp_instance, double timeLimit, double vehicleFuelCapacity_) : Cplex_model (vrp_instance, timeLimit), vehicleFuelCapacity (vehicleFuelCapacity_), n(vrp_instance.customers.size() + 1) {
+Flow_model::Flow_model (const Vrp_instance& vrp_instance, double timeLimit, double vehicleFuelCapacity_) : Cplex_model (vrp_instance, timeLimit), vehicleFuelCapacity (vehicleFuelCapacity_), n(vrp_instance.customers.size() + 1), nAFSLB(0) {
+}
+
+Flow_model::Flow_model (const Vrp_instance& vrp_instance, double timeLimit, double vehicleFuelCapacity_, int nAFSLB_) : Cplex_model (vrp_instance, timeLimit), vehicleFuelCapacity (vehicleFuelCapacity_), n(vrp_instance.customers.size() + 1), nAFSLB(nAFSLB_) {
 }
 
 pair<Gvrp_instance, Mip_solution_info> Flow_model::run () {
@@ -120,6 +123,12 @@ void Flow_model::createModel() {
     model.add(c);
     expr.end();
     expr = IloExpr(env);
+    //s \leqslant |V| - 1 - nAFSLB
+    c = IloConstraint (s <= int(n) - 1 - nAFSLB);
+    c.setName("s definition");
+    model.add(c);
+    expr.end();
+    expr = IloExpr(env);
     //x_{rt} = 0
     c = IloConstraint (x[0][n - 1] == 0);
     c.setName("root can not be a leaf");
@@ -178,8 +187,8 @@ void Flow_model::createModel() {
     for (size_t i = 1; i < n; ++i) {
       if (instance.distances[0][i] > vehicleFuelCapacity/2.0) {
         for (size_t j = 0; j < n - 1; ++j) 
-         // if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0) 
-          if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0 && instance.distances[j + 1][0] <= vehicleFuelCapacity) 
+          if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0) 
+          //if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0 && instance.distances[j + 1][0] <= vehicleFuelCapacity) 
             expr += 1 - x[j + 1][n - 1];
         constraintName<<"if "<<i<<" is a sink then must exists a branch node respecting the EMH constraints";
         c = IloConstraint (expr >= x[i][n - 1]);
@@ -251,46 +260,18 @@ void Flow_model::createGvrp_instance(){
       for (size_t j = 0; j < sall; ++j)
         solution->vehicleAverageSpeed = max(solution->vehicleAverageSpeed, instance.distances[i][j]);
     //customers service time
-    customerServiceTime = solution->vehicleAverageSpeed / customers.size();
+    customerServiceTime = floor(solution->vehicleAverageSpeed / customers.size());
     //build set of customers
     for (Vertex& customer : solution->customers) {
       customersSet.insert(customer.id);
       customer.serviceTime = customerServiceTime;
     }
     //afss service time
-    afsServiceTime = solution->vehicleAverageSpeed / afss.size();
+    afsServiceTime = floor(solution->vehicleAverageSpeed / afss.size());
     for (Vertex& afs : solution->afss) 
       afs.serviceTime = afsServiceTime;
     //set time limit
     Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (*solution);
-
-
-    
-        /*
-    cout<<vehicleFuelCapacity<<endl;
-    for (size_t i = 1; i < gvrp_feasible_solution_heuristic.gvrp_afs_tree->pred.size(); ++i)
-      if (i == gvrp_feasible_solution_heuristic.gvrp_afs_tree->pred[i]) {
-        int id = gvrp_feasible_solution_heuristic.gvrp_afs_tree->f0[i]->id;
-        cout<<id<<" disconnected "<<endl;
-        for (size_t j = 0; j < n - 1; ++j) 
-          if (x_vals[id][j] > 0)
-            cout<<"\tto "<<j + 1<<" with "<<x_vals[id][j]<<" where edge is "<<instance.distances[id][j + 1]<<endl;
-        for (size_t k = 0; k < n; ++k) 
-          if (x_vals[k][id - 1] > 0)
-            cout<<"\tfrom "<<k<<" with "<<x_vals[k][id - 1]<<" where edge is "<<instance.distances[k][id]<<endl;
-        if (instance.distances[id][0] <= vehicleFuelCapacity)
-          cout<<"\tbut connected to "<<0<<endl;
-        for (const Vertex& afs : afss) {
-          if (id != afs.id && instance.distances[id][afs.id] <= vehicleFuelCapacity)
-            cout<<"\tbut connected to "<<afs.id<<" "<<x_vals[id][afs.id - 1]<<endl;
-        }
-      }
-    cout<<endl;
-
-        */
-
-
-
     Gvrp_solution gvrp_solution = gvrp_feasible_solution_heuristic.run();
     //cout<<gvrp_solution<<endl;
     for (const list<Vertex>& route : gvrp_solution.routes) {
@@ -304,7 +285,7 @@ void Flow_model::createGvrp_instance(){
       routeTime += nCustomers * customerServiceTime + (route.size() - nCustomers - 2) * afsServiceTime;
       longestTime = max(longestTime, routeTime);
     }
-    solution->timeLimit = 2 * longestTime; 
+    solution->timeLimit = ceil(2 * longestTime); 
     //cout<<*solution<<endl;
   } catch (IloException& e) {
     throw e;

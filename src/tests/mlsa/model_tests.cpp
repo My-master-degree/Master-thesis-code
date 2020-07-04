@@ -7,6 +7,7 @@
 #include "SampleConfig.h"
 
 #include <string>
+#include <cmath>
 #include <list>
 #include <iostream>
 #include <fstream>
@@ -48,8 +49,6 @@ void Model_tests::run() {
     instance_part = PROJECT_SOLUTIONS_PATH + string("UchoaEtAl/") + instance_part + ".sol";
     routes = read_uchoa_vrp_solution (instance_part);
     //run
-//    Flow_model flow_model (*vrp_instance, execution_time, calculateVRPSolutionCost(routes, *vrp_instance)/2);  
-//    Flow_model flow_model (*vrp_instance, execution_time, calculateRouteAverageCost(routes, *vrp_instance));  
     double longestEdge = 0.0;
     for (size_t i = 0; i < vrp_instance->customers.size() + 1; ++i)
       for (size_t j = 0; j < vrp_instance->customers.size() + 1; ++j)
@@ -59,28 +58,26 @@ void Model_tests::run() {
       Gvrp_instance * gvrp_instance = nullptr;
       double vehicleFuelCapacity = 0.0;
       //bs
-      for (double l = 0.0, r = longestEdge, m = r/2.0; l <= r; m = l + (r - l)/2.0) {
+      for (int l = 0, r = 1000000000, m = floor(r/2.0); l <= r; m = floor(l + (r - l)/2.0)) {
         int afssLB = vrp_instance->customers.size() * ratio;
-//        cout<<l<<" "<<m<<" "<<r<<endl;
+        cout<<l<<" "<<m<<" "<<r<<endl;
         try {
-          Flow_model flow_model (*vrp_instance, execution_time, m);  
+          Flow_model flow_model (*vrp_instance, execution_time, m, afssLB);  
           flow_model.max_num_feasible_integer_sol = nIntSol;
           flow_model.VERBOSE = VERBOSE;
           pair<Gvrp_instance, Mip_solution_info > sol = flow_model.run();    
-          if (sol.first.afss.size() >= afssLB) {
-            gvrp_instance = new Gvrp_instance (sol.first);
-            mip_solution_info = sol.second;
-            vehicleFuelCapacity = m;
-            if (sol.first.afss.size() == afssLB)
-              break;
-            l = m + 1.0;
-          } else 
-            r = m - 1.0;
+          gvrp_instance = new Gvrp_instance (sol.first);
+          mip_solution_info = sol.second;
+          vehicleFuelCapacity = m;
+          if (sol.first.afss.size() == afssLB) 
+            r = m - 1;
+          else 
+            l = m + 1;
         } catch (string s){
           cout<<"Error:"<<s;
         } catch (const Mip_solution_info exc) {
 //          cout<<"Invalid solution "<<exc<<endl;
-          l = m + 1.0;
+          l = m + 1;
         }
       }
       //write in file

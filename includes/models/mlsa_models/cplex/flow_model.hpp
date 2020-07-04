@@ -23,12 +23,14 @@ namespace models {
       class Flow_model : public Cplex_model<Vrp_instance, Gvrp_instance> {
         public:
           explicit Flow_model (const Vrp_instance& vrp_instance, double timeLimit, double vehicleFuelCapacity);
+          explicit Flow_model (const Vrp_instance& vrp_instance, double timeLimit, double vehicleFuelCapacity, int nAFSLB);
           double vehicleFuelCapacity;
           pair<Gvrp_instance, Mip_solution_info> run();
           IloNumVar s;
           Matrix2DVar x;
           Matrix2DVal x_vals;
           size_t n;
+          int nAFSLB;
         protected:
           void createVariables();
           void createObjectiveFunction();
