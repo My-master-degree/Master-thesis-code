@@ -45,7 +45,7 @@ Gvrp_afs_tree::Gvrp_afs_tree(const Gvrp_instance& gvrp_instance) {
         time = (cost / gvrp_instance.vehicleAverageSpeed) + f0[r]->serviceTime; 
         if (cost * gvrp_instance.vehicleFuelConsumptionRate <= gvrp_instance.vehicleFuelCapacity && pairCosts[f][curr] + cost < pairCosts[f][r] && pairTimes[f][curr] + time < pairTimes[f][r]) {
           pairTimes[f][r] = pairTimes[f][curr] + time;
-          pairCosts[f][r] = pairCosts[f][curr] + time;
+          pairCosts[f][r] = pairCosts[f][curr] + cost;
           pairPreds[f][r] = curr;
           q.push(r);
         }

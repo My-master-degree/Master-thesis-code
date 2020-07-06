@@ -187,8 +187,8 @@ void Flow_model::createModel() {
     for (size_t i = 1; i < n; ++i) {
       if (instance.distances[0][i] > vehicleFuelCapacity/2.0) {
         for (size_t j = 0; j < n - 1; ++j) 
-          if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0) 
-          //if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0 && instance.distances[j + 1][0] <= vehicleFuelCapacity) 
+         // if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0) 
+          if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0 && instance.distances[j + 1][0] <= vehicleFuelCapacity) 
             expr += 1 - x[j + 1][n - 1];
         constraintName<<"if "<<i<<" is a sink then must exists a branch node respecting the EMH constraints";
         c = IloConstraint (expr >= x[i][n - 1]);

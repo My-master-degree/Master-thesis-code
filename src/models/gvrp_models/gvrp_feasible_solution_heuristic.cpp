@@ -49,11 +49,11 @@ Gvrp_solution Gvrp_feasible_solution_heuristic::run () {
             cost = gvrp_instance.distances[f0[f]->id][customer.id] + gvrp_instance.distances[customer.id][f0[r]->id];
             fuel = cost * gvrp_instance.vehicleFuelConsumptionRate;
             if (fuel <= gvrp_instance.vehicleFuelCapacity) {
-              routeFuel = fuels[f] + fuel + fuels[r] ;
+              routeFuel = fuels[f] + fuel + fuels[r];
               if (times[f] + (cost/gvrp_instance.vehicleAverageSpeed) + customer.serviceTime + times[r] <= gvrp_instance.timeLimit && routeFuel < bestAfssFuel) {
                 bestAfssFuel = routeFuel; 
                 bestAfss = make_pair(f, r);
-              }
+              } 
             }
           }
     //get route
