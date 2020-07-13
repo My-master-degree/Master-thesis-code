@@ -55,8 +55,9 @@ void Local_searchs_tests::run() {
     //get solution
     Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (*gvrp_instance);
     Gvrp_solution gvrp_solution = gvrp_feasible_solution_heuristic.run();
-    if (gvrp_solution.getInfeasibilities().size() > 0)
+    if (gvrp_solution.getInfeasibilities().size() > 0) {
       cout<<"oooopppsss"<<endl;
+    }
     //local searchs
     struct timespec start, finish;
     double elapsed;

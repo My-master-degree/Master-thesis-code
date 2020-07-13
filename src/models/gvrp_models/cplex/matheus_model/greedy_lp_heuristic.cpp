@@ -4,6 +4,7 @@
 #include "models/gvrp_models/cplex/matheus_model/matheus_model.hpp"
 #include "models/gvrp_models/cplex/matheus_model/greedy_lp_heuristic.hpp"
 #include "models/gvrp_models/cplex/gvrp_lp_kk_heuristic.hpp"
+#include "models/gvrp_models/local_searchs/fsRemove.hpp"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -19,6 +20,7 @@ using namespace std;
 using namespace models;
 using namespace models::cplex;
 using namespace models::gvrp_models;
+using namespace models::gvrp_models::local_searchs;
 using namespace models::gvrp_models::cplex;
 using namespace models::gvrp_models::cplex::matheus_model;
 
@@ -181,6 +183,15 @@ void Greedy_lp_heuristic::main() {
         break;
       routes.push_back(route);
       route = list<Vertex> ();
+    }
+    if (valid) {
+      Gvrp_solution gvrp_solution (routes, matheus_model.instance);
+
+      FsRemove fsRemove (matheus_model.instance, gvrp_solution);
+      gvrp_solution = fsRemove.run();
+      routes = gvrp_solution.routes;
+
+      cost = gvrp_solution.calculateCost();
     }
     //better solution found
     if (valid && cost - getIncumbentObjValue() < -1e-6) {

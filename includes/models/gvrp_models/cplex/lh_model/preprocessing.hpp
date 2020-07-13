@@ -13,6 +13,7 @@ namespace models {
             LH_model& lh_model;
           public:
             explicit Preprocessing (LH_model& lh_model);
+            ~Preprocessing ();
             virtual void add () = 0;
         };
       }

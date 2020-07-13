@@ -64,6 +64,8 @@ namespace models {
             vector<const Vertex *> f0;
             vector<double> customersMinRequiredFuel;
             vector<double> customersMinRequiredTime;
+            vector<vector<double>> gvrpReducedGraphDistances;
+            vector<vector<double>> gvrpReducedGraphTimes;
             int nPreprocessings1;
             int nPreprocessings2;
             int nPreprocessings3;

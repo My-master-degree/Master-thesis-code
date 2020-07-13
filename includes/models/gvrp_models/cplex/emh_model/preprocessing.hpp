@@ -13,6 +13,7 @@ namespace models {
             EMH_model& emh_model;
           public:
             explicit Preprocessing (EMH_model& emh_model);
+            virtual ~Preprocessing ();
             virtual void add () = 0;
         };
       }

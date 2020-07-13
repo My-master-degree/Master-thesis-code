@@ -48,8 +48,7 @@ void Subcycle_user_constraint::main() {
   const size_t sc0 = matheus_model.c0.size(),
         sf0 = matheus_model.f0.size();
   int bppNRoutesLB, 
-      mstNRoutesLB, 
-      gvrpNRoutesLB,
+      improvedMSTNRoutesLB, 
       maxNRoutes;
   DSU dsu (sc0);
   IloEnv env = getEnv();
@@ -172,36 +171,24 @@ void Subcycle_user_constraint::main() {
       const size_t sS = S.size();
       vector<const Vertex *> vertices (sS + 1);
       int j = 0;
-      double serviceTimes = 0.0;
       for (int i : S) {
-        vertices[j++] = matheus_model.c0[i];
-        serviceTimes += matheus_model.c0[i]->serviceTime;
+        vertices[j] = matheus_model.c0[i];
+        ++j;
       }
       vertices[j] = matheus_model.c0[0];
-        //get mst
-      mstNRoutesLB = ceil(calculateVrpMST(matheus_model.instance, vertices)/matheus_model.instance.timeLimit);
-        //calculate ditances
-      const auto& [closest, secondClosest] = calculateClosestsGVRPCustomers(matheus_model.instance, *matheus_model.gvrp_afs_tree, vertices);
-      for (size_t i = 0; i < sS; ++i)
-        cout<<matheus_model.customersC0Indexes[vertices[i]->id]<<" "<<closest[i].first<<" "<<secondClosest[i].first<<endl;
-        //bin packing
-//       bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(matheus_model.instance, vertices, closest, secondClosest, matheus_model.bpp_time_limit);
-      bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(matheus_model.instance, vertices, closest, secondClosest, 100000000);
-        //greedy
-      gvrpNRoutesLB = ceil(calculate_GVRP_LBs(vertices, closest, secondClosest).second/matheus_model.instance.timeLimit);
-      if (mstNRoutesLB >= bppNRoutesLB && mstNRoutesLB >= gvrpNRoutesLB) {
-        //cout<<"MST with "<<mstNRoutesLB;
-        //++matheus_model.nMSTNRoutesLB;
-        //maxNRoutes = mstNRoutesLB;
-      } else if (bppNRoutesLB >= mstNRoutesLB && bppNRoutesLB >= gvrpNRoutesLB) {
-        //cout<<"BPP with "<<bppNRoutesLB;
-        //++matheus_model.nBPPNRoutesLB;
-        //maxNRoutes = bppNRoutesLB;
-      } else  {
-        //cout<<"KK Greedy with "<<bppNRoutesLB;
-        //++matheus_model.nKKGreedyNRoutesLB;
-        //maxNRoutes = kkGreedyNRoutesLB;
-      }
+      //get n routes lbs
+      const auto& closestsTimes = calculateClosestsGVRPCustomers(matheus_model.gvrpReducedGraphTimes, vertices);
+      //get mst
+      improvedMSTNRoutesLB = int(ceil(calculateGvrpLBByImprovedMSTTime(vertices, closestsTimes, matheus_model.gvrpReducedGraphTimes)/matheus_model.instance.timeLimit));
+      //bin packing
+      bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(matheus_model.instance, vertices, closestsTimes, 10000000);
+      maxNRoutes = max(improvedMSTNRoutesLB, bppNRoutesLB);
+      /*
+      if (improvedMSTNRoutesLB == maxNRoutes) 
+        ++matheus_model.nImprovedMSTNRoutesLB;
+      if (bppNRoutesLB == maxNRoutes) 
+        ++matheus_model.nBPPNRoutesLB;
+        */
       lhs -= maxNRoutes;
       try {
         add(lhs >= 0).end();

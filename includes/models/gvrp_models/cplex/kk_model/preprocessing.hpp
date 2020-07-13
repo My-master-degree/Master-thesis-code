@@ -13,6 +13,7 @@ namespace models {
             KK_model& kk_model;
           public:
             explicit Preprocessing (KK_model& kk_model);
+            ~Preprocessing ();
             virtual void add () = 0;
         };
       }

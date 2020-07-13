@@ -13,6 +13,7 @@ namespace models {
             KK_model& kk_model;
           public:
             explicit Extra_constraint (KK_model& kk_model);
+            ~Extra_constraint();
             virtual void add() = 0; 
         };
       }

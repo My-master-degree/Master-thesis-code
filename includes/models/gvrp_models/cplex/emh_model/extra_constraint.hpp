@@ -13,6 +13,7 @@ namespace models {
             EMH_model& emh_model;
           public:
             explicit Extra_constraint (EMH_model& emh_model);
+            ~Extra_constraint();
             virtual void add() = 0; 
         };
       }

@@ -3,6 +3,7 @@
 #include "models/gvrp_models/cplex/matheus_model_2/matheus_model_2.hpp"
 #include "models/gvrp_models/cplex/matheus_model_2/greedy_lp_heuristic.hpp"
 #include "models/gvrp_models/cplex/gvrp_lp_kk_heuristic.hpp"
+#include "models/gvrp_models/local_searchs/fsRemove.hpp"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -17,6 +18,7 @@ ILOSTLBEGIN
 using namespace std;
 using namespace models;
 using namespace models::cplex;
+using namespace models::gvrp_models::local_searchs;
 using namespace models::gvrp_models::cplex;
 using namespace models::gvrp_models::cplex::matheus_model_2;
 
@@ -180,6 +182,15 @@ void Greedy_lp_heuristic::main() {
       routes.push_back(route);
       route = list<Vertex> ();
     }
+    if (valid) {
+      Gvrp_solution gvrp_solution (routes, matheus_model_2.instance);
+
+      FsRemove fsRemove (matheus_model_2.instance, gvrp_solution);
+      gvrp_solution = fsRemove.run();
+      routes = gvrp_solution.routes;
+
+      cost = gvrp_solution.calculateCost();
+    }
     //better solution found
     if (valid && cost - getIncumbentObjValue() < -1e-6) {
       ++matheus_model_2.nGreedyLP;
@@ -226,7 +237,7 @@ void Greedy_lp_heuristic::main() {
           auto currIndex = matheus_model_2.customersC0Indexes.find(curr->id);
           int i = matheus_model_2.customersC0Indexes[prev->id];
           //is a customer
-          if (currIndex != matheus_model_2.customersC0Indexes.end()) {
+          if (currIndex != matheus_model_2.customersC0Indexes.end() && !(curr->id == matheus_model_2.instance.depot.id && curr != --route.end())) {
             int j = currIndex->second;
             matheus_model_2.x_vals[i][j] = 1;
             currFuel -= matheus_model_2.customersFuel(i, j);

@@ -27,32 +27,23 @@ void Model_tests::run() {
   string solution_name = "mlsa_flow_";
   double afssRatio[] = {0.10, 0.20, 0.30};
   ofstream resultsFile;
-  string instance_part;
-  vector<vector<int>> routes;
   resultsFile.open (solution_name + string("results.csv"));
   resultsFile<<"Instance;Solution;C;F;Beta;T;C service time; F service time;GAP;Cost;Time;Status;Ratio"<<endl;
   list<Vrp_instance> vrp_instances;
   int i = 0;
-  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("UchoaEtAl/"));
+//  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("UchoaEtAl/"));
+  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("Augerat1995SetP/"));
     //instance list
   for (const string& instance : instances){
-    Vrp_instance vrp_instance = read_uchoa_vrp_instance(PROJECT_INSTANCES_PATH + string("UchoaEtAl/") + instance);
+//    Vrp_instance vrp_instance = read_uchoa_vrp_instance(PROJECT_INSTANCES_PATH + string("UchoaEtAl/") + instance);
+    Vrp_instance vrp_instance = read_augerat_vrp_1995_setP_instance(PROJECT_INSTANCES_PATH + string("Augerat1995SetP/") + instance);
     vrp_instances.push_back(vrp_instance);
   }
     //executions
   auto vrp_instance = vrp_instances.begin();
   for (const string& instance : instances) {
     cout<<instance<<endl;
-    //get vrp sol
-    stringstream ss (instance);
-    getline(ss, instance_part, '.');
-    instance_part = PROJECT_SOLUTIONS_PATH + string("UchoaEtAl/") + instance_part + ".sol";
-    routes = read_uchoa_vrp_solution (instance_part);
     //run
-    double longestEdge = 0.0;
-    for (size_t i = 0; i < vrp_instance->customers.size() + 1; ++i)
-      for (size_t j = 0; j < vrp_instance->customers.size() + 1; ++j)
-        longestEdge = max(vrp_instance->distances[i][j], longestEdge);
     for (double ratio : afssRatio) {
       Mip_solution_info mip_solution_info;
       Gvrp_instance * gvrp_instance = nullptr;
@@ -85,7 +76,6 @@ void Model_tests::run() {
           resultsFile<<instance<<";-;-;-;-;-;-;-;"<<mip_solution_info.gap<<";"<<mip_solution_info.cost<<";"<<mip_solution_info.elapsed_time<<";"<<mip_solution_info.status<<";"<<ratio<<endl;
       else {
         string sol_file_name = solution_name + to_string(gvrp_instance->customers.size()) + string ("c") + to_string(gvrp_instance->afss.size()) + string ("f") + to_string(vehicleFuelCapacity) + string("B-") + instance;
-
 
 
 

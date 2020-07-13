@@ -4,3 +4,5 @@
 using namespace models::gvrp_models::cplex::emh_model;
 
 Preprocessing::Preprocessing (EMH_model& emh_model_) : emh_model(emh_model_) {}
+
+Preprocessing::~Preprocessing () {}

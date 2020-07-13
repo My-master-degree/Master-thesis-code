@@ -4,3 +4,5 @@
 using namespace models::gvrp_models::cplex::lh_model;
 
 Preprocessing::Preprocessing (LH_model& lh_model_) : lh_model(lh_model_) {}
+
+Preprocessing::~Preprocessing () {}
