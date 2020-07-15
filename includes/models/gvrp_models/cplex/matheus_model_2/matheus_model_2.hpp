@@ -62,7 +62,6 @@ namespace models {
             vector<vector<double>> gvrpReducedGraphTimes;
             unsigned long int nGreedyLP;
             unsigned int BPPTimeLimit;
-            long int levelGreedyLPHeuristic;
             long int levelSubcycleCallback;
             int nRoutesLB;
             int nPreprocessings1;
@@ -90,6 +89,7 @@ namespace models {
             void setCustomParameters();
             void fillVals();
             void createGvrp_solution();
+            void endVals();
             void endVars();
         };
       }

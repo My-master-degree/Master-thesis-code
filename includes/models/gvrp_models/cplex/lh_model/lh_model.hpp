@@ -44,6 +44,7 @@ namespace models {
             map<int, int> afssF0Indexes;
             vector<const Vertex *> c0;
             vector<const Vertex *> f0;
+            int nPreprocessings0;
             int nPreprocessings1;
             int nPreprocessings2;
             int nPreprocessings3;
@@ -60,6 +61,7 @@ namespace models {
             void setCustomParameters();
             void fillVals();
             void createGvrp_solution();
+            void endVals();
             void endVars();
         };
       }

@@ -43,6 +43,7 @@ namespace models {
           virtual void setCustomParameters() = 0;
           virtual void createGvrp_solution() = 0;
           virtual void endVars() = 0;
+          virtual void endVals() = 0;
       };
     }
   }

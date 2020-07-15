@@ -32,7 +32,7 @@ using namespace models::gvrp_models::cplex;
 using namespace models::gvrp_models::cplex::cubic_model;
 
 Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit): Gvrp_model(instance, time_limit) {
-  if (instance.distances_enum != SYMMETRIC && instance.distances_enum != METRIC)
+  if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
   //fill all and customers
   for (const Vertex& customer : instance.customers) {
@@ -54,7 +54,6 @@ Cubic_model::~Cubic_model() {
 }
 
 pair<Gvrp_solution, Mip_solution_info> Cubic_model::run(){
-    throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
   //setup
   stringstream output_exception;
   Mip_solution_info mipSolInfo;
@@ -322,32 +321,10 @@ void Cubic_model::extraStepsAfterModelCreation() {
 void Cubic_model::setCustomParameters(){
   try{
     setParameters();
-    //DOUBTS:
-    // Turn off the presolve reductions and set the CPLEX optimizer
-    // to solve the worker LP with primal simplex method.
-    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
-    cplex.setParam(IloCplex::Param::Preprocessing::Symmetry, 0);
-    cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal); 
-    //preprocesing setting
-    cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
-    // Turn on traditional search for use with control callbacks
-//    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
-    //:DOUBTS
-    //LAZY CONSTRAINTS
-    //thread safe setting
+    //although this parameter is not necessary, it is being defined to standarize the experiments
+    cplex.setParam(IloCplex::Param::Preprocessing::Linear, 0);
+    //although this parameter parameter is defined as default (since this formulation makes use of lazy constraint callback), it is being defined to standarize the experiments
     cplex.setParam(IloCplex::Param::Threads, 1);
-    // Tweak some CPLEX parameters so that CPLEX has a harder time to
-    // solve the model and our cut separators can actually kick in.
-    cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::MIRCut, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Implied, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Gomory, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::FlowCovers, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::PathCut, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::LiftProj, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::ZeroHalfCut, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Covers, -1);
   } catch (IloException& e) {
     throw e;
   } catch (...) {
@@ -479,6 +456,15 @@ void Cubic_model::createGvrp_solution(){
   } catch (...) {
     throw string("Error in getting routes");
   }
+}
+
+void Cubic_model::endVals(){
+  for (int k = 0; k < instance.maxRoutes; k++){ 
+    for (const pair<int, const Vertex *>& p : all)
+      x_vals[k][p.first].end();
+    x_vals[k].end();
+  }
+  x_vals.end();
 }
 
 void Cubic_model::endVars(){

@@ -1,13 +1,4 @@
 #include "utils/util.hpp"
-#include "models/vertex.hpp"
-#include "models/distances_enum.hpp"
-#include "models/cplex/mip_solution_info.hpp"
-#include "models/cplex/depth_node_callback.hpp"
-#include "models/gvrp_models/gvrp_solution.hpp"
-#include "models/gvrp_models/gvrp_instance.hpp"
-#include "models/gvrp_models/cplex/gvrp_model.hpp"
-#include "models/gvrp_models/cplex/matheus_model_2/matheus_model_2.hpp"
-#include "models/gvrp_models/cplex/matheus_model_2/preprocessing.hpp"
 #include "models/gvrp_models/cplex/matheus_model_2/user_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model_2/lazy_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model_2/subcycle_user_constraint.hpp"
@@ -34,11 +25,12 @@ using namespace models::gvrp_models::cplex::matheus_model_2;
 
 using namespace std;
 
-Matheus_model_2::Matheus_model_2(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), f0(vector<const Vertex *> (instance.afss.size() + 1)), nGreedyLP(0), BPPTimeLimit(100000000), levelGreedyLPHeuristic(0), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0) {
+Matheus_model_2::Matheus_model_2(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), f0(vector<const Vertex *> (instance.afss.size() + 1)), nGreedyLP(0), BPPTimeLimit(100000000), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //c_0
   c0[0] = &instance.depot;
+  customersC0Indexes[instance.depot.id] = 0;
   int i = 0;
   for (const Vertex& customer : instance.customers) {
     c0[i + 1] = &customer;
@@ -147,6 +139,7 @@ pair<Gvrp_solution, Mip_solution_info> Matheus_model_2::run(){
     fillVals();
 //    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
+    endVals ();
     mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
     endVars();
 //    env.end();
@@ -668,32 +661,12 @@ void Matheus_model_2::extraStepsAfterModelCreation() {
 void Matheus_model_2::setCustomParameters(){
   try{
     setParameters();
-    //DOUBTS:
-    // Turn off the presolve reductions and set the CPLEX optimizer
-    // to solve the worker LP with primal simplex method.
-    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
-    cplex.setParam(IloCplex::Param::Preprocessing::Symmetry, 0);
-    cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal); 
-    //preprocesing setting
-    cplex.setParam(IloCplex::Param::Preprocessing::Presolve, IloFalse); 
-    // Turn on traditional search for use with control callbacks
-//    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, IloCplex::Traditional);
-    //:DOUBTS
-    //LAZY CONSTRAINTS
-    //thread safe setting
+    //for the user cut callback
+    cplex.setParam(IloCplex::Param::Preprocessing::Linear, 0);
+    //for the lazy constraint callback, although this formulation does not make use of lazy constraints, (this parameter is being defined to standarize the experiments (since the cubic formulations makes use of lazy constraints)
+    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 2);
+    //this parameter is being defined to standarize the experiments (since the cubic formulations makes use of lazy constraints)
     cplex.setParam(IloCplex::Param::Threads, 1);
-    // Tweak some CPLEX parameters so that CPLEX has a harder time to
-    // solve the model and our cut separators can actually kick in.
-    cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::MIRCut, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Implied, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Gomory, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::FlowCovers, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::PathCut, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::LiftProj, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::ZeroHalfCut, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques, -1);
-    cplex.setParam(IloCplex::Param::MIP::Cuts::Covers, -1);
   } catch (IloException& e) {
     throw e;
   } catch (...) {
@@ -841,6 +814,18 @@ void Matheus_model_2::createGvrp_solution(){
   } catch (...) {
     throw string("Error in getting routes");
   }
+}
+
+void Matheus_model_2::endVals () {
+  //end vals
+  for (size_t i = 0; i < c0.size(); ++i) {
+    for (size_t f = 0; f < f0.size(); ++f)
+      y_vals[i][f].end();
+    y_vals[i].end();
+    x_vals[i].end();
+  }
+  y_vals.end();
+  x_vals.end();
 }
 
 void Matheus_model_2::endVars(){

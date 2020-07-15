@@ -26,12 +26,12 @@ void KK_model_tests::run() {
   Mip_solution_info mipSolInfo;
     //instance list
  // list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
- list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("new/"));
+ list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("new/non-consec/"));
   list<Gvrp_instance> gvrp_instances;
   int i = 0;
   for (const string& instance : instances){
   //  Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
-    Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/") + instance);
+    Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/non-consec/") + instance);
     gvrp_instances.push_back(gvrp_instance);
   }
     //executions
@@ -43,9 +43,6 @@ void KK_model_tests::run() {
   i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
-    Gvrp_feasible_solution_heuristic gfsh (*gvrp_instance);
-    Gvrp_solution gvrp_solution = gfsh.run();
-    cout<<gvrp_solution<<endl;
     /*
     Mip_start kk_model (*gvrp_instance, execution_time, gvrp_solution);  
     */

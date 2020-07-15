@@ -122,6 +122,7 @@ pair<Gvrp_solution, Mip_solution_info> KK_model::run(){
     fillVals();
  //   cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
+    endVals();
     mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
 //    cout<<"Ending vars"<<endl;
     endVars();
@@ -427,6 +428,12 @@ void KK_model::extraStepsAfterModelCreation() {
 void KK_model::setCustomParameters(){
   try{
     setParameters();
+    //for the user cut callback, although this formulation does not make use of lazy constraints, (this parameter is being defined to standarize the experiments (since the cubic formulations makes use of user constraints)
+    cplex.setParam(IloCplex::Param::Preprocessing::Linear, 0);
+    //for the lazy constraint callback, although this formulation does not make use of lazy constraints, (this parameter is being defined to standarize the experiments (since the cubic formulations makes use of lazy constraints)
+    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 2);
+    //this parameter is being defined to standarize the experiments (since the cubic formulations makes use of lazy constraints)
+    cplex.setParam(IloCplex::Param::Threads, 1);
   } catch (IloException& e) {
     throw e;
   } catch (...) {
@@ -557,6 +564,18 @@ void KK_model::createGvrp_solution(){
   } catch (...) {
     throw string("Error in getting routes");
   }
+}
+
+void KK_model::endVals () {
+  //end vals
+  for (size_t i = 0; i < c0.size(); ++i) {
+    for (size_t f = 0; f < f0.size(); ++f)
+      y_vals[i][f].end();
+    y_vals[i].end();
+    x_vals[i].end();
+  }
+  y_vals.end();
+  x_vals.end();
 }
 
 void KK_model::endVars(){

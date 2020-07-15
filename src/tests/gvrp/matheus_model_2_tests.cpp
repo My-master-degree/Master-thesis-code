@@ -31,11 +31,11 @@ void Matheus_model_2_tests::run() {
   Mip_solution_info mipSolInfo;
     //instance list
  //list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
-  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("new/"));
+  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("new/non-consec/"));
   list<Gvrp_instance> gvrp_instances;
   for (const string& instance : instances) {
   //  Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
-   Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/") + instance);
+   Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/non-consec/") + instance);
     gvrp_instances.push_back(gvrp_instance);
   }
     //executions
@@ -50,7 +50,6 @@ void Matheus_model_2_tests::run() {
     Gvrp_solution gvrp_solution = gfsh.run();
     Matheus_model_2 matheus_model_2 (*gvrp_instance, execution_time);  
     //  Mip_start matheus_model_2 (*gvrp_instance, execution_time, gvrp_solution);  
-    matheus_model_2.levelGreedyLPHeuristic = 39;
     matheus_model_2.levelSubcycleCallback = 0;
     execute_model(matheus_model_2, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model_2.nGreedyLP<<";"<<matheus_model_2.nBPPNRoutesLB<<";"<<matheus_model_2.nImprovedMSTNRoutesLB<<";"<<matheus_model_2.nPreprocessings1<<";"<<matheus_model_2.nPreprocessings2<<";"<<matheus_model_2.nPreprocessings3<<";"<<matheus_model_2.nPreprocessings4<<endl;

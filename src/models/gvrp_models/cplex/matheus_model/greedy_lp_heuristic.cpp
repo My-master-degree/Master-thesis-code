@@ -35,7 +35,7 @@ void Greedy_lp_heuristic::main() {
     //node callback
     Depth const* const d = (Depth *) getNodeData();
     IloInt depth = d ? d->depth : 0;
-    if (depth > matheus_model.levelGreedyLPHeuristic) 
+    if (depth > 10 && depth%10 == 0) 
       return;
     //setup
     const size_t sc0 = matheus_model.c0.size(),

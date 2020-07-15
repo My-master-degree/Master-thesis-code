@@ -71,7 +71,6 @@ namespace models {
             int nPreprocessings3;
             int nPreprocessings4;
             unsigned long int nGreedyLP;
-            long int levelGreedyLPHeuristic;
             int nRoutesLB;
             double solLB;
             double psi;
@@ -90,6 +89,7 @@ namespace models {
             void setCustomParameters();
             void fillVals();
             void createGvrp_solution();
+            void endVals();
             void endVars();
         };
       }

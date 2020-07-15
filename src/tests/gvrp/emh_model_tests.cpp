@@ -30,12 +30,12 @@ void EMH_model_tests::run() {
   Mip_solution_info mipSolInfo;
     //instance list
 //  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
-  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("new/"));
+  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("new/non-consec/"));
   list<Gvrp_instance> gvrp_instances;
   int i = 0;
   for (const string& instance : instances){
 //    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
-    Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/") + instance);
+    Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/non-consec/") + instance);
     gvrp_instances.push_back(gvrp_instance);
   }
     //executions

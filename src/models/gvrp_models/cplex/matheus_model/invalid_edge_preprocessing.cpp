@@ -30,14 +30,15 @@ void Invalid_edge_preprocessing::add () {
     if (c1 != matheus_model.customersC0Indexes.end() && c2 != matheus_model.customersC0Indexes.end()) 
       matheus_model.model.add(matheus_model.x[c1->second][c2->second] == 0);
     //first is afs and second is customer
-    else if (f1 != matheus_model.afssF0Indexes.end() && c2 != matheus_model.customersC0Indexes.end()) 
+    if (f1 != matheus_model.afssF0Indexes.end() && c2 != matheus_model.customersC0Indexes.end()) 
       for (size_t i = 0; i < matheus_model.c0.size(); ++i)
         matheus_model.model.add(matheus_model.y[i][f1->second][c2->second] == 0);
     //first is customer and second is afs 
-    else if (c1 != matheus_model.customersC0Indexes.end() && f2 != matheus_model.afssF0Indexes.end()) 
+    if (c1 != matheus_model.customersC0Indexes.end() && f2 != matheus_model.afssF0Indexes.end()) 
       for (size_t i = 0; i < matheus_model.c0.size(); ++i)
-        matheus_model.model.add(matheus_model.y[i][f2->second][c1->second] == 0);
-    else 
+        matheus_model.model.add(matheus_model.y[c1->second][f2->second][i] == 0);
+    //first is customer and second is afs 
+    if (f1 != matheus_model.afssF0Indexes.end() && f2 != matheus_model.afssF0Indexes.end()) 
       for (size_t i_ = 0; i_ < matheus_model.c0.size(); ++i_)
         for (size_t j_ = 0; j_ < matheus_model.c0.size(); ++j_)
           for (size_t k = 0; k < matheus_model.c0.size(); ++k)

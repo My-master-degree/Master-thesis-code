@@ -3,6 +3,7 @@
 #include "models/gvrp_models/gvrp_solution.hpp"
 #include "models/gvrp_models/gvrp_feasible_solution_heuristic.hpp"
 #include "models/gvrp_models/cplex/lh_model/lh_model.hpp"
+#include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing.hpp"
 #include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing_C4_C5.hpp"
 #include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing_C6.hpp"
 #include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing_C7.hpp"
@@ -28,12 +29,12 @@ void LH_model_tests::run() {
   Mip_solution_info mipSolInfo;
     //instance list
 //  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("EMH/"));
-  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("new/"));
+  list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("new/non-consec/"));
   list<Gvrp_instance> gvrp_instances;
   int i = 0;
   for (const string& instance : instances){
 //    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
-    Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/") + instance);
+    Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/non-consec/") + instance);
     gvrp_instances.push_back(gvrp_instance);
   }
     //executions
@@ -46,6 +47,7 @@ void LH_model_tests::run() {
   for (const string& instance : instances) {
     cout<<instance<<endl;
     LH_model lh_model (*gvrp_instance, execution_time);  
+    lh_model.preprocessings.push_back(new Invalid_edge_preprocessing(lh_model));
     lh_model.preprocessings.push_back(new Invalid_edge_preprocessing_C4_C5(lh_model));
     lh_model.preprocessings.push_back(new Invalid_edge_preprocessing_C6(lh_model));
     lh_model.preprocessings.push_back(new Invalid_edge_preprocessing_C7(lh_model));

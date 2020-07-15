@@ -54,6 +54,7 @@ namespace models {
             void setCustomParameters();
             void fillX_vals();
             void createGvrp_solution();
+            void endVals();
             void endVars();
         };
       }

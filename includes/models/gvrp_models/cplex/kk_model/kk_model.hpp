@@ -66,6 +66,7 @@ namespace models {
             void setCustomParameters();
             void fillVals();
             void createGvrp_solution();
+            void endVals();
             void endVars();
         };
       }

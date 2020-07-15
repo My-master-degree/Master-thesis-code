@@ -35,29 +35,35 @@ int main (int argc, char **argv)
     }
   //experiments
   /*
-  //cubic model
-  Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);
-  cubic_model_tests.run();
     //instance generation model
   Model_tests model_tests (VERBOSE, execution_time, nIntSol);
   model_tests.run();
     //local searchs
   Local_searchs_tests local_searchs_tests;
   local_searchs_tests.run();
+  //cubic model
+  cout<<"============    CUBIC MODEL    =============="<<endl;
+  Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);
+  cubic_model_tests.run();
   */
     //EMH model
+  cout<<"============    EMH MODEL    =============="<<endl;
   EMH_model_tests emh_model_tests (VERBOSE, execution_time, nIntSol);
   emh_model_tests.run();
+  cout<<"============    KK MODEL    =============="<<endl;
     //KK model
   KK_model_tests kk_model_tests (VERBOSE, execution_time, nIntSol);
   kk_model_tests.run();
     //LH model
+  cout<<"============    LH MODEL    =============="<<endl;
   LH_model_tests lh_model_tests (VERBOSE, execution_time, nIntSol);
   lh_model_tests.run();
     //Matheus model
+  cout<<"============    MATHEUS MODEL    =============="<<endl;
   Matheus_model_tests matheus_model_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_tests.run();
     //Matheus model 2
+  cout<<"============    MATHEUS 2 MODEL    =============="<<endl;
   Matheus_model_2_tests matheus_model_2_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_2_tests.run();
   /*

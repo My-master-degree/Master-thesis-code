@@ -68,20 +68,20 @@ pair<Gvrp_solution, Mip_solution_info> EMH_model::run(){
   stringstream output_exception;
   Mip_solution_info mipSolInfo;
   try {
-    cout<<"Creating variables"<<endl;
+//    cout<<"Creating variables"<<endl;
     createVariables();
-    cout<<"Creating objective function"<<endl;
+//    cout<<"Creating objective function"<<endl;
     createObjectiveFunction();
-    cout<<"Creating model"<<endl;
+//    cout<<"Creating model"<<endl;
     createModel();
-    cout<<"Setting parameters"<<endl;
+//    cout<<"Setting parameters"<<endl;
     setCustomParameters();
-    cout<<"Solving model"<<endl;
+//    cout<<"Solving model"<<endl;
     struct timespec start, finish;
     double elapsed;
     clock_gettime(CLOCK_MONOTONIC, &start);
     if ( !cplex.solve() ) {
-      env.error() << "Failed to optimize LP." << endl;
+//      env.error() << "Failed to optimize LP." << endl;
       mipSolInfo = Mip_solution_info(-1, cplex.getStatus(), -1, -1);
       endVars();
       throw mipSolInfo;
@@ -89,11 +89,12 @@ pair<Gvrp_solution, Mip_solution_info> EMH_model::run(){
     clock_gettime(CLOCK_MONOTONIC, &finish);
     elapsed = (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 //    cplex.exportModel("cplexcpp.lp");
-    env.out() << "Solution value = " << cplex.getObjValue() << endl;
-    cout<<"Getting x values"<<endl;
+//    env.out() << "Solution value = " << cplex.getObjValue() << endl;
+//    cout<<"Getting x values"<<endl;
     fillX_vals();
-    cout<<"Creating GVRP solution"<<endl;
+//    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
+    endVals();
     mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
     endVars();
     return make_pair(*solution, mipSolInfo);
@@ -333,6 +334,12 @@ void EMH_model::setCustomParameters(){
   try{
     setParameters();
     cplex.setParam(IloCplex::Param::Simplex::Tolerances::Optimality, 1e-3);
+    //for the user cut callback
+    cplex.setParam(IloCplex::Param::Preprocessing::Linear, 0);
+    //for the lazy constraint callback, although this formulation does not make use of lazy constraints, (this parameter is being defined to standarize the experiments (since the cubic formulations makes use of lazy constraints)
+    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 2);
+    //this parameter is being defined to standarize the experiments (since the cubic formulations makes use of lazy constraints)
+    cplex.setParam(IloCplex::Param::Threads, 1);
   } catch (IloException& e) {
     throw e;
   } catch (...) {
@@ -391,6 +398,12 @@ void EMH_model::createGvrp_solution(){
   } catch (...) {
     throw string("Error in getting routes");
   }
+}
+
+void EMH_model::endVals(){
+  for (const pair<int, const Vertex *>& p : all) 
+    x[p.first].end();
+  x.end();
 }
 
 void EMH_model::endVars(){

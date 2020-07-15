@@ -20,12 +20,13 @@ using namespace models::gvrp_models::cplex::lh_model;
 
 using namespace std;
 
-LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0) {
+LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nPreprocessings0(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //c_0
   c0 = vector<const Vertex *> (instance.customers.size() + 1);
   c0[0] = &instance.depot;
+  customersC0Indexes[instance.depot.id] = 0;
   int i = 0;
   for (const Vertex& customer : instance.customers) {
     c0[i + 1] = &customer;
@@ -101,6 +102,7 @@ pair<Gvrp_solution, Mip_solution_info> LH_model::run(){
     fillVals();
 //    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
+    endVals ();
     mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
     endVars();
 //    env.end();
@@ -474,6 +476,69 @@ void LH_model::createModel() {
         constraintName.str("");
       }
     }
+
+
+
+
+
+    /*
+    vector<vector<int>> routes_ = {
+      {0, 1, 10, 2, 7, 13, 9, 7, 19, 0},
+      {0, 6, 7, 5, 16, 7, 14, 7, 0},
+      {0, 17, 8, 3, 10, 12, 15, 11, 4, 0}
+    };
+    list<list<Vertex>> routes;
+    for (const vector<int>& route_ : routes_) {
+      list<Vertex> route;
+      for (int node : route_) 
+        if (customersC0Indexes.count(node))
+          route.push_back(Vertex(*c0[customersC0Indexes[node]]));
+        else if (afssF0Indexes.count(node))
+          route.push_back(Vertex(*f0[afssF0Indexes[node]]));
+      routes.push_back(route);
+    }
+    double currFuel, 
+           currTime;
+    for (const list<Vertex>& route : routes) {
+      currFuel = instance.vehicleFuelCapacity;
+      currTime = 0.0;
+      list<Vertex>::const_iterator curr = route.begin(), 
+        prev = curr;
+      for (++curr; curr != route.end(); prev = curr, ++curr) {
+        auto currIndex = customersC0Indexes.find(curr->id);
+        int i = customersC0Indexes[prev->id];
+        //is a customer
+        if (currIndex != customersC0Indexes.end()) {
+          int j = currIndex->second;
+          model.add(x[i][j] == 1);
+          model.add(u[i][j] == currTime);
+          if (i > 0 && j > 0) 
+            model.add(a[i - 1][j - 1] == currFuel - customersFuel(i, j));
+          else if (i > 0) 
+            model.add(v[i - 1][0] == currFuel);
+          currFuel -= customersFuel(i, j);
+          currTime += time(i, j);
+        } else {
+          //is an afs 
+          int f = afssF0Indexes[curr->id];
+          ++curr;
+          int j = customersC0Indexes[curr->id];
+          model.add(y[i][f][j] == 1);
+          model.add(u[i][j] == currTime);
+          if (i > 0) 
+            model.add(v[i - 1][f] == currFuel);
+          currTime += time(i, f, j);
+          currFuel = instance.vehicleFuelCapacity - afsToCustomerFuel(f, j);
+        }
+      }
+    }
+    */
+
+
+
+
+
+
     //init
     cplex = IloCplex(model);
     //extra steps
@@ -492,6 +557,12 @@ void LH_model::extraStepsAfterModelCreation() {
 void LH_model::setCustomParameters(){
   try{
     setParameters();
+    //for the user cut callback
+    cplex.setParam(IloCplex::Param::Preprocessing::Linear, 0);
+    //for the lazy constraint callback, although this formulation does not make use of lazy constraints, (this parameter is being defined to standarize the experiments (since the cubic formulations makes use of lazy constraints)
+    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 2);
+    //this parameter is being defined to standarize the experiments (since the cubic formulations makes use of lazy constraints)
+    cplex.setParam(IloCplex::Param::Threads, 1);
   } catch (IloException& e) {
     throw e;
   } catch (...) {
@@ -639,6 +710,18 @@ void LH_model::createGvrp_solution(){
   } catch (...) {
     throw string("Error in getting routes");
   }
+}
+
+void LH_model::endVals () {
+  //end vals
+  for (size_t i = 0; i < c0.size(); ++i) {
+    for (size_t f = 0; f < f0.size(); ++f)
+      y_vals[i][f].end();
+    y_vals[i].end();
+    x_vals[i].end();
+  }
+  y_vals.end();
+  x_vals.end();
 }
 
 void LH_model::endVars(){

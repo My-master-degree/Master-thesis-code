@@ -425,9 +425,11 @@ list<pair<int, int>> utils::get_invalid_edges_1 (const Gvrp_instance& gvrp_insta
     throw string("The preprocessing 'Invalid edge preprocessing 1' only applies for metric instances");
   list<pair<int, int>> edges;
   for (size_t i = 0; i < gvrp_instance.distances.size(); i++)
-    for (size_t j = 0; j < gvrp_instance.distances.size(); j++)
-      if (gvrp_instance.distances[i][j] * gvrp_instance.vehicleFuelConsumptionRate > gvrp_instance.vehicleFuelCapacity || gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed > gvrp_instance.timeLimit)
+    for (size_t j = 0; j < gvrp_instance.distances.size(); j++) {
+      if (gvrp_instance.distances[i][j] * gvrp_instance.vehicleFuelConsumptionRate > gvrp_instance.vehicleFuelCapacity || gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed > gvrp_instance.timeLimit) {
         edges.push_back(make_pair(i, j));
+      }
+    }
   return edges;
 }
 
