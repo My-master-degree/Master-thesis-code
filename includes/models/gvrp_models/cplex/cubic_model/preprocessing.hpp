@@ -11,6 +11,7 @@ namespace models {
             Cubic_model& cubic_model;
           public:
             explicit Preprocessing (Cubic_model& cubic_model);
+            virtual ~Preprocessing ();
             virtual void add () = 0;
         };
       }

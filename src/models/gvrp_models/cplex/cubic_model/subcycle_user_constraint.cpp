@@ -1,3 +1,5 @@
+#include "utils/util.hpp"
+#include "models/dsu.hpp"
 #include "models/vertex.hpp"
 #include "models/gvrp_models/cplex/cubic_model/cubic_model.hpp"
 #include "models/gvrp_models/cplex/cubic_model/user_constraint.hpp"
@@ -8,20 +10,17 @@
 #include <queue>
 #include <list>
 #include <ilcplex/ilocplex.h>
-/*
 #include <lemon/gomory_hu.h>
 #include <lemon/concepts/graph.h>
 #include <lemon/list_graph.h>
-*/
 
 using namespace std;
+using namespace utils;
 using namespace models;
 using namespace models::cplex;
 using namespace models::gvrp_models::cplex::cubic_model;
-/*
 using namespace lemon;
 using namespace lemon::concepts;
-*/
 
 Subcycle_user_constraint::Subcycle_user_constraint (Cubic_model& cubic_model_) : User_constraint (cubic_model_) {}
 
@@ -32,117 +31,130 @@ IloCplex::CallbackI* Subcycle_user_constraint::duplicateCallback() const {
 void Subcycle_user_constraint::main() {
   Depth const* const d = (Depth *)getNodeData();
   IloInt depth = d ? d->depth : 0;
-  if (depth > 0) {
+  if (depth > cubic_model.levelSubcycleCallback) {
     abortCutLoop();
     return;
   }
-  int depot = cubic_model.instance.depot.id,
-      i,
-      k;
-//  int j;
+  const size_t sall = cubic_model.instance.distances.size();
+  DSU dsu (sall);
+  ListGraph graph;
+  ListGraph::EdgeMap<double>  weight(graph); 
   IloEnv env = getEnv();
   IloExpr lhs(env);
-//  vector<ListGraph::Node> nodes (all.size());
+  unordered_set<int> component;
+  list<unordered_set<int>> components;
+  unordered_multimap<int, int> subcomponents (sall);
+  vector<ListGraph::Node> nodes (sall);
+  int depot = cubic_model.instance.depot.id;
+  size_t k;
   //get values
   Matrix3DVal x_vals (env, cubic_model.instance.maxRoutes);
   for (k = 0; k < cubic_model.instance.maxRoutes; k++) {
-    x_vals[k] = IloArray<IloNumArray> (env, cubic_model.all.size());
+    x_vals[k] = IloArray<IloNumArray> (env, sall);
     for (const pair<int, const Vertex *>& p : cubic_model.all) {
-      i = p.first;
-      x_vals[k][i] = IloNumArray (env, cubic_model.all.size(), 0, 1, IloNumVar::Float);
+      int i = p.first;
+      x_vals[k][i] = IloNumArray (env, sall, 0, 1, IloNumVar::Float);
       getValues(x_vals[k][i], cubic_model.x[k][i]);
     }
   }
+  //build graph
+  //creating nodes
+  for (const pair<int, const Vertex *>& p : cubic_model.all) 
+    nodes[p.first] = graph.addNode();
+  //creating edges
+  for (const pair<int, const Vertex *>& p : cubic_model.all) {
+    int i = p.first;
+    for (const pair<int, const Vertex *>& p1 : cubic_model.all) {
+      int j = p1.first;
+      double cost = 0.0;
+      for (k = 0; k < cubic_model.instance.maxRoutes; k++) 
+        if (x_vals[k][i][j] > EPS)
+          cost += x_vals[k][i][j];
+      weight[graph.addEdge(nodes[i], nodes[j])] = cost;
+    }
+  }
+  //gomory hu
+  GomoryHu<ListGraph, ListGraph::EdgeMap<double>> gh (graph, weight);
+  gh.run();
   //get subcycles
-  for (k = 0; k < cubic_model.instance.maxRoutes; k++) {
-    /*
-    //gomory hu
-    ListGraph graph;
-    ListGraph::EdgeMap<double>  weight(graph); 
-    //creating nodes
-    for (const pair<int, Vertex>& p : cubic_model.all) 
-      nodes[p.first] = graph.addNode();
-    //creating edges
-    for (const pair<int, Vertex>& p : cubic_model.all) {
-      i = p.first;
-      for (const pair<int, Vertex>& p1 : cubic_model.all) {
-        j = p1.first;
-        weight[graph.addEdge(nodes[i], nodes[j])] = x_vals[k][i][j];
-      }
+  for (const pair<int, const Vertex *>& p : cubic_model.all) {
+    int i = p.first;
+    for (const pair<int, const Vertex *>& p1 : cubic_model.all) {
+      int j = p1.first;
+      if (gh.minCutValue(nodes[i], nodes[j]) >= 2.0) 
+        dsu.join(i, j);
     }
-    GomoryHu<ListGraph, ListGraph::EdgeMap<double> > gh (graph, weight);
-    gh.run();
-    //get subcycles
-    for (int i : cubic_model.customers) {
-    if (gh.minCutValue(nodes[i], nodes[0]) < 2.0) {
-
-    }
-    }
-    */
-    //bfs to remove all edges connected to the depot
-    queue<int> q;
-    q.push(depot);
-    while (!q.empty()) {
-      int curr = q.front();
-      q.pop();
-      for (const pair<int, const Vertex *>& p : cubic_model.all)
-        if (x_vals[k][curr][p.first] > EPS){
-          x_vals[k][curr][p.first] = 0.0;
-          q.push(p.first);
-        }        
-    }
-    //bfs to remove all edges not connected to the depot
-    for (const Vertex& customer : cubic_model.instance.customers) {
-      set<int> component, customersComponent;
-      //checking for neighboring
-      bool hasNeighboring = false;
-      for (const pair<int, const Vertex *>& p : cubic_model.all)
-        if (x_vals[k][customer.id][p.first] > EPS){
-          hasNeighboring = true;
-          break; 
-        }
-      //checking if bfs is needed
-      if (!hasNeighboring)
+  }
+  //get subcycles
+  //get subcomponents
+  for (size_t i = 0; i < sall; ++i) 
+    subcomponents.insert(make_pair(dsu.findSet(i), i));
+  //store components
+  unordered_multimap<int, int>::iterator it = subcomponents.begin();
+  int j = it->first;
+  for (; it != subcomponents.end(); ++it) {
+    if (it->first != j) {
+      j = it->first;
+      components.push_back(component);
+      component.clear();
+    } 
+    component.insert(it->second);
+  }
+  components.push_back(component);
+  //end of multimap 
+  //inequalitites
+  for (const unordered_set<int>& S : components) 
+    if (!S.count(depot)) {
+      //get customers from component S
+      list<int> customersComponent;
+      for (int customer : cubic_model.customers)
+        if (S.count(customer))
+          customersComponent.push_back(customer);
+      if (customersComponent.size() == 0)
         continue;
-      q.push(customer.id);
-      while (!q.empty()) {
-        int curr = q.front();
-        q.pop();
-        component.insert(curr);
-        //if it is a customer
-        if (cubic_model.customers.count(curr))
-          customersComponent.insert(curr);
-        for (const pair<int, const Vertex *>& p : cubic_model.all)
-          if (x_vals[k][curr][p.first] > EPS){
-            x_vals[k][curr][p.first] = 0.0;
-            q.push(p.first);
-          }
+      size_t i = 1;
+      vector<const Vertex *> vertices (customersComponent.size() + 1);
+      vertices[0] = &cubic_model.instance.depot;
+      for (int customer : customersComponent) {
+        vertices[i] = cubic_model.all[customer];
+        ++i;
       }
-      for (int customer_ : customersComponent) {
-        //getting lhs
+      //get n routes lbs
+      const auto& closestsTimes = calculateClosestsGVRPCustomers(cubic_model.gvrpReducedGraphTimes, vertices);
+      //get mst
+      int improvedMSTNRoutesLB = int(ceil(calculateGvrpLBByImprovedMSTTime(vertices, closestsTimes, cubic_model.gvrpReducedGraphTimes)/cubic_model.instance.timeLimit));
+      //bin packing
+      int bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(cubic_model.instance, vertices, closestsTimes, cubic_model.BPPTimeLimit);
+      int maxNRoutes = max(improvedMSTNRoutesLB, bppNRoutesLB);
+      if (improvedMSTNRoutesLB == maxNRoutes) 
+        ++cubic_model.nImprovedMSTNRoutesLB;
+      if (bppNRoutesLB == maxNRoutes) 
+        ++cubic_model.nBPPNRoutesLB;
+      //getting lhs
+      for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
         for (const pair<int, const Vertex *>& p2 : cubic_model.all) {
           int a = p2.first;
-          if (!component.count(a))
-            for (int b : component) 
+          if (!S.count(a))
+            for (int b : S) 
               lhs += cubic_model.x[k][a][b];
         }
-        //getting rhs
-        for (int b : component)
-          lhs -= cubic_model.x[k][b][customer_];
-        try {
-          add(lhs >= 0.0).end();
-        } catch(IloException& e) {
-          cerr << "Exception while adding lazy constraint" << e.getMessage() << "\n";
-          throw;
-        }
-        lhs.end();
-        lhs = IloExpr(env);
-      } 
+      }
+      //getting rhs
+      lhs -= maxNRoutes;
+      try {
+        add(lhs >= 0.0).end();
+      } catch(IloException& e) {
+        cerr << "Exception while adding lazy constraint" << e.getMessage() << "\n";
+        throw;
+      }
+      lhs.end();
+      lhs = IloExpr(env);
     }
+  //end vars
+  for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k)
     for (const pair<int, const Vertex *>& p : cubic_model.all){
       int i = p.first;
       x_vals[k][i].end();
     }
-  }
   x_vals.end();
 }

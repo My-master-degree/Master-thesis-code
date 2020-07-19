@@ -41,11 +41,12 @@ int main (int argc, char **argv)
     //local searchs
   Local_searchs_tests local_searchs_tests;
   local_searchs_tests.run();
+  */
   //cubic model
   cout<<"============    CUBIC MODEL    =============="<<endl;
   Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);
   cubic_model_tests.run();
-  */
+  /*
     //EMH model
   cout<<"============    EMH MODEL    =============="<<endl;
   EMH_model_tests emh_model_tests (VERBOSE, execution_time, nIntSol);
@@ -66,7 +67,6 @@ int main (int argc, char **argv)
   cout<<"============    MATHEUS 2 MODEL    =============="<<endl;
   Matheus_model_2_tests matheus_model_2_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_2_tests.run();
-  /*
     //BBP model
   BPP_model_tests bpp_model_tests (VERBOSE, execution_time, nIntSol);
   bpp_model_tests.run();

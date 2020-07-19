@@ -12,6 +12,7 @@ Invalid_edge_preprocessing::Invalid_edge_preprocessing (Cubic_model& cubic_model
 
 void Invalid_edge_preprocessing::add () {
   list<pair<int, int>> edges = get_invalid_edges_1(cubic_model.instance);
+  cubic_model.nPreprocessings1 = edges.size();
   for (auto const& [i, j] : edges)
     for (int k = 0; k < cubic_model.instance.maxRoutes; k++)
       cubic_model.model.add(cubic_model.x[k][i][j] == 0);

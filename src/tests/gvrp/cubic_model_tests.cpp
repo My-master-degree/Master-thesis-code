@@ -5,20 +5,11 @@
 #include "models/cplex/mip_solution_info.hpp"
 #include "models/gvrp_models/cplex/cubic_model/cubic_model.hpp"
 #include "models/gvrp_models/cplex/cubic_model/mip_start.hpp"
-#include "models/gvrp_models/cplex/cubic_model/improved_cubic_model.hpp"
 #include "models/gvrp_models/cplex/cubic_model/subcycle_user_constraint.hpp"
 #include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing.hpp"
 #include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing_2.hpp"
 #include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing_3.hpp"
 #include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing_4.hpp"
-#include "models/gvrp_models/cplex/cubic_model/no_consecutive_afs_visit_preprocessing.hpp"
-#include "models/gvrp_models/cplex/cubic_model/max_afs_visit_constraint.hpp"
-#include "models/gvrp_models/cplex/cubic_model/max_distance_route_constraint.hpp"
-#include "models/gvrp_models/cplex/cubic_model/min_distance_route_constraint.hpp"
-#include "models/gvrp_models/cplex/cubic_model/energy_lb_constraint.hpp"
-#include "models/gvrp_models/cplex/cubic_model/energy_ub_constraint.hpp"
-#include "models/gvrp_models/cplex/cubic_model/energy_lifting_constraint.hpp"
-#include "models/gvrp_models/cplex/cubic_model/routes_order_constraint.hpp"
 #include "utils/util.hpp"
 #include "SampleConfig.h"
 
@@ -60,6 +51,7 @@ void Cubic_model_tests::run() {
   openResultFile(resultsFile, solution_name);
   i = 0;
   for (const string& instance : instances) {
+    cout<<instance<<endl;
     Cubic_model cubic_model (*gvrp_instance, execution_time);  
     //keep this line, for some strange bug it is necessary to define the time limit explicitly 
     cubic_model.time_limit = execution_time;
@@ -67,7 +59,6 @@ void Cubic_model_tests::run() {
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
     i++;
-    break;
   }
   closeResultFile(resultsFile);
 }

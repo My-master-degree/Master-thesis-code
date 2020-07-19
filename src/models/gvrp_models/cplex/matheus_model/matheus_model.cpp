@@ -61,10 +61,7 @@ Matheus_model::Matheus_model(const Gvrp_instance& instance, unsigned int time_li
   gvrpReducedGraphTimes = gvrpReducedGraphs.second;
   //set sol lb
   const auto& closestsDistances = calculateClosestsGVRPCustomers(gvrpReducedGraphDistances, c0);
-  double lb1 = 0.0;
-  for (size_t i = 0; i < c0.size(); ++i)
-    lb1 += (closestsDistances[i].first + closestsDistances[i].second)/2.0;
-  solLB = max(calculateGvrpLBByImprovedMST(c0, closestsDistances, gvrpReducedGraphDistances), lb1);
+  solLB = max(calculateGvrpLBByImprovedMST(c0, closestsDistances, gvrpReducedGraphDistances), calculateGvrpLB1(closestsDistances));
   //set n routes lb
   const auto& closestsTimes = calculateClosestsGVRPCustomers(gvrpReducedGraphTimes, c0);
   nRoutesLB = max(int(ceil(calculateGvrpLBByImprovedMSTTime(c0, closestsTimes, gvrpReducedGraphTimes)/instance.timeLimit)), calculateGVRP_BPP_NRoutesLB(instance, c0, closestsTimes, 1000000));

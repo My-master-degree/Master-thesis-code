@@ -11,10 +11,11 @@
 #include "models/gvrp_models/cplex/cubic_model/user_constraint.hpp"
 #include "models/gvrp_models/cplex/cubic_model/preprocessing.hpp"
 #include "models/gvrp_models/cplex/cubic_model/extra_constraint.hpp"
+#include "models/gvrp_models/cplex/cubic_model/heuristic_callback.hpp"
 
-#include <map>
+#include <unordered_map>
+#include <unordered_set>
 #include <list>
-#include <set>
 #include <ilcplex/ilocplex.h>
 
 ILOSTLBEGIN
@@ -39,14 +40,29 @@ namespace models {
             ~Cubic_model(); 
             pair<Gvrp_solution, Mip_solution_info> run();
             IDVertex all;
+            unordered_set<int> afss;
             Matrix3DVar x;
             IloNumVarArray e;
             list<Lazy_constraint*> lazy_constraints;
             list<User_constraint*> user_constraints;
             list<Preprocessing*> preprocessings;
             list<Extra_constraint*> extra_constraints;
-          protected:
+            list<Heuristic_callback*> heuristic_callbacks;
+            vector<vector<double>> gvrpReducedGraphTimes;
+            unordered_map<int,double> customersMinRequiredFuel;
+            unsigned long int nGreedyLP;
+            unsigned int BPPTimeLimit;
+            long int levelSubcycleCallback;
+            int nPreprocessings1;
+            int nPreprocessings2;
+            int nPreprocessings3;
+            int nPreprocessings4;
+            int nImprovedMSTNRoutesLB;
+            int nBPPNRoutesLB;
+            int nRoutesLB;
+            double solLB;
             Matrix3DVal x_vals;
+          protected:
             void createVariables();
             void createObjectiveFunction();
             void createModel();

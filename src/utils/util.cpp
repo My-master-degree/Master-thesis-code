@@ -132,6 +132,8 @@ vector<pair<double, double>> utils::calculateClosestsGVRPCustomers (const vector
         } else if (closest[i].second > cost) 
           closest[i].second = cost;
       }
+    if (closest[i].second == DBL_MAX)
+      closest[i].second = closest[i].first;
   } 
   return closest;
 }
@@ -532,8 +534,14 @@ list<pair<int, int>> utils::get_invalid_edges_4 (const Gvrp_instance& gvrp_insta
   return edges;
 }
 
-//reading
+double utils::calculateGvrpLB1 (const vector<pair<double, double>>& closestsDistances) {
+  double lb = 0.0;
+  for (size_t i = 0; i < closestsDistances.size(); ++i)
+    lb += (closestsDistances[i].first + closestsDistances[i].second)/2.0;
+  return lb;
+}
 
+//reading
 Gvrp_instance utils::matheus_instance_reader(const string& file_path){
   string line, token;
   ifstream inFile;

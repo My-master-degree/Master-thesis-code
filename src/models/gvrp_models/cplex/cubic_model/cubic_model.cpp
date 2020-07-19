@@ -1,3 +1,4 @@
+#include "utils/util.hpp"
 #include "models/vertex.hpp"
 #include "models/cplex/mip_solution_info.hpp"
 #include "models/cplex/depth_node_callback.hpp"
@@ -7,7 +8,13 @@
 #include "models/gvrp_models/gvrp_afs_tree.hpp"
 #include "models/gvrp_models/cplex/gvrp_model.hpp"
 #include "models/gvrp_models/cplex/cubic_model/cubic_model.hpp"
+#include "models/gvrp_models/cplex/cubic_model/greedy_lp_heuristic.hpp"
 #include "models/gvrp_models/cplex/cubic_model/subcycle_lazy_constraint.hpp"
+#include "models/gvrp_models/cplex/cubic_model/subcycle_user_constraint.hpp"
+#include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing.hpp"
+#include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing_2.hpp"
+#include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing_3.hpp"
+#include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing_4.hpp"
 #include "models/gvrp_models/cplex/cubic_model/lazy_constraint.hpp"
 #include "models/gvrp_models/cplex/cubic_model/user_constraint.hpp"
 #include "models/gvrp_models/cplex/cubic_model/extra_constraint.hpp"
@@ -26,12 +33,13 @@
 ILOSTLBEGIN
 
 using namespace std;
+using namespace utils;
 using namespace models;
 using namespace models::gvrp_models;
 using namespace models::gvrp_models::cplex;
 using namespace models::gvrp_models::cplex::cubic_model;
 
-Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit): Gvrp_model(instance, time_limit) {
+Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit): Gvrp_model(instance, time_limit), afss(unordered_set<int> (instance.afss.size())), nGreedyLP(0), BPPTimeLimit(100000000), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0)  {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
   //fill all and customers
@@ -39,11 +47,43 @@ Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit
     all[customer.id] = &customer;
     customers.insert(customer.id);
   }
-  for (const Vertex& afs : instance.afss) 
+  for (const Vertex& afs : instance.afss) {
     all[afs.id] = &afs;
+    afss.insert(afs.id);
+  }
   all[instance.depot.id] = &instance.depot;
+  //reductions
+  const auto& gvrpReducedGraphs = calculateGVRPReducedGraphs (instance, *gvrp_afs_tree);
+  vector<vector<double>> gvrpReducedGraphDistances = gvrpReducedGraphs.first;
+  gvrpReducedGraphTimes = gvrpReducedGraphs.second;
+  //set sol lb
+  vector<const Vertex *> c0 (instance.customers.size() + 1);
+  c0[0] = &instance.depot;
+  size_t i = 1;
+  for (const Vertex& customer : instance.customers) {
+    c0[i] = &customer;
+    ++i;
+  }
+  const auto& closestsDistances = calculateClosestsGVRPCustomers(gvrpReducedGraphDistances, c0);
+  solLB = max(calculateGvrpLBByImprovedMST(c0, closestsDistances, gvrpReducedGraphDistances), calculateGvrpLB1(closestsDistances));
+  //set n routes lb
+  const auto& closestsTimes = calculateClosestsGVRPCustomers(gvrpReducedGraphTimes, c0);
+  nRoutesLB = max(int(ceil(calculateGvrpLBByImprovedMSTTime(c0, closestsTimes, gvrpReducedGraphTimes)/instance.timeLimit)), calculateGVRP_BPP_NRoutesLB(instance, c0, closestsTimes, 1000000));
+  //customer min required fuel
+  customersMinRequiredFuel = unordered_map<int, double> (c0.size() - 1);
+  for (const Vertex& customer : instance.customers) 
+    customersMinRequiredFuel[customer.id] = calculateCustomerMinRequiredFuel(instance, *gvrp_afs_tree, customer);
   //lazies
   lazy_constraints.push_back(new Subcycle_lazy_constraint(*this));
+  //user cuts
+  user_constraints.push_back(new Subcycle_user_constraint(*this));
+  //preprocessings
+  preprocessings.push_back(new Invalid_edge_preprocessing(*this));
+  preprocessings.push_back(new Invalid_edge_preprocessing_2(*this));
+  preprocessings.push_back(new Invalid_edge_preprocessing_3(*this));
+  preprocessings.push_back(new Invalid_edge_preprocessing_4(*this));
+  //heuristic callbacks
+  heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
 }
 
 Cubic_model::~Cubic_model() {
@@ -51,6 +91,10 @@ Cubic_model::~Cubic_model() {
     delete lazy_constraint;
   for (User_constraint * user_constraint : user_constraints)
     delete user_constraint;
+  for (Preprocessing * preprocessing : preprocessings)
+    delete preprocessing;
+  for (Extra_constraint * extra_constraint : extra_constraints)
+    delete extra_constraint;
 }
 
 pair<Gvrp_solution, Mip_solution_info> Cubic_model::run(){
@@ -103,11 +147,10 @@ void Cubic_model::createVariables(){
   try {
     //setting names
     stringstream nameStream;
-    for (const pair<int, const Vertex *>& p : all){
-      int i = p.first;
-      nameStream<<"e["<<i<<"]";
+    for (int customer : customers){
+      nameStream<<"e["<<customer<<"]";
       const string name = nameStream.str();
-      e[i].setName(name.c_str());
+      e[customer].setName(name.c_str());
       nameStream.clear();
       nameStream.str("");
     }
@@ -180,12 +223,15 @@ void Cubic_model::createModel() {
           expr1 += x[k][j][i];
         }
         c = IloConstraint (expr == expr1);
-        c.setName("#entering edges == #exiting edges");
+        constraintName<<"#entering edges == #exiting edges in "<<i<<" in route "<<k;
+        c.setName(constraintName.str().c_str());
         model.add(c);
         expr1.end();
         expr.end();
         expr = IloExpr(env);
         expr1 = IloExpr(env);
+        constraintName.clear();
+        constraintName.str("");
       }    
     //\sum_{v_i \in V} x_{0i}^k \leqslant 1, \forall k in M
     for (int k = 0; k < instance.maxRoutes; k++){
@@ -194,25 +240,32 @@ void Cubic_model::createModel() {
         expr += x[k][depot][i];
       }
       c = IloConstraint (expr <= 1);
-      c.setName("route must be used at most once");
+      constraintName<<"route "<<k<<" must be used at most once";
+      c.setName(constraintName.str().c_str());
       model.add(c);
       expr.end();
       expr = IloExpr(env);
+      constraintName.clear();
+      constraintName.str("");
     }
     //\sum_{k \in M} \sum_{v_j \in V} x_{ij}^{k} = 1, \forall v_i \in C
-    for (Vertex customer :instance.customers){
+    for (const Vertex& customer :instance.customers){
       int i = customer.id;
       for (int k = 0; k < instance.maxRoutes; k++){
         for (const pair<int, const Vertex *>& p1 : all){
           int j = p1.first;
-          expr += x[k][i][j];
+          if (i != j) 
+            expr += x[k][i][j];
         }
       }
       c = IloConstraint (expr == 1);
-      c.setName("customer must be visited exactly once");
+      constraintName<<"customer "<<i<<" must be visited exactly once";
+      c.setName(constraintName.str().c_str());
       model.add(c);
       expr.end();
       expr = IloExpr(env);
+      constraintName.clear();
+      constraintName.str("");
     }
     //\sum_{k \in M} \sum_{v_j \in V} x_{0j}^k \leqslant m
     for (int k = 0; k < instance.maxRoutes; k++)
@@ -223,74 +276,178 @@ void Cubic_model::createModel() {
     model.add(c);
     expr.end();
     expr = IloExpr(env);
-    //e_0 = \beta
-    c = IloConstraint (e[depot] == beta);
-    c.setName("e_depot = beta");
-    model.add(c);
-    //e_f = \beta, \forall v_f \in F
-    for (Vertex afs : instance.afss)  {
-      int f = afs.id;
-      c = IloConstraint (e[f] == beta);
-      c.setName("e_f = beta");
-      model.add(c);
-    }
-    //e_j \leq e_i - c_{ij} x_{ij}^k + \beta (1 - x_{ij}^k), \forall v_j \in C,\forall v_i \in V, \forall k \in M
+    //e_j \leq e_i - c_{ij} x_{ij}^k + \beta (1 - x_{ij}^k) + e_{ji} x_{ji}^k, \forall v_j \in C,\forall v_i \in V, \forall k \in M
     for (int k = 0; k < instance.maxRoutes; k++)
-      for (Vertex customer : instance.customers) {
-        int j = customer.id;
-        for (const pair<int, const Vertex *>& p :all) {
-          int i =  p.first;
-          expr = e[i] - x[k][i][j] * instance.distances[i][j] * instance.vehicleFuelConsumptionRate + beta * (1 -  x[k][i][j]);
+      for (int i : customers) {
+        for (int j : customers) {
+          expr = e[i] - x[k][i][j] * instance.fuel(i, j) + beta * (1 - x[k][i][j]) + x[k][j][i] * instance.fuel(j, i);
           c = IloConstraint (e[j] <= expr);
-          c.setName("updating fuel level");
+          constraintName<<"e_"<<j<<" update fuel level";
+          c.setName(constraintName.str().c_str());
           model.add(c);
           expr.end();
           expr = IloExpr (env);
+          constraintName.clear();
+          constraintName.str("");
         }
       }
-    //e_i \geq c_{ij} x_{ij}^k, \forall v_i, \forall v_j \in V, \forall k \in M
+    //UB_E^i \geq e_j \leq LB_E^i, \forall v_j \in C
+    for (int j : customers) {
+      //ub
+      c = IloConstraint (e[j] <= instance.vehicleFuelCapacity - customersMinRequiredFuel[j]);
+      constraintName<<"e_"<<j<<" fuel level upper bound";
+      c.setName(constraintName.str().c_str());
+      model.add(c);
+      constraintName.clear();
+      constraintName.str("");
+      //lb
+      c = IloConstraint (e[j] >= customersMinRequiredFuel[j]);
+      constraintName<<"e_"<<j<<" fuel level lower bound";
+      c.setName(constraintName.str().c_str());
+      model.add(c);
+      constraintName.clear();
+      constraintName.str("");
+    }
+    //e_i \geq e_{ij} x_{ij}^k, \forall v_i \in C, \forall v_j \in F_0, \forall k \in M
+    for (int k = 0; k < instance.maxRoutes; k++)
+      for (int i : customers)
+        for (const pair<int, const Vertex *>& p1 : all){
+          int j = p1.first;
+          if (!customers.count(j)) {
+            expr = instance.distances[i][j] * x[k][i][j] * instance.vehicleFuelConsumptionRate;
+            c = IloConstraint (e[i] >= expr);
+            constraintName<<"e_"<<i<<" mandatory fuel to "<<j;
+            c.setName(constraintName.str().c_str());
+            model.add(c);
+            expr.end();
+            expr = IloExpr(env);
+            constraintName.clear();
+            constraintName.str("");
+          }
+        }
+    //e_i \leq e_{ji} x_{ji}^k, \forall v_i \in C, \forall v_j \in F_0, \forall k \in M
+    for (int k = 0; k < instance.maxRoutes; k++)
+      for (int i : customers)
+        for (const pair<int, const Vertex *>& p1 : all){
+          int j = p1.first;
+          if (!customers.count(j)) {
+            expr = instance.vehicleFuelCapacity - instance.distances[j][i] * x[k][j][i] * instance.vehicleFuelConsumptionRate;
+            c = IloConstraint (e[i] <= expr);
+            constraintName<<"e_"<<i<<" mandatory fuel to "<<j;
+            c.setName(constraintName.str().c_str());
+            model.add(c);
+            expr.end();
+            expr = IloExpr(env);
+            constraintName.clear();
+            constraintName.str("");
+          }
+        }
+    //x_{ij}^k c_{ij} \leq \beta, \forall v_i, \forall v_j \in V, \forall k \in M
     for (int k = 0; k < instance.maxRoutes; k++)
       for (const pair<int, const Vertex *>& p : all){
         int i = p.first;
         for (const pair<int, const Vertex *>& p1 : all){
           int j = p1.first;
           expr = instance.distances[i][j] * x[k][i][j] * instance.vehicleFuelConsumptionRate;
-          c = IloConstraint (e[i] >= expr);
-          c.setName("disabling infeasible edges");
+          c = IloConstraint (expr <= beta);
+          constraintName<<"disabling infeasible edge ("<<i<<", "<<j<<") again";
+          c.setName(constraintName.str().c_str());
           model.add(c);
           expr.end();
           expr = IloExpr(env);
+          constraintName.clear();
+          constraintName.str("");
         }
       }
-    //x_{ij}^k c_{ij} \leq \beta, \forall v_i, \forall v_j \in V, \forall k \in M
-      for (int k = 0; k < instance.maxRoutes; k++)
-        for (const pair<int, const Vertex *>& p : all){
-          int i = p.first;
-          for (const pair<int, const Vertex *>& p1 : all){
-            int j = p1.first;
-            expr = instance.distances[i][j] * x[k][i][j] * instance.vehicleFuelConsumptionRate;
-            c = IloConstraint (expr <= beta);
-            c.setName("disabling infeasible edges 2");
-            model.add(c);
-            expr.end();
-            expr = IloExpr(env);
-          }
+    //\sum_{(i, j) \in E} x_{ij}^k ((c_{ij} / S) + time(v_i) )\leq T, \forall k \in M
+    for (int k = 0; k < instance.maxRoutes; k++){
+      for (const pair<int, const Vertex *>& p : all){
+        int i = p.first;
+        for (const pair<int, const Vertex *>& p1 : all){
+          int j = p1.first;
+          expr += x[k][i][j] * (instance.time(i, j) + p.second->serviceTime);
         }
-      //\sum_{(i, j) \in E} x_{ij}^k ((c_{ij} / S) + time(v_i) )\leq T, \forall k \in M
-      for (int k = 0; k < instance.maxRoutes; k++){
-        for (const pair<int, const Vertex *>& p : all){
-          int i = p.first;
-          for (const pair<int, const Vertex *>& p1 : all){
-            int j = p1.first;
-            expr += x[k][i][j] * ((instance.distances[i][j] / instance.vehicleAverageSpeed) + p.second->serviceTime);
-          }
-        }
-        c = IloConstraint (expr <= T);
-        c.setName("time limit constraint");
-        model.add(c);
-        expr.end();
-        expr = IloExpr(env);
       }
+      c = IloConstraint (expr <= T);
+      constraintName<<"route "<<k<<" time limit constraint";
+      c.setName(constraintName.str().c_str());
+      model.add(c);
+      expr.end();
+      expr = IloExpr(env);
+      constraintName.clear();
+      constraintName.str("");
+    }
+    //route fuel lb 1
+    for (int k = 0; k < instance.maxRoutes; ++k) 
+      for (int f_ : afss)
+        for (const pair<int, const Vertex *>& p1 : all){
+          int i_ = p1.first;
+          for (const pair<int, const Vertex *>& p2 : all){
+            int i = p2.first;
+            for (int f_ : afss)
+              expr -= x[k][i][f_] * psi;
+            for (const pair<int, const Vertex *>& p3 : all){
+              int j = p3.first;
+              expr += x[k][i][j] * instance.fuel(i, j);
+            }
+          }
+          c = IloConstraint (expr >= x[k][f_][i_] * (-psi + 2 * lambda));
+          constraintName<<"route "<<k<<" fuel lb 1";
+          c.setName(constraintName.str().c_str());
+          model.add(c);
+          expr.end();
+          expr = IloExpr(env);
+          constraintName.clear();
+          constraintName.str("");
+        }
+    //route fuel lb 2
+    for (int k = 0; k < instance.maxRoutes; ++k) 
+      for (int f_ : afss)
+        for (const pair<int, const Vertex *>& p1 : all){
+          int i_ = p1.first;
+          for (const pair<int, const Vertex *>& p2 : all){
+            int i = p2.first;
+            for (int f_ : afss)
+              expr -= x[k][i][f_] * instance.vehicleFuelCapacity / 2.0;
+            for (const pair<int, const Vertex *>& p3 : all){
+              int j = p3.first;
+              expr += x[k][i][j] * instance.fuel(i, j);
+            }
+          }
+          c = IloConstraint (expr >= x[k][f_][i_] * alpha);
+          constraintName<<"route "<<k<<" fuel lb 1";
+          c.setName(constraintName.str().c_str());
+          model.add(c);
+          expr.end();
+          expr = IloExpr(env);
+          constraintName.clear();
+          constraintName.str("");
+        }
+    //n routes LB
+    for (int k = 0; k < instance.maxRoutes; ++k) 
+      for (const pair<int, const Vertex *>& p2 : all){
+        int i = p2.first;
+        expr += x[k][0][i];
+      }
+    c = IloConstraint (expr >= nRoutesLB);
+    c.setName("nRoutes LB");
+    model.add(c);
+    expr.end();
+    expr = IloExpr(env);
+    //solution lb
+    for (size_t k = 0 ; k < instance.maxRoutes; ++k)
+      for (const pair<int, const Vertex *>& p : all){
+        int i = p.first;
+        for (const pair<int, const Vertex *>& p1 : all){
+          int j = p1.first;
+          expr += x[k][i][j] * instance.distances[i][j];
+        }
+      }
+    c = IloConstraint (expr >= solLB);
+    c.setName("solution LB");
+    model.add(c);
+    expr.end();
+    expr = IloExpr(env);
     //extra constraints
     for (Extra_constraint* extra_constraint : extra_constraints) 
       extra_constraint->add();
@@ -302,6 +459,9 @@ void Cubic_model::createModel() {
     //user cuts
     for (User_constraint * user_constraint : user_constraints)
       cplex.use(user_constraint);
+    //heuristic callbacks
+    for (Heuristic_callback * heuristic_callback : heuristic_callbacks)
+      cplex.use(heuristic_callback);
     //extra steps
     extraStepsAfterModelCreation();
     //depth node callback

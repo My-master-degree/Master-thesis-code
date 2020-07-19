@@ -35,6 +35,7 @@ namespace utils {
   list<pair<int, int>> get_invalid_edges_2 (const Gvrp_instance& gvrp_instance);
   list<pair<int, int>> get_invalid_edges_3 (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree);
   list<pair<int, int>> get_invalid_edges_4 (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree);
+  double calculateGvrpLB1 (const vector<pair<double, double>>& closestsDistances);
   //reading
   Gvrp_instance matheus_instance_reader(const string& file_path);
   Vrp_instance read_uchoa_vrp_instance (const string &file_path);    

@@ -73,9 +73,6 @@ namespace models {
             unsigned long int nGreedyLP;
             int nRoutesLB;
             double solLB;
-            double psi;
-            double lambda;
-            double alpha;
             double time(int i, int f, int j);
             double time(int i, int j);
             double customersFuel(int i, int j);

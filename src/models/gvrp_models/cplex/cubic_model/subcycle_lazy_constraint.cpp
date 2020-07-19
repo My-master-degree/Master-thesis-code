@@ -1,3 +1,4 @@
+#include "utils/util.hpp"
 #include "models/vertex.hpp"
 #include "models/gvrp_models/cplex/cubic_model/cubic_model.hpp"
 #include "models/gvrp_models/cplex/cubic_model/lazy_constraint.hpp"
@@ -9,6 +10,7 @@
 #include <ilcplex/ilocplex.h>
 
 using namespace std;
+using namespace utils;
 using namespace models;
 using namespace models::gvrp_models::cplex::cubic_model;
 
@@ -73,6 +75,24 @@ void Subcycle_lazy_constraint::main() {
             q.push(p.first);
           }
       }
+      size_t i = 1;
+      vector<const Vertex *> vertices (customersComponent.size() + 1);
+      vertices[0] = &cubic_model.instance.depot;
+      for (int customer : customersComponent) {
+        vertices[i] = cubic_model.all[customer];
+        ++i;
+      }
+      //get n routes lbs
+      const auto& closestsTimes = calculateClosestsGVRPCustomers(cubic_model.gvrpReducedGraphTimes, vertices);
+      //get mst
+      int improvedMSTNRoutesLB = int(ceil(calculateGvrpLBByImprovedMSTTime(vertices, closestsTimes, cubic_model.gvrpReducedGraphTimes)/cubic_model.instance.timeLimit));
+      //bin packing
+      int bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(cubic_model.instance, vertices, closestsTimes, cubic_model.BPPTimeLimit);
+      int maxNRoutes = max(improvedMSTNRoutesLB, bppNRoutesLB);
+      if (improvedMSTNRoutesLB == maxNRoutes) 
+        ++cubic_model.nImprovedMSTNRoutesLB;
+      if (bppNRoutesLB == maxNRoutes) 
+        ++cubic_model.nBPPNRoutesLB;
       for (int k_ = 0; k_ < cubic_model.instance.maxRoutes; k_++) { 
         for (int customer_ : customersComponent) {
           //getting lhs
@@ -84,7 +104,7 @@ void Subcycle_lazy_constraint::main() {
           }
           //getting rhs
           for (int b : component)
-            lhs -= cubic_model.x[k_][b][customer_];
+            lhs -= cubic_model.x[k_][b][customer_] * maxNRoutes;
           try {
             add(lhs >= 0).end();
           } catch(IloException& e) {

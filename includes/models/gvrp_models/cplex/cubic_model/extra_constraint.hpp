@@ -13,6 +13,7 @@ namespace models {
             Cubic_model& cubic_model;
           public:
             explicit Extra_constraint (Cubic_model& cubic_model);
+            virtual ~Extra_constraint ();
             virtual void add() = 0; 
         };
       }
