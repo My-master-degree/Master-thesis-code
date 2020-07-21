@@ -41,6 +41,6 @@ void Invalid_edge_preprocessing::add () {
       for (size_t i_ = 0; i_ < matheus_model_2.c0.size(); ++i_)
         for (size_t j_ = 0; j_ < matheus_model_2.c0.size(); ++j_)
           for (size_t k = 0; k < matheus_model_2.c0.size(); ++k)
-          matheus_model_2.model.add(matheus_model_2.y[i_][f1->second][j_] + matheus_model_2.y[j_][f2->second][k] <= 1);
+            matheus_model_2.model.add(matheus_model_2.y[i_][f1->second][j_] + matheus_model_2.y[j_][f2->second][k] <= 1);
   }
 }

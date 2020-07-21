@@ -377,33 +377,83 @@ void KK_model::createModel() {
       constraintName.clear();
       constraintName.str("");
     }
+    // y_{0fi} = y_{if0} = 0 \forall v_i \in C_0, \forall v_f \in F_0 :  e_{0f} > \beta
+    for (size_t f = 0; f < f0.size(); ++f) 
+      if (customerToAfsFuel(0, f) > instance.vehicleFuelCapacity)
+        for (size_t i = 0; i < c0.size(); ++i) {
+          c = IloConstraint (y[0][f][i] == 0);
+          constraintName<<"preprocessing y[0]["<<f<<"]["<<i<<"]";
+          c.setName(constraintName.str().c_str());
+          model.add(c);
+          constraintName.clear();
+          constraintName.str("");
+          c = IloConstraint (y[i][f][0] == 0);
+          constraintName<<"preprocessing y["<<i<<"]["<<f<<"][0]";
+          c.setName(constraintName.str().c_str());
+          model.add(c);
+          constraintName.clear();
+          constraintName.str("");
+        }
+
+
+
     /*
-    // y_{jf0} * e_{f0} \leqslant \beta \forall v_j \in C_0, \forall v_f \in F_0
-    for (size_t j = 0; j < c0.size(); ++j) 
-      for (size_t f = 0; f < f0.size(); ++f) {
-        expr = afsToCustomerFuel(f, 0) * y[j][f][0];
-        c = IloConstraint (expr <= instance.vehicleFuelCapacity);
-        constraintName<<"edge ("<<f<<", 0) can only exists if it is possible";
-        c.setName(constraintName.str().c_str());
-        model.add(c);
-        expr.end();
-        expr = IloExpr(env);
-        constraintName.clear();
-        constraintName.str("");
+    vector<vector<int>> routes_ = {
+      {0, 5, 9, 21, 9, 34, 9, 38, 0},
+      {0, 6, 7, 26, 7, 43, 7, 0, },
+      {0, 22, 8, 22, 31, 22, 0},
+      {0, 11, 2, 29, 16, 2, 32, 0, },
+      {0, 12, 37, 15, 33, 39, 10, 30, 9, 0, },
+      {0, 17, 44, 42, 19, 41, 4, 18, 0, },
+      {0, 35, 20, 3, 22, 28, 22, 1, 27, 0, },
+      {0, 14, 25, 14, 24, 23, 7, 0}
+    };
+    list<list<Vertex>> routes;
+    for (const vector<int>& route_ : routes_) {
+      list<Vertex> route;
+      for (int node : route_) 
+        if (customersC0Indexes.count(node))
+          route.push_back(Vertex(*c0[customersC0Indexes[node]]));
+        else if (afssF0Indexes.count(node))
+          route.push_back(Vertex(*f0[afssF0Indexes[node]]));
+      routes.push_back(route);
+    }
+    double currFuel, 
+           currTime;
+    for (const list<Vertex>& route : routes) {
+      currFuel = instance.vehicleFuelCapacity;
+      currTime = 0.0;
+      list<Vertex>::const_iterator curr = route.begin(), 
+        prev = curr;
+      for (++curr; curr != route.end(); prev = curr, ++curr) {
+        auto currIndex = customersC0Indexes.find(curr->id);
+        int i = customersC0Indexes[prev->id];
+        //is a customer
+        if (currIndex != customersC0Indexes.end()) {
+          int j = currIndex->second;
+          model.add(x[i][j] == 1);
+          currFuel -= customersFuel(i, j);
+          currTime += time(i, j);
+        } else {
+          //is an afs 
+          int f = afssF0Indexes[curr->id];
+          ++curr;
+          int j = customersC0Indexes[curr->id];
+          model.add(y[i][f][j] == 1);
+          currFuel = instance.vehicleFuelCapacity - afsToCustomerFuel(f, j);
+          currTime += time(i, f, j);
+        }
       }
-    // e_j \geqslant x_{j0} * e_{j0} \forall v_j \in C_0
-    for (size_t j = 1; j < c0.size(); ++j) {
-      expr = customersFuel(j, 0) * x[j][0];
-      c = IloConstraint (e[j - 1] >= expr);
-      constraintName<<"edge ("<<j<<", 0) can only exists if it is possible";
-      c.setName(constraintName.str().c_str());
-      model.add(c);
-      expr.end();
-      expr = IloExpr(env);
-      constraintName.clear();
-      constraintName.str("");
     }
     */
+
+
+
+
+
+
+
+
     //extra constraints
     for (Extra_constraint* extra_constraint : extra_constraints) 
       extra_constraint->add();

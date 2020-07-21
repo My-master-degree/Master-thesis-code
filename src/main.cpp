@@ -41,20 +41,20 @@ int main (int argc, char **argv)
     //local searchs
   Local_searchs_tests local_searchs_tests;
   local_searchs_tests.run();
-  */
   //cubic model
   cout<<"============    CUBIC MODEL    =============="<<endl;
   Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);
   cubic_model_tests.run();
-  /*
     //EMH model
   cout<<"============    EMH MODEL    =============="<<endl;
   EMH_model_tests emh_model_tests (VERBOSE, execution_time, nIntSol);
   emh_model_tests.run();
-  cout<<"============    KK MODEL    =============="<<endl;
+  */
     //KK model
+  cout<<"============    KK MODEL    =============="<<endl;
   KK_model_tests kk_model_tests (VERBOSE, execution_time, nIntSol);
   kk_model_tests.run();
+  /*
     //LH model
   cout<<"============    LH MODEL    =============="<<endl;
   LH_model_tests lh_model_tests (VERBOSE, execution_time, nIntSol);
