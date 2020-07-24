@@ -282,19 +282,11 @@ void Matheus_model_3::createModel() {
     //LB^i_T - s_i \leqslant t[i] \leqslant \beta - LB_i^T, \forall v_i \in V'\backslash\{v_0\}
     for (const pair<int, const Vertex *>& p : all) {
       int i = p.first;
-      model.add(timesLBs[i] - p.second->serviceTime <= t[i] <= instance.timeLimit - timesLBs[i]);
+      if (i != depot)
+        model.add(timesLBs[i] - p.second->serviceTime <= t[i] <= instance.timeLimit - timesLBs[i]);
     }
 
 
-    //e_f = \beta, \forall v_f \in F_0
-    for (const pair<int, const Vertex *>& p : dummies) {
-      c = IloConstraint (e[p.first] == beta);
-      c.setName("e_f = beta");
-      model.add(c);
-    }
-    c = IloConstraint (e[depot] == beta);
-    c.setName("e_depot = beta");
-    model.add(c);
     //e_j \leq e_i - c_{ij} x_{ij} + \beta (1 - x_{ij}), \forall v_j \in C,\forall v_i \in V'
     for (const Vertex& customer : instance.customers) {
       int j = customer.id;

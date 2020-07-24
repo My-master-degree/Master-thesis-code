@@ -46,7 +46,7 @@ void LH_model_tests::run() {
     execute_model(lh_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<lh_model.nPreprocessings0<<";"<<lh_model.nPreprocessings1<<";"<<lh_model.nPreprocessings2<<";"<<lh_model.nPreprocessings3<<endl;
     gvrp_instance++;
-    i++;
+    ++i;
   }
   closeResultFile(resultsFile);
 }

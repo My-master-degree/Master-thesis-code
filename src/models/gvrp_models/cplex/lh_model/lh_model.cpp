@@ -566,11 +566,6 @@ void LH_model::extraStepsAfterModelCreation() {
 void LH_model::setCustomParameters(){
   try{
     setParameters();
-    //for the user cut callback
-    cplex.setParam(IloCplex::Param::Preprocessing::Linear, 0);
-    //for the lazy constraint callback, although this formulation does not make use of lazy constraints, (this parameter is being defined to standarize the experiments (since the cubic formulations makes use of lazy constraints)
-    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 2);
-    //this parameter is being defined to standarize the experiments (since the cubic formulations makes use of lazy constraints)
     cplex.setParam(IloCplex::Param::Threads, 1);
   } catch (IloException& e) {
     throw e;
