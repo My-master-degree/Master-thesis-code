@@ -13,6 +13,7 @@
 #include "models/gvrp_models/cplex/matheus_model_3/extra_constraint.hpp"
 
 #include <map>
+#include <unordered_map>
 #include <set>
 #include <ilcplex/ilocplex.h>
 ILOSTLBEGIN
@@ -38,14 +39,29 @@ namespace models {
             pair<Gvrp_solution, Mip_solution_info> run();
             map<int, list<int>> afs_dummies;
             map<int, const Vertex *> dummies;
-            const Vertex * depotDummy;
             Matrix2DVar x;
             IloNumVarArray t;
-            IloNumVarArray e;
+            unordered_map<int, IloNumVar> e;
+            unordered_map<int, double> timesLBs;
+            unordered_map<int, double> fuelsLBs;
             Matrix2DVal x_vals;
             list<User_constraint*> user_constraints;
             list<Preprocessing*> preprocessings;
+//            list<Heuristic_callback*> heuristic_callbacks;
             list<Extra_constraint*> extra_constraints;
+            unsigned long int nGreedyLP;
+            unsigned int BPPTimeLimit;
+            long int levelSubcycleCallback;
+            int nRoutesLB;
+            int nPreprocessings1;
+            int nPreprocessings2;
+            int nPreprocessings3;
+            int nPreprocessings4;
+            int nImprovedMSTNRoutesLB;
+            int nBPPNRoutesLB;
+            double solLB;
+            double time(int i, int j);
+            double M1(int i, int j);
           protected:
             void createVariables();
             void createObjectiveFunction();

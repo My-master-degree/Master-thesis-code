@@ -17,6 +17,8 @@ Swap::Swap (const Gvrp_instance& gvrp_instance, const Gvrp_solution& gvrp_soluti
   strategy = strategy_;
 }
 
+Swap::~Swap (){}
+
 Gvrp_solution Swap::run () {
   newSolution = new Gvrp_solution (solution.routes, instance);
   list<list<Vertex>>& routes = newSolution->routes;

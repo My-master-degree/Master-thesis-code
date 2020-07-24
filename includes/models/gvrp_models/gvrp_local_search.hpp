@@ -10,6 +10,7 @@ namespace models {
     class Gvrp_local_search : public Local_search<Gvrp_instance, Gvrp_solution> {
       public:
         explicit Gvrp_local_search (const Gvrp_instance& gvrp_instance, const Gvrp_solution& gvrp_solution);
+        virtual ~Gvrp_local_search();
         virtual Gvrp_solution run() = 0;
     };
   }

@@ -73,7 +73,7 @@ Matheus_model::Matheus_model(const Gvrp_instance& instance, unsigned int time_li
   preprocessings.push_back(new Invalid_edge_preprocessing_3(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_4(*this));
   //heuristic callbacks
-  heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
+//  heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
   //customer min required fuel
   customersMinRequiredFuel = vector<double> (c0.size()- 1);
   for (size_t i = 1; i < c0.size(); ++i)
@@ -343,11 +343,11 @@ void Matheus_model::createModel() {
     //u_{ij} \geqslant max(LB_j^T - t_{ij} - s_j, LB_i^T) x_{ij} + \sum_{v_f \in F} max(LB_j^T - t_{ifj} - s_j, LB_i^T) y_{ifj}, \forall v_i \in C \forall v_j \in C_0
     for (size_t i = 1; i < c0.size(); ++i) 
       for (size_t j = 0; j < c0.size(); ++j) {
-        expr = max(customersMinRequiredTime[j] - time(i, j), customersMinRequiredTime[i]) * x[i][j];
-//        expr = max(time(0, j) - time(i, j), time(0, i)) * x[i][j];
+//        expr = max(customersMinRequiredTime[j] - time(i, j), customersMinRequiredTime[i]) * x[i][j];
+        expr = max(time(0, j) - time(i, j), time(0, i)) * x[i][j];
         for (size_t f = 1; f < f0.size(); ++f)
-          expr += max(customersMinRequiredTime[j] - time(i, f, j), customersMinRequiredTime[i]) * y[i][f][j];
-//          expr += max(time(0, j) - time(i, f, j), time(0, i)) * y[i][f][j];
+//          expr += max(customersMinRequiredTime[j] - time(i, f, j), customersMinRequiredTime[i]) * y[i][f][j];
+          expr += max(time(0, j) - time(i, f, j), time(0, i)) * y[i][f][j];
         constraint = IloConstraint (u[i][j] >= expr);
         constraintName<<"lb time in "<<c0[i]->id<<" to "<<c0[j]->id;
         constraint.setName(constraintName.str().c_str());
@@ -360,9 +360,11 @@ void Matheus_model::createModel() {
     //u_{ij} \leqslant T - t_{ij} - s_j - LB_j^T, \forall v_i \in C \forall v_j \in C_0
     for (size_t i = 1; i < c0.size(); ++i) 
       for (size_t j = 0; j < c0.size(); ++j) {
-        expr = min(instance.timeLimit - c0[j]->serviceTime - customersMinRequiredTime[j] - time(i, j), instance.timeLimit - customersMinRequiredTime[i]) * x[i][j];
+        expr = min(instance.timeLimit - time(j, 0) - time(i, j), instance.timeLimit - time(i, 0)) * x[i][j];
+//        expr = min(instance.timeLimit - c0[j]->serviceTime - customersMinRequiredTime[j] - time(i, j), instance.timeLimit - customersMinRequiredTime[i]) * x[i][j];
         for (size_t f = 1; f < f0.size(); ++f)
-          expr += min(instance.timeLimit - c0[j]->serviceTime - customersMinRequiredTime[j] - time(i, f, j), instance.timeLimit - c0[i]->serviceTime - customersMinRequiredTime[i]) * y[i][f][j];
+          expr += min(instance.timeLimit - time(j, 0) - time(i, f, j), instance.timeLimit - time(i, 0)) * y[i][f][j];
+//          expr += min(instance.timeLimit - c0[j]->serviceTime - customersMinRequiredTime[j] - time(i, f, j), instance.timeLimit - c0[i]->serviceTime - customersMinRequiredTime[i]) * y[i][f][j];
         constraint = IloConstraint (u[i][j] <= expr);
 //        constraint = IloConstraint (u[i][j] <= max(instance.timeLimit - time(i, j) - c0[j]->serviceTime - customersMinRequiredTime[j], 0.0));
         constraintName<<"ub time in "<<c0[i]->id<<" to "<<c0[j]->id;
@@ -390,6 +392,7 @@ void Matheus_model::createModel() {
         constraintName.str("");
       }
     */
+    /*
     //\sum_{v_j \in C_0} u_{ij} + (t_{ij} + s_j + LB_j^T) x_{ij} + \sum_{v_f \in F_0} (t_{ifj} + s_j + LB_j^T) * z_{ifj} \leqslant T, \forall v_i \in C
     for (size_t i = 1; i < c0.size(); ++i) {
       for (size_t j = 0; j < c0.size(); ++j) {
@@ -406,6 +409,7 @@ void Matheus_model::createModel() {
       constraintName.clear();
       constraintName.str("");
     }
+    */
     //energy constraints
     //\sum_{v_i \in C} a_{i, j} - a_{j, i} = \sum_{v_f \in F_0} v_{jr} + \sum_{v_i \in C} e_{ji} x_{ji} - \sum_{v_i \in C_0} \sum_{v_f \in F} (\beta - e_{fj}) y_{ifj} - (\beta - e_{0j}) x_{0j}, \forall v_j \in C
     for (size_t j = 1; j < c0.size(); ++j) {
@@ -430,7 +434,15 @@ void Matheus_model::createModel() {
     //a_{ij} >= x_{ij} * max (LB_j^E, LB_i^E - e_{ij}), \forall v_i, v_j \in C
     for (size_t j = 1; j < c0.size(); ++j) 
       for (size_t i = 1; i < c0.size(); ++i) {
-        constraint = IloConstraint (a[i - 1][j - 1] >= x[i][j] * max(customersMinRequiredFuel[j - 1], customersMinRequiredFuel[i - 1] - customersFuel(i, j)));
+        //min_{v_f \in F_0} e_{jf} and min_{v_f \in F_0} e_{if}
+        double closestAfsToJ = customerToAfsFuel(j, 0),
+               closestAfsToI = customerToAfsFuel(i, 0);
+        for (size_t f = 1; f < f0.size(); ++f) {
+          closestAfsToJ = min(closestAfsToJ, customerToAfsFuel(j, f));
+          closestAfsToI = min(closestAfsToI, customerToAfsFuel(i, f));
+        }
+        constraint = IloConstraint (a[i - 1][j - 1] >= x[i][j] * max(closestAfsToJ, closestAfsToI - customersFuel(i, j)));
+//        constraint = IloConstraint (a[i - 1][j - 1] >= x[i][j] * max(customersMinRequiredFuel[j - 1], customersMinRequiredFuel[i - 1] - customersFuel(i, j)));
         constraintName<<"a["<<i - 1<<"]["<<j - 1<<"] lb";
         constraint.setName(constraintName.str().c_str());
         model.add(constraint);
@@ -440,7 +452,15 @@ void Matheus_model::createModel() {
     //a_{ij} <= x_{ij} * min (\beta - LB_j^E, \beta - LB_i^E - e_{ij}), \forall v_i, v_j \in C
     for (size_t j = 1; j < c0.size(); ++j) 
       for (size_t i = 1; i < c0.size(); ++i) {
-        constraint = IloConstraint (a[i - 1][j - 1] <= x[i][j] * min(instance.vehicleFuelCapacity - customersMinRequiredFuel[i - 1] - customersFuel(i, j), instance.vehicleFuelCapacity - customersMinRequiredFuel[j - 1]));
+        //min_{v_f \in F_0} e_{fj} and min_{v_f \in F_0} e_{fi}
+        double closestAfsToJ = afsToCustomerFuel(0, j),
+               closestAfsToI = afsToCustomerFuel(0, i);
+        for (size_t f = 1; f < f0.size(); ++f) {
+          closestAfsToJ = min(closestAfsToJ, afsToCustomerFuel(f, j));
+          closestAfsToI = min(closestAfsToI, afsToCustomerFuel(f, i));
+        }
+        constraint = IloConstraint (a[i - 1][j - 1] <= x[i][j] * min(instance.vehicleFuelCapacity - closestAfsToI - customersFuel(i, j), instance.vehicleFuelCapacity - closestAfsToJ));
+//        constraint = IloConstraint (a[i - 1][j - 1] <= x[i][j] * min(instance.vehicleFuelCapacity - customersMinRequiredFuel[i - 1] - customersFuel(i, j), instance.vehicleFuelCapacity - customersMinRequiredFuel[j - 1]));
         constraintName<<"a["<<i - 1<<"]["<<j - 1<<"] ub";
         constraint.setName(constraintName.str().c_str());
         model.add(constraint);
@@ -526,6 +546,7 @@ void Matheus_model::createModel() {
     model.add(constraint);
     expr.end();
     expr = IloExpr(env);
+    /*
     //solution fuel lb alpha 1
     for (size_t i = 0; i < c0.size(); ++i) {
       for (size_t f = 0; f < f0.size(); ++f)
@@ -633,6 +654,7 @@ void Matheus_model::createModel() {
         constraintName.clear();
         constraintName.str("");
       }
+    */
     //n routes LB
     for (size_t i = 0; i < c0.size(); ++i) {
       expr += x[0][i];
@@ -653,13 +675,12 @@ void Matheus_model::createModel() {
 
 
 
-
-
-    /*
+  /*
     vector<vector<int>> routes_ = {
-      {0, 1, 10, 2, 7, 13, 9, 7, 19, 0},
-      {0, 6, 7, 5, 16, 7, 14, 7, 0},
-      {0, 17, 8, 3, 10, 12, 15, 11, 4, 0}
+      {0, 4, 15, 12, 10, 15, 11, 15, 1, 0}, 
+      {0, 7, 13, 7, 0}, 
+      {0, 7, 14, 5, 7, 9, 16, 7, 19, 0}, 
+      {0, 8, 17, 18, 8, 3, 2, 7, 6, 0}, 
     };
     list<list<Vertex>> routes;
     for (const vector<int>& route_ : routes_) {

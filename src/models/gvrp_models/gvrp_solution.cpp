@@ -16,7 +16,7 @@ Gvrp_solution::Gvrp_solution(list<list<Vertex> > _routes, Gvrp_instance _gvrp_in
   routes(_routes), gvrp_instance(_gvrp_instance) {
 }
 
-list<string> Gvrp_solution::getInfeasibilities () {
+list<string> Gvrp_solution::getInfeasibilities () const {
   //setup
   //maps of customers and afss
   int depot = gvrp_instance.depot.id;
@@ -119,17 +119,17 @@ list<string> Gvrp_solution::getInfeasibilities () {
   return infeasibilities;
 }
 
-void Gvrp_solution::write_in_file(const string& file_path){
+void Gvrp_solution::write_in_file(const string& file_path) const {
   ofstream solutionFile;
   solutionFile.open (file_path);
   solutionFile <<*this;
   solutionFile.close(); 
 }
 
-double Gvrp_solution::calculateCost () {
+double Gvrp_solution::calculateCost () const {
   double cost = 0;
-  for (list<Vertex>& route : routes) 
-    for (list<Vertex>::iterator c = next(route.begin()); c != route.end(); ++c)
+  for (const list<Vertex>& route : routes) 
+    for (list<Vertex>::const_iterator c = next(route.begin()); c != route.end(); ++c)
       cost += gvrp_instance.distances[prev(c)->id][c->id];
   return cost;
 }

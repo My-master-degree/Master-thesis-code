@@ -16,6 +16,9 @@ Merge::Merge (const Gvrp_instance& gvrp_instance, const Gvrp_solution& gvrp_solu
   strategy = strategy_;
 }
 
+Merge::~Merge () {
+}
+
 Gvrp_solution Merge::run () {
   newSolution = new Gvrp_solution (solution.routes, instance);
   list<list<Vertex>>& routes = newSolution->routes;

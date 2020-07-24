@@ -17,6 +17,8 @@ FSAdd::FSAdd (const Gvrp_instance& gvrp_instance, const Gvrp_solution& gvrp_solu
   strategy = strategy_;
 }
 
+FSAdd::~FSAdd (){}
+
 Gvrp_solution FSAdd::run () {
   newSolution = new Gvrp_solution (solution.routes, instance);
   /*

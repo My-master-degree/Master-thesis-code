@@ -49,20 +49,20 @@ int main (int argc, char **argv)
   cout<<"============    EMH MODEL    =============="<<endl;
   EMH_model_tests emh_model_tests (VERBOSE, execution_time, nIntSol);
   emh_model_tests.run();
-  */
     //KK model
   cout<<"============    KK MODEL    =============="<<endl;
   KK_model_tests kk_model_tests (VERBOSE, execution_time, nIntSol);
   kk_model_tests.run();
-  /*
     //LH model
   cout<<"============    LH MODEL    =============="<<endl;
   LH_model_tests lh_model_tests (VERBOSE, execution_time, nIntSol);
   lh_model_tests.run();
+  */
     //Matheus model
   cout<<"============    MATHEUS MODEL    =============="<<endl;
   Matheus_model_tests matheus_model_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_tests.run();
+  /*
     //Matheus model 2
   cout<<"============    MATHEUS 2 MODEL    =============="<<endl;
   Matheus_model_2_tests matheus_model_2_tests (VERBOSE, execution_time, nIntSol);

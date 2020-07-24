@@ -21,8 +21,8 @@ namespace models {
     class Gvrp_solution {
       public:
         explicit Gvrp_solution(list<list<Vertex> > routes, Gvrp_instance gvrp_instance);
-        void write_in_file(const string& file_path);
-        list<string> getInfeasibilities ();
+        void write_in_file(const string& file_path) const;
+        list<string> getInfeasibilities () const;
         friend ostream& operator<<(ostream& strm, const Gvrp_solution& gvrp_solution){
           //setup
           //maps of customers and afss
@@ -103,7 +103,7 @@ namespace models {
         };
         list<list<Vertex> > routes;
         Gvrp_instance gvrp_instance;
-        double calculateCost();
+        double calculateCost() const;
     };
   }
 }

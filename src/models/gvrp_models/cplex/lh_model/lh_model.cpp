@@ -6,6 +6,10 @@
 #include "models/gvrp_models/cplex/gvrp_model.hpp"
 #include "models/gvrp_models/cplex/lh_model/lh_model.hpp"
 #include "models/gvrp_models/cplex/lh_model/preprocessing.hpp"
+#include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing.hpp"
+#include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing_C4_C5.hpp"
+#include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing_C6.hpp"
+#include "models/gvrp_models/cplex/lh_model/invalid_edge_preprocessing_C7.hpp"
 
 #include <sstream>
 #include <list>
@@ -43,6 +47,11 @@ LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvr
     afssF0Indexes[afs.id] = f + 1;
     ++f;
   }
+  //preprocessing
+  preprocessings.push_back(new Invalid_edge_preprocessing(*this));
+  preprocessings.push_back(new Invalid_edge_preprocessing_C4_C5(*this));
+  preprocessings.push_back(new Invalid_edge_preprocessing_C6(*this));
+  preprocessings.push_back(new Invalid_edge_preprocessing_C7(*this));
 } 
 
 LH_model::~LH_model() {

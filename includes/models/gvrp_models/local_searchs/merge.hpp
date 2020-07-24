@@ -12,6 +12,7 @@ namespace models {
       class Merge : public Gvrp_local_search {
         public:
           explicit Merge(const Gvrp_instance& gvrp_instance, const Gvrp_solution& gvrp_solution, Local_search_strategy_enum strategy);
+          ~Merge();
           Gvrp_solution run ();
       };
     }

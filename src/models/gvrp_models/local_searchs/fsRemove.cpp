@@ -15,6 +15,8 @@ using namespace models::gvrp_models::local_searchs;
 
 FsRemove::FsRemove (const Gvrp_instance& gvrp_instance, const Gvrp_solution& gvrp_solution) : Gvrp_local_search(gvrp_instance, gvrp_solution) {}
 
+FsRemove::~FsRemove () {}
+
 Gvrp_solution FsRemove::run () {
   newSolution = new Gvrp_solution (solution.routes, instance);
   //create c0

@@ -12,6 +12,7 @@ namespace models {
       class Swap : public Gvrp_local_search {
         public:
           explicit Swap(const Gvrp_instance& gvrp_instance, const Gvrp_solution& gvrp_solution, Local_search_strategy_enum strategy);
+          ~Swap();
           Gvrp_solution run ();
       };
     }

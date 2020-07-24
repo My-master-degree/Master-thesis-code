@@ -1,8 +1,12 @@
+#include "utils/util.hpp"
 #include "models/vertex.hpp"
 #include "models/distances_enum.hpp"
 #include "models/cplex/mip_solution_info.hpp"
+#include "models/local_search_strategy_enum.hpp"
+#include "models/gvrp_models/gvrp_feasible_solution_heuristic.hpp"
 #include "models/gvrp_models/gvrp_solution.hpp"
 #include "models/gvrp_models/gvrp_instance.hpp"
+#include "models/gvrp_models/local_searchs/all.hpp"
 #include "models/gvrp_models/cplex/gvrp_model.hpp"
 #include "models/gvrp_models/cplex/matheus_model_3/matheus_model_3.hpp"
 #include "models/gvrp_models/cplex/matheus_model_3/preprocessing.hpp"
@@ -13,45 +17,64 @@
 #include <list>
 #include <time.h> 
 #include <string> 
+#include <unordered_set> 
 
+using namespace utils;
 using namespace models;
 using namespace models::cplex;
 using namespace models::gvrp_models;
+using namespace models::gvrp_models::local_searchs;
 using namespace models::gvrp_models::cplex;
 using namespace models::gvrp_models::cplex::matheus_model_3;
 
 using namespace std;
 
-Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), depotDummy(new Vertex(instance.depot.id, instance.depot.x, instance.depot.y, instance.afss.front().serviceTime))  {
+Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nGreedyLP(0) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //populating all map and customers set
   all[instance.depot.id] = &instance.depot;
+  timesLBs[instance.depot.id] = 0.0;
   for (const Vertex& customer: instance.customers) {
     all[customer.id] = &customer;
     customers.insert(customer.id);
+    timesLBs[customer.id] = calculateCustomerMinRequiredTime (instance, *gvrp_afs_tree, customer);
+    fuelsLBs[customer.id] = calculateCustomerMinRequiredFuel (instance, *gvrp_afs_tree, customer);
   }
   //creating dummies
+  //get ub on the number of dummies
+  Gvrp_feasible_solution_heuristic gfsh (instance);
+  Gvrp_solution heuristic_solution = gfsh.run();
+  All all_ls (instance, heuristic_solution, FIRST_IMPROVEMENT);
+  heuristic_solution = all_ls.run();
+  double routeFuelLimit = (instance.timeLimit - instance.customers.front().serviceTime) * instance.vehicleAverageSpeed * instance.vehicleFuelConsumptionRate;
+  int nDummies = min(min(floor(((routeFuelLimit - 2 * lambda)/psi) + 1), floor(2 * (routeFuelLimit - alpha)/instance.vehicleFuelCapacity)) * heuristic_solution.routes.size(), double(instance.customers.size() + instance.maxRoutes));
+  //insert them
   for (const Vertex& afs: instance.afss) {
     afs_dummies[afs.id].push_back(afs.id);
     all[afs.id] = &afs;
     dummies[afs.id] = &afs;
   }
+  for (size_t f = 0; f < gvrp_afs_tree->f0.size(); ++f)
+    timesLBs[gvrp_afs_tree->f0[f]->id] = gvrp_afs_tree->times[f];
   int dummy_id = all.rbegin()->second->id;
   //afs dummies
   for (const Vertex& afs: instance.afss)
-    for (size_t i = 0; i < instance.customers.size(); ++i) {
+    for (size_t i = 1; i < nDummies; ++i) {
       afs_dummies[afs.id].push_back(++dummy_id);
       all[dummy_id] = &afs;
       dummies[dummy_id] = &afs;
+      timesLBs[dummy_id] = timesLBs[afs.id];
     }
-  //depot dummies
-  for (size_t i = 0; i < instance.customers.size() + 1; ++i) {
-    afs_dummies[instance.depot.id].push_back(++dummy_id);
-    all[dummy_id] = depotDummy;
-    dummies[dummy_id] = depotDummy;
-  }
 } 
+
+double Matheus_model_3::time (int i, int j) {
+  return all[i]->serviceTime + instance.time(i, j);
+}
+
+double Matheus_model_3::M1(int i, int j) {
+  return instance.timeLimit + time(i, j) - (timesLBs[i] + timesLBs[j]);
+}
 
 Matheus_model_3::~Matheus_model_3() {
   for (Preprocessing * preprocessing : preprocessings)
@@ -60,7 +83,6 @@ Matheus_model_3::~Matheus_model_3() {
     delete user_constraint;  
   for (Extra_constraint * extra_constraint : extra_constraints)
     delete extra_constraint;  
-  delete depotDummy;
 }
 
 pair<Gvrp_solution, Mip_solution_info> Matheus_model_3::run(){
@@ -108,18 +130,20 @@ pair<Gvrp_solution, Mip_solution_info> Matheus_model_3::run(){
 
 void Matheus_model_3::createVariables(){
   x = Matrix2DVar (env, all.size());
-  e = IloNumVarArray (env, all.size(), 0, instance.vehicleFuelCapacity, IloNumVar::Float);
   t = IloNumVarArray (env, all.size(), 0, instance.timeLimit, IloNumVar::Float);
   try {
     //setting names
     stringstream nameStream;
-    for (const pair<int, const Vertex *>& p : all){
-      int i = p.first;
+    for(int customer : customers) {
       //e var
-      nameStream<<"e["<<i<<"]";
-      e[i].setName(nameStream.str().c_str());
+      nameStream<<"e["<<customer<<"]";
+      e[customer] = IloNumVar (env, 0, instance.vehicleFuelCapacity, IloNumVar::Float);
+      e[customer].setName(nameStream.str().c_str());
       nameStream.clear();
       nameStream.str("");
+    }
+    for (const pair<int, const Vertex *>& p : all){
+      int i = p.first;
       //t var
       nameStream<<"t["<<i<<"]";
       t[i].setName(nameStream.str().c_str());
@@ -243,35 +267,25 @@ void Matheus_model_3::createModel() {
     model.add(c);
     expr.end();
     expr = IloExpr(env);
-    //t_j \geq t_i + (t_{ij}  + p_j) * x_{ij} - T (1 - x_{ij}), \forall v_j \in V\backslash\{v_0\},\forall v_i \in V
+    //times 
+    //t_i - t_j + M1_{ij} x_{ij} + (M1_{ij} - t_{ij} - t_{ji}) x_{ji} \leqslant M1_{ij} - t_{ij}, \forall v_i, v_j \in V'\backslash\{v_0\}
     for (const pair<int, const Vertex *>& p1 : all) {
       int j = p1.first;
       if (j != depot) {
         for (const pair<int, const Vertex *>& p : all) {
           int i = p.first;
-          if (i != j) {
-            expr = t[i] + x[i][j] * (instance.time(p.second->id, p1.second->id) + p1.second->serviceTime) - T * (1 -  x[i][j]);
-            c = IloConstraint (t[j] >= expr);
-            c.setName("updating time");
-            model.add(c);
-            expr.end();
-            expr = IloExpr (env);
-          }
+          if (i != depot && i != j) 
+            model.add(t[j] - t[i] + M1(i, j) * x[i][j] + (M1(i, j) - time(i, j) - time(j, i)) * x[j][i] <= M1(i, j) - time(i, j));
         }
       }
     }
-    //t_{0j} \leq t_j \leq T - t_{j0}_ , \forall v_j \in V\backslash\{v_0\}
+    //LB^i_T - s_i \leqslant t[i] \leqslant \beta - LB_i^T, \forall v_i \in V'\backslash\{v_0\}
     for (const pair<int, const Vertex *>& p : all) {
-      int j = p.first;
-      if (j != depot) {
-        c = IloConstraint (t[j] >= instance.time(depot, p.second->id));
-        c.setName("time variable lb");
-        model.add(c);
-        c = IloConstraint (t[j] <= T - instance.time(p.second->id, depot));
-        c.setName("time variable ub");
-        model.add(c);
-      }
+      int i = p.first;
+      model.add(timesLBs[i] - p.second->serviceTime <= t[i] <= instance.timeLimit - timesLBs[i]);
     }
+
+
     //e_f = \beta, \forall v_f \in F_0
     for (const pair<int, const Vertex *>& p : dummies) {
       c = IloConstraint (e[p.first] == beta);
