@@ -31,15 +31,23 @@ Gvrp_solution Swap::run () {
   //create afss sets
   for (const Vertex& afs : instance.afss)
     afss.insert(afs.id);
+  size_t i = 0;
   for (list<list<Vertex>>::iterator r1 = routes.begin(); r1 != routes.end(); ++r1) {
+    cout<<"Route "<<i<<endl;
+    ++i;
     //get r1 time
     r1Time = r1->begin()->serviceTime;
     for (list<Vertex>::iterator c = next(r1->begin()); c != r1->end(); ++c) 
       r1Time += c->serviceTime + instance.time(prev(c)->id, c->id);
     //try to improve r1
     for (list<Vertex>::iterator c1 = next(r1->begin()); c1 != --r1->end(); ++c1) {
+      cout<<c1->id<<endl;
+      for(const Vertex& node : *r1)
+        cout<<node.id<<", ";
+      cout<<endl;
       for (list<Vertex>::iterator c2 = next(c1); c2 != --r1->end(); ++c2) {
         if (!afss.count(c1->id) && !afss.count(c2->id)) {
+//        cout<<"\t"<<c2->id<<endl;
           swap(*c1, *c2);
           //check feasibility
           feasible = true;

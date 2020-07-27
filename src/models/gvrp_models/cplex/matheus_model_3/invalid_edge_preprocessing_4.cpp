@@ -25,7 +25,7 @@ void Invalid_edge_preprocessing_4::add () {
     if (f1 != matheus_model_3.afs_dummies.end()) 
       for (int i_dummy : f1->second)
         matheus_model_3.model.add(matheus_model_3.x[i_dummy][j] == 0);
-  //first is customer and second is afs 
+    //first is customer and second is afs 
     else if (f2 != matheus_model_3.afs_dummies.end()) 
       for (int j_dummy : f2->second)
         matheus_model_3.model.add(matheus_model_3.x[i][j_dummy] == 0);

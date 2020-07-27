@@ -20,14 +20,14 @@ void Invalid_edge_preprocessing::add () {
     if (f1 == matheus_model_3.afs_dummies.end() && f2 == matheus_model_3.afs_dummies.end()) 
       matheus_model_3.model.add(matheus_model_3.x[i][j] == 0);
     //first is afs and second is customer
-    else if (f1 != matheus_model_3.afs_dummies.end() && f2 == matheus_model_3.afs_dummies.end()) 
+    if (f1 != matheus_model_3.afs_dummies.end() && f2 == matheus_model_3.afs_dummies.end()) 
       for (int i_dummy : f1->second)
         matheus_model_3.model.add(matheus_model_3.x[i_dummy][j] == 0);
     //first is customer and second is afs 
-    else if (f1 == matheus_model_3.afs_dummies.end() && f2 != matheus_model_3.afs_dummies.end()) 
+    if (f1 == matheus_model_3.afs_dummies.end() && f2 != matheus_model_3.afs_dummies.end()) 
       for (int j_dummy : f2->second)
         matheus_model_3.model.add(matheus_model_3.x[i][j_dummy] == 0);
-    else 
+    if (f1 != matheus_model_3.afs_dummies.end() && f2 != matheus_model_3.afs_dummies.end()) 
       for (int i_dummy : f1->second)
         for (int j_dummy : f2->second)
         matheus_model_3.model.add(matheus_model_3.x[i_dummy][j_dummy] == 0);

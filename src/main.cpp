@@ -4,6 +4,7 @@
 #include "tests/gvrp/lh_model_tests.hpp"
 #include "tests/gvrp/matheus_model_tests.hpp"
 #include "tests/gvrp/matheus_model_2_tests.hpp"
+#include "tests/gvrp/matheus_model_3_tests.hpp"
 #include "tests/gvrp/local_searchs_tests.hpp"
 #include "tests/mlsa/model_tests.hpp"
 #include "tests/bpp/bpp_model_tests.hpp"
@@ -57,16 +58,20 @@ int main (int argc, char **argv)
   cout<<"============    LH MODEL    =============="<<endl;
   LH_model_tests lh_model_tests (VERBOSE, execution_time, nIntSol);
   lh_model_tests.run();
-  */
     //Matheus model
   cout<<"============    MATHEUS MODEL    =============="<<endl;
   Matheus_model_tests matheus_model_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_tests.run();
-  /*
     //Matheus model 2
   cout<<"============    MATHEUS 2 MODEL    =============="<<endl;
   Matheus_model_2_tests matheus_model_2_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_2_tests.run();
+  */
+    //Matheus model 3
+  cout<<"============    MATHEUS 3 MODEL    =============="<<endl;
+  Matheus_model_3_tests matheus_model_3_tests (VERBOSE, execution_time, nIntSol);
+  matheus_model_3_tests.run();
+  /*
     //BBP model
   BPP_model_tests bpp_model_tests (VERBOSE, execution_time, nIntSol);
   bpp_model_tests.run();

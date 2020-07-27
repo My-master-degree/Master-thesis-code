@@ -99,11 +99,11 @@ void Greedy_lp_heuristic::main() {
         }
       } while (currNode != depot);
       //insert route in the routes
-      if (valid && route.size() > 2) {
+      if (valid && route.size() > 1) {
         route.push_back(Vertex(*cubic_model.all[currNode]));
         routes.push_back(route);
-        route = list<Vertex> ();
       }
+      route = list<Vertex> ();
     }
     //if valid solution
     if (customers.size() == cubic_model.instance.customers.size()) {

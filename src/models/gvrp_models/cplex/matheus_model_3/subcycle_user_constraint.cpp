@@ -1,3 +1,4 @@
+#include "utils/util.hpp"
 #include "models/vertex.hpp"
 #include "models/dsu.hpp"
 #include "models/cplex/mip_depth.hpp"
@@ -15,6 +16,8 @@
 #include <iostream>
 
 using namespace std;
+
+using namespace utils;
 using namespace models;
 using namespace models::cplex;
 using namespace models::gvrp_models::cplex::matheus_model_3;
@@ -36,19 +39,20 @@ void Subcycle_user_constraint::main() {
     return;
   }
   //setup
-  DSU dsu (matheus_model_3.all.size());
+  const size_t sall = matheus_model_3.all.size();
+  DSU dsu (sall);
   IloEnv env = getEnv();
   IloExpr lhs(env);
-  vector<ListGraph::Node> nodes (matheus_model_3.all.size());
+  vector<ListGraph::Node> nodes (sall);
   ListGraph graph;
   multimap<int, int> subcomponents;
   set<int> component;
   list<set<int>> components;
   queue<int> q;
   //get values
-  Matrix2DVal x_vals (env, matheus_model_3.all.size());
+  Matrix2DVal x_vals (env, sall);
   for (const pair<int, const Vertex *>& p : matheus_model_3.all) {
-    x_vals[p.first] = IloNumArray (env, matheus_model_3.all.size(), 0, 1, IloNumVar::Float);
+    x_vals[p.first] = IloNumArray (env, sall, 0, 1, IloNumVar::Float);
     getValues(x_vals[p.first], matheus_model_3.x[p.first]);
   }
   //creating nodes
@@ -117,14 +121,33 @@ void Subcycle_user_constraint::main() {
   //end of multimap 
   //inequallitites
   for (const set<int>& S : components) 
+    //\sum_{v_i \in V'\S} \sum_{v_j \in S} x_{ij} \geqslant N_ROUTES_LB(S) 
     if (!S.count(matheus_model_3.instance.depot.id)) {
-      //\sum_{v_i \in V'\S} \sum_{v_j \in S} x_{ij} \geqslant 1 
+      //get customers from component S
+      vector<const Vertex *> vertices;
+      vertices.push_back(&matheus_model_3.instance.depot);
+      for (int customer : matheus_model_3.customers)
+        if (S.count(customer)) 
+          vertices.push_back(matheus_model_3.all[customer]);
+      if (vertices.size() == 1)
+        continue;
+      //get n routes lbs
+      const auto& closestsTimes = calculateClosestsGVRPCustomers(matheus_model_3.gvrpReducedGraphTimes, vertices);
+      //get mst
+      int improvedMSTNRoutesLB = int(ceil(calculateGvrpLBByImprovedMSTTime(vertices, closestsTimes, matheus_model_3.gvrpReducedGraphTimes)/matheus_model_3.instance.timeLimit));
+      //bin packing
+      int bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(matheus_model_3.instance, vertices, closestsTimes, matheus_model_3.BPPTimeLimit);
+      int maxNRoutes = max(improvedMSTNRoutesLB, bppNRoutesLB);
+      if (improvedMSTNRoutesLB == maxNRoutes) 
+        ++matheus_model_3.nImprovedMSTNRoutesLB;
+      if (bppNRoutesLB == maxNRoutes) 
+        ++matheus_model_3.nBPPNRoutesLB;
       //lhs
       for (const pair<int, const Vertex *>& p : matheus_model_3.all) 
         if (!S.count(p.first))
           for (int j : S) 
             lhs += matheus_model_3.x[p.first][j];
-      lhs -= 1;
+      lhs -= maxNRoutes;
       try {
         add(lhs >= 0).end();
       } catch(IloException& e) {

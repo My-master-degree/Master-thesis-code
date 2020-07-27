@@ -29,11 +29,15 @@ Gvrp_solution All::run () {
     Gvrp_solution currSolution = *newSolution;
     oldCost = newCost;
     //merge
-    models::gvrp_models::local_searchs::Merge merge (instance, currSolution, strategy);
+    Merge merge (instance, currSolution, strategy);
     currSolution = merge.run();
     //swap
+    /*
     Swap swap (instance, currSolution, strategy);
     currSolution = swap.run();
+    cout<<"Swap: "<<endl;
+    cout<<currSolution<<endl;
+    */
     //fs remove
     FsRemove fsRemove (instance, currSolution);
     currSolution = fsRemove.run();

@@ -48,9 +48,9 @@ namespace models {
             Matrix2DVar u;
             Matrix2DVar v;
             Matrix2DVar e;
-            Matrix2DVar c;
-            Matrix2DVar w;
-            Matrix2DVar z;
+//            Matrix2DVar c;
+//            Matrix2DVar w;
+//            Matrix2DVar z;
             Matrix3DVal y_vals;
             Matrix2DVal x_vals;
             list<User_constraint*> user_constraints;
