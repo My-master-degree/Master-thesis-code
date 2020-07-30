@@ -18,6 +18,7 @@ Invalid_edge_preprocessing_4::Invalid_edge_preprocessing_4 (Matheus_model_3& mat
 
 void Invalid_edge_preprocessing_4::add () {
   list<pair<int, int>> edges = get_invalid_edges_4(matheus_model_3.instance, *matheus_model_3.gvrp_afs_tree);
+  matheus_model_3.nPreprocessings4 = edges.size();
   for (auto const& [i, j] : edges) {
     auto f1 = matheus_model_3.afs_dummies.find(i),
          f2 = matheus_model_3.afs_dummies.find(j);

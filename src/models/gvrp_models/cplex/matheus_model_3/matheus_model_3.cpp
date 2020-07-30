@@ -26,6 +26,9 @@
 #include <time.h> 
 #include <string> 
 #include <unordered_set> 
+#include <queue> 
+#include <unordered_set>
+
 
 using namespace utils;
 using namespace models;
@@ -37,7 +40,7 @@ using namespace models::gvrp_models::cplex::matheus_model_3;
 
 using namespace std;
 
-Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nGreedyLP(0) {
+Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nGreedyLP(0), BPPTimeLimit(10000000), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //populating all map and customers set
@@ -46,7 +49,7 @@ Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int tim
   for (const Vertex& customer: instance.customers) {
     all[customer.id] = &customer;
     customers.insert(customer.id);
-    timesLBs[customer.id] = calculateCustomerMinRequiredTime (instance, *gvrp_afs_tree, customer);
+    timesLBs[customer.id] = calculateCustomerMinRequiredTime (instance, *gvrp_afs_tree, customer) + customer.serviceTime;
     fuelsLBs[customer.id] = calculateCustomerMinRequiredFuel (instance, *gvrp_afs_tree, customer);
   }
   //creating dummies
@@ -105,6 +108,7 @@ Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int tim
   preprocessings.push_back(new Invalid_edge_preprocessing_4(*this));
   //heuristic callbacks
   heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
+
 } 
 
 double Matheus_model_3::time (int i, int j) {
@@ -112,7 +116,8 @@ double Matheus_model_3::time (int i, int j) {
 }
 
 double Matheus_model_3::M1(int i, int j) {
-  return instance.timeLimit + instance.time(all[i]->id, all[j]->id) - (timesLBs[i] + all[i]->serviceTime + timesLBs[j] + all[j]->serviceTime);
+  return instance.timeLimit + time(i, j) - (timesLBs[i] + timesLBs[j]);
+//  return instance.timeLimit + time(i, j) - (time(i, 0) + time(j, 0));
 }
 
 double Matheus_model_3::fuel (int i, int j) {
@@ -325,7 +330,7 @@ void Matheus_model_3::createModel() {
         for (const pair<int, const Vertex *>& p : all) {
           int i = p.first;
           if (i != depot && i != j) {
-            c = IloConstraint (t[j] - t[i] + M1(i, j) * x[i][j] + (M1(i, j) - time(i, j) - time(j, i)) * x[j][i] <= M1(i, j) - time(i, j));
+            c = IloConstraint (t[i] - t[j] + M1(i, j) * x[i][j] + (M1(i, j) - time(i, j) - time(j, i)) * x[j][i] <= M1(i, j) - time(i, j));
             constraintName<<" updating time "<<i;
             c.setName(constraintName.str().c_str());
             model.add(c);
@@ -347,7 +352,6 @@ void Matheus_model_3::createModel() {
         constraintName.str("");
       }
     }
-    /*
     for (int customer : customers) {
       c = IloConstraint (timesLBs[customer] - all[customer]->serviceTime <= t[customer] <= instance.timeLimit - timesLBs[customer]);
       constraintName<<customer<<" time lb and ub";
@@ -356,7 +360,6 @@ void Matheus_model_3::createModel() {
       constraintName.clear();
       constraintName.str("");
     }
-    */
     //energy
     //e_j - e_i + M2_{ij} x_{ij} + (M2_{ij} - (e_{ij} + e_{ji})) x_{ji} \leqslant M2_{ij} - e_{ij}, \forall v_i, v_j \in C
     for (int i : customers) 

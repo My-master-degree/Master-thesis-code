@@ -309,12 +309,12 @@ void Cubic_model::createModel() {
       constraintName.str("");
     }
     //e_i \geq e_{ij} x_{ij}^k, \forall v_i \in C, \forall v_j \in F_0, \forall k \in M
-    for (int k = 0; k < instance.maxRoutes; k++)
       for (int i : customers)
-        for (const pair<int, const Vertex *>& p1 : all){
+        for (const pair<int, const Vertex *>& p1 : all) {
           int j = p1.first;
           if (!customers.count(j)) {
-            expr = instance.distances[i][j] * x[k][i][j] * instance.vehicleFuelConsumptionRate;
+            for (int k = 0; k < instance.maxRoutes; k++)
+              expr += instance.distances[i][j] * x[k][i][j] * instance.vehicleFuelConsumptionRate;
             c = IloConstraint (e[i] >= expr);
             constraintName<<"e_"<<i<<" mandatory fuel to "<<j;
             c.setName(constraintName.str().c_str());
@@ -326,12 +326,13 @@ void Cubic_model::createModel() {
           }
         }
     //e_i \leq e_{ji} x_{ji}^k, \forall v_i \in C, \forall v_j \in F_0, \forall k \in M
-    for (int k = 0; k < instance.maxRoutes; k++)
       for (int i : customers)
         for (const pair<int, const Vertex *>& p1 : all){
           int j = p1.first;
           if (!customers.count(j)) {
-            expr = instance.vehicleFuelCapacity - instance.distances[j][i] * x[k][j][i] * instance.vehicleFuelConsumptionRate;
+            for (int k = 0; k < instance.maxRoutes; k++)
+              expr -= instance.distances[j][i] * x[k][j][i] * instance.vehicleFuelConsumptionRate;
+            expr += instance.vehicleFuelCapacity;
             c = IloConstraint (e[i] <= expr);
             constraintName<<"e_"<<i<<" mandatory fuel to "<<j;
             c.setName(constraintName.str().c_str());
@@ -423,6 +424,24 @@ void Cubic_model::createModel() {
           constraintName.clear();
           constraintName.str("");
         }
+    //n afs visits UB per route
+    for(size_t k = 0; k < instance.maxRoutes; ++k) {
+      for (int afs : afss) {
+        for (const pair<int, const Vertex *>& p : all) {
+          expr += x[k][afs][p.first];
+          for (int customer : customers)
+            expr -= x[k][customer][p.first];
+        }
+        c = IloConstraint (expr <= 1);
+        constraintName<<"afs "<<afs<<" route "<<k<<" n visit ub";
+        c.setName(constraintName.str().c_str());
+        model.add(c);
+        expr.end();
+        expr = IloExpr(env);
+        constraintName.clear();
+        constraintName.str("");
+      }
+    }
     //n routes LB
     for (int k = 0; k < instance.maxRoutes; ++k) 
       for (const pair<int, const Vertex *>& p2 : all){

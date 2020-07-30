@@ -73,6 +73,21 @@ void Subcycle_user_constraint::main() {
       weight[graph.addEdge(nodes[i], nodes[j])] = cost;
     }
   }
+  for (auto it = cubic_model.all.begin(); it != cubic_model.all.end(); ++it) {
+    int i = it->first;
+    for (auto it1 = it; it1 != cubic_model.all.end(); ++it1) {
+      int j = it1->first;
+      double cost = 0.0;
+      for (k = 0; k < cubic_model.instance.maxRoutes; k++) {
+        if (x_vals[k][i][j] > EPS)
+          cost += x_vals[k][i][j];
+        if (x_vals[k][j][i] > EPS)
+          cost += x_vals[k][j][i];
+      }
+//      if (cost > 0.0)
+//        cout<<i<<", "<<j<<": "<<cost<<endl;
+    }
+  }
   //gomory hu
   GomoryHu<ListGraph, ListGraph::EdgeMap<double>> gh (graph, weight);
   gh.run();
@@ -81,7 +96,7 @@ void Subcycle_user_constraint::main() {
     int i = p.first;
     for (const pair<int, const Vertex *>& p1 : cubic_model.all) {
       int j = p1.first;
-      if (gh.minCutValue(nodes[i], nodes[j]) >= 2.0) 
+      if (gh.minCutValue(nodes[i], nodes[j]) >= 2.0 - EPS) 
         dsu.join(i, j);
     }
   }
@@ -103,7 +118,7 @@ void Subcycle_user_constraint::main() {
   components.push_back(component);
   //end of multimap 
   //inequalitites
-  for (const unordered_set<int>& S : components) 
+  for (unordered_set<int>& S : components) 
     if (!S.count(depot)) {
       //get customers from component S
       list<int> customersComponent;
@@ -130,19 +145,97 @@ void Subcycle_user_constraint::main() {
         ++cubic_model.nImprovedMSTNRoutesLB;
       if (bppNRoutesLB == maxNRoutes) 
         ++cubic_model.nBPPNRoutesLB;
-      //getting lhs
-      for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
-        for (const pair<int, const Vertex *>& p2 : cubic_model.all) {
-          int a = p2.first;
-          if (!S.count(a))
-            for (int b : S) 
-              lhs += cubic_model.x[k][a][b];
-        }
-      }
-      //getting rhs
-      lhs -= maxNRoutes;
       try {
+        //in edges
+        //getting lhs
+        for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+          for (const pair<int, const Vertex *>& p2 : cubic_model.all) {
+            int a = p2.first;
+            if (!S.count(a))
+              for (int b : S) 
+                lhs += cubic_model.x[k][a][b];
+          }
+        }
+        //getting rhs
+        lhs -= maxNRoutes;
         add(lhs >= 0.0).end();
+        //out edges
+        lhs.end();
+        lhs = IloExpr(env);
+        //getting lhs
+        for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+          for (const pair<int, const Vertex *>& p2 : cubic_model.all) {
+            int a = p2.first;
+            if (!S.count(a))
+              for (int b : S) 
+                lhs += cubic_model.x[k][b][a];
+          }
+        }
+        //getting rhs
+        lhs -= maxNRoutes;
+        add(lhs >= 0.0).end();
+        lhs.end();
+        lhs = IloExpr(env);
+        //bfs to get all afss out and connected to this component
+        for (int node : S) {
+        //  cout<<node<<", "; 
+        }
+//        cout<<endl;
+        queue<int> q; 
+        for (int node : S)
+          q.push(node);
+        while (!q.empty()) {
+          int curr = q.front();
+          q.pop();
+          for (int afs : cubic_model.afss) {
+            double weight = 0.0;
+            for (k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+              if (x_vals[k][curr][afs] > EPS)
+                weight += x_vals[k][curr][afs];
+              if (x_vals[k][j][curr] > EPS)
+                weight += x_vals[k][afs][curr];
+            }
+            if (!S.count(afs) && weight > EPS) {
+//              cout<<"from "<<curr<<" to "<<afs<<endl;
+              q.push(afs);
+              S.insert(afs);
+              //in edges
+              //getting lhs
+              for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+                for (const pair<int, const Vertex *>& p2 : cubic_model.all) {
+                  int a = p2.first;
+                  if (!S.count(a))
+                    for (int b : S) 
+                      lhs += cubic_model.x[k][a][b];
+                }
+              }
+              //getting rhs
+              lhs -= maxNRoutes;
+              add(lhs >= 0.0).end();
+              //out edges
+              lhs.end();
+              lhs = IloExpr(env);
+              //getting lhs
+              for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+                for (const pair<int, const Vertex *>& p2 : cubic_model.all) {
+                  int a = p2.first;
+                  if (!S.count(a))
+                    for (int b : S) 
+                      lhs += cubic_model.x[k][b][a];
+                }
+              }
+              //getting rhs
+              lhs -= maxNRoutes;
+              add(lhs >= 0.0).end();
+              lhs.end();
+              lhs = IloExpr(env);
+//              for (int node : S) 
+//                cout<<node<<", "; 
+//              cout<<endl;
+            }
+          }
+        }
+//        cout<<"("<<maxNRoutes<<")"<<endl;
       } catch(IloException& e) {
         cerr << "Exception while adding lazy constraint" << e.getMessage() << "\n";
         throw;

@@ -19,6 +19,7 @@ Invalid_edge_preprocessing_2::Invalid_edge_preprocessing_2 (Matheus_model_3& mat
 
 void Invalid_edge_preprocessing_2::add () {
   list<pair<int, int>> edges = get_invalid_edges_2(matheus_model_3.instance);
+  matheus_model_3.nPreprocessings2 = edges.size();
   for (const auto& [i, j] : edges)
     if (i == matheus_model_3.instance.depot.id) {
       auto d = matheus_model_3.afs_dummies[i];

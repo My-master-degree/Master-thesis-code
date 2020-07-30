@@ -56,7 +56,7 @@ void Cubic_model_tests::run() {
     //keep this line, for some strange bug it is necessary to define the time limit explicitly 
     cubic_model.time_limit = execution_time;
     execute_model(cubic_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
-    resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
+    resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<cubic_model.nGreedyLP<<";"<<cubic_model.nBPPNRoutesLB<<";"<<cubic_model.nImprovedMSTNRoutesLB<<";"<<cubic_model.nPreprocessings1<<";"<<cubic_model.nPreprocessings2<<";"<<cubic_model.nPreprocessings3<<";"<<cubic_model.nPreprocessings4<<endl;
     gvrp_instance++;
     i++;
   }
@@ -81,7 +81,7 @@ void Cubic_model_tests::execute_model(Cubic_model& cubic_model, const string& in
 
 void Cubic_model_tests::openResultFile (ofstream& resultsFile, string fileName) {
   resultsFile.open (fileName + string("results.csv"));
-  resultsFile<<"Instance,Solution,GAP,Cost,Time,Status"<<endl;
+  resultsFile<<"Instance;Solution;GAP;Cost;Time;Status;GreedyLP;BPP;ImprovedMST;preprocessing1;preprocessing2;preprocessing3;preprocessing4"<<endl;
 }
 
 void Cubic_model_tests::closeResultFile (ofstream& resultsFile) {

@@ -89,7 +89,7 @@ void Subcycle_user_constraint::main() {
     //get subcycles
     for (int i : component) 
       for (int j : component) 
-        if (gh.minCutValue(nodes[j], nodes[j]) >= 2.0) 
+        if (gh.minCutValue(nodes[j], nodes[j]) >= 2.0 - EPS) 
           dsu.join(i, j);
     component.clear();
   }

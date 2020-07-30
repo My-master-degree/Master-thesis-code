@@ -486,6 +486,16 @@ void Matheus_model::createModel() {
     //a_{ij} >= x_{ij} * max (LB_j^E, LB_i^E - e_{ij}), \forall v_i, v_j \in C
     for (size_t j = 1; j < c0.size(); ++j) 
       for (size_t i = 1; i < c0.size(); ++i) {
+        /*
+        //min_{v_f \in F_0} e_{jf} and min_{v_f \in F_0} e_{if}
+        double closestAfsToJ = customerToAfsFuel(j, 0),
+               closestAfsToI = customerToAfsFuel(i, 0);
+        for (size_t f = 1; f < f0.size(); ++f) {
+          closestAfsToJ = min(closestAfsToJ, customerToAfsFuel(j, f));
+          closestAfsToI = min(closestAfsToI, customerToAfsFuel(i, f));
+        }
+        constraint = IloConstraint (a[i - 1][j - 1] >= x[i][j] * max(closestAfsToJ, closestAfsToI - customersFuel(i, j)));
+        */
         constraint = IloConstraint (a[i - 1][j - 1] >= x[i][j] * max(customersMinRequiredFuel[j - 1], customersMinRequiredFuel[i - 1] - customersFuel(i, j)));
         constraintName<<"a["<<i - 1<<"]["<<j - 1<<"] lb";
         constraint.setName(constraintName.str().c_str());
@@ -496,6 +506,16 @@ void Matheus_model::createModel() {
     //a_{ij} <= x_{ij} * min (\beta - LB_j^E, \beta - LB_i^E - e_{ij}), \forall v_i, v_j \in C
     for (size_t j = 1; j < c0.size(); ++j) 
       for (size_t i = 1; i < c0.size(); ++i) {
+        /*
+        //min_{v_f \in F_0} e_{fj} and min_{v_f \in F_0} e_{fi}
+        double closestAfsToJ = afsToCustomerFuel(0, j),
+               closestAfsToI = afsToCustomerFuel(0, i);
+        for (size_t f = 1; f < f0.size(); ++f) {
+          closestAfsToJ = min(closestAfsToJ, afsToCustomerFuel(f, j));
+          closestAfsToI = min(closestAfsToI, afsToCustomerFuel(f, i));
+        }
+        constraint = IloConstraint (a[i - 1][j - 1] <= x[i][j] * min(instance.vehicleFuelCapacity - closestAfsToI - customersFuel(i, j), instance.vehicleFuelCapacity - closestAfsToJ));
+        */
         constraint = IloConstraint (a[i - 1][j - 1] <= x[i][j] * min(instance.vehicleFuelCapacity - customersMinRequiredFuel[i - 1] - customersFuel(i, j), instance.vehicleFuelCapacity - customersMinRequiredFuel[j - 1]));
         constraintName<<"a["<<i - 1<<"]["<<j - 1<<"] ub";
         constraint.setName(constraintName.str().c_str());
@@ -514,6 +534,13 @@ void Matheus_model::createModel() {
     }
     //v_{j0} \leqslant x_{j0} * (\beta - LB_j^E), \forall v_j \in C
     for (size_t j = 1; j < c0.size(); ++j) {
+      /*
+      //min_{v_f \in F_0} e_{fj}
+      double closestAfsToJ = afsToCustomerFuel(0, j);
+      for (size_t f = 1; f < f0.size(); ++f) 
+        closestAfsToJ = min(closestAfsToJ, afsToCustomerFuel(f, j));
+      constraint = IloConstraint (v[j - 1][0] <= x[j][0] * (instance.vehicleFuelCapacity - closestAfsToJ));
+      */
       constraint = IloConstraint (v[j - 1][0] <= x[j][0] * (instance.vehicleFuelCapacity - customersMinRequiredFuel[j - 1]));
       constraintName<<"v["<<j - 1<<"][0] ub";
       constraint.setName(constraintName.str().c_str());
@@ -541,7 +568,13 @@ void Matheus_model::createModel() {
       for (size_t f = 1; f < f0.size(); ++f) {
         for (size_t i = 0; i < c0.size(); ++i) 
           expr += y[j][f][i];
+        /*
         //min_{v_f \in F_0} e_{jf}
+        double closestAfsToJ = customerToAfsFuel(j, 0);
+        for (size_t f = 1; f < f0.size(); ++f) 
+          closestAfsToJ = min(closestAfsToJ, customerToAfsFuel(j, f));
+        constraint = IloConstraint (v[j - 1][f] <= expr * (instance.vehicleFuelCapacity - closestAfsToJ));
+        */
         constraint = IloConstraint (v[j - 1][f] <= expr * (instance.vehicleFuelCapacity - customersMinRequiredFuel[j - 1]));
         constraintName<<"v["<<j - 1<<"]["<<f<<"] ub";
         constraint.setName(constraintName.str().c_str());

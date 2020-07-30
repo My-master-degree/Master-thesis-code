@@ -13,6 +13,7 @@ Invalid_edge_preprocessing::Invalid_edge_preprocessing (Matheus_model_3& matheus
 
 void Invalid_edge_preprocessing::add () {
   list<pair<int, int>> edges = get_invalid_edges_1(matheus_model_3.instance);
+  matheus_model_3.nPreprocessings1 = edges.size();
   for (auto const& [i, j] : edges) {
     auto f1 = matheus_model_3.afs_dummies.find(i),
          f2 = matheus_model_3.afs_dummies.find(j);
