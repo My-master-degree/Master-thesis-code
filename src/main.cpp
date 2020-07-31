@@ -54,10 +54,12 @@ int main (int argc, char **argv)
   cout<<"============    LH MODEL    =============="<<endl;
   LH_model_tests lh_model_tests (VERBOSE, execution_time, nIntSol);
   lh_model_tests.run();
+  */
     //Matheus model
   cout<<"============    MATHEUS MODEL    =============="<<endl;
   Matheus_model_tests matheus_model_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_tests.run();
+  /*
     //Matheus model 2
   cout<<"============    MATHEUS 2 MODEL    =============="<<endl;
   Matheus_model_2_tests matheus_model_2_tests (VERBOSE, execution_time, nIntSol);
@@ -66,12 +68,10 @@ int main (int argc, char **argv)
   cout<<"============    CUBIC MODEL    =============="<<endl;
   Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);
   cubic_model_tests.run();
-  */
     //Matheus model 3
   cout<<"============    MATHEUS 3 MODEL    =============="<<endl;
   Matheus_model_3_tests matheus_model_3_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_3_tests.run();
-  /*
     //BBP model
   BPP_model_tests bpp_model_tests (VERBOSE, execution_time, nIntSol);
   bpp_model_tests.run();

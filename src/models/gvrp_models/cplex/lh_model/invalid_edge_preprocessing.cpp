@@ -37,11 +37,5 @@ void Invalid_edge_preprocessing::add () {
     if (c1 != lh_model.customersC0Indexes.end() && f2 != lh_model.afssF0Indexes.end()) 
       for (size_t i = 0; i < lh_model.c0.size(); ++i)
         lh_model.model.add(lh_model.y[c1->second][f2->second][i] == 0);
-    //first is customer and second is afs 
-    if (f1 != lh_model.afssF0Indexes.end() && f2 != lh_model.afssF0Indexes.end()) 
-      for (size_t i_ = 0; i_ < lh_model.c0.size(); ++i_)
-        for (size_t j_ = 0; j_ < lh_model.c0.size(); ++j_)
-          for (size_t k = 0; k < lh_model.c0.size(); ++k)
-            lh_model.model.add(lh_model.y[i_][f1->second][j_] + lh_model.y[j_][f2->second][k] <= 1);
   }
 }

@@ -37,7 +37,7 @@ void Invalid_edge_preprocessing::add () {
     if (c1 != matheus_model.customersC0Indexes.end() && f2 != matheus_model.afssF0Indexes.end()) 
       for (size_t i = 0; i < matheus_model.c0.size(); ++i)
         matheus_model.model.add(matheus_model.y[c1->second][f2->second][i] == 0);
-    //first is customer and second is afs 
+    //first is an afs and second is afs 
     if (f1 != matheus_model.afssF0Indexes.end() && f2 != matheus_model.afssF0Indexes.end()) 
       for (size_t i_ = 0; i_ < matheus_model.c0.size(); ++i_)
         for (size_t j_ = 0; j_ < matheus_model.c0.size(); ++j_)

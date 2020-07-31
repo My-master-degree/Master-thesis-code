@@ -19,11 +19,15 @@ Invalid_edge_preprocessing_C4_C5::Invalid_edge_preprocessing_C4_C5 (LH_model& lh
 
 void Invalid_edge_preprocessing_C4_C5::add () {
   //invalid edges
-  list<pair<int, int>> edges = get_invalid_edges_2(lh_model.instance);
-  lh_model.nPreprocessings1 = edges.size();
-  for (const auto& [i, j] : edges)
-    if (i == lh_model.instance.depot.id)
-      lh_model.model.add(lh_model.x[0][lh_model.customersC0Indexes[j]] == 0);
-    else
-      lh_model.model.add(lh_model.x[lh_model.customersC0Indexes[i]][0] == 0);
+  lh_model.nPreprocessings1 = 0;
+  for (size_t i = 1; i < lh_model.c0.size(); ++i) {
+    double closestAFS = lh_model.customersFuel(0, i);
+    for (size_t f = 0; f < lh_model.f0.size(); ++f)
+      closestAFS = min (closestAFS, lh_model.afsToCustomerFuel(f, i));
+    if (closestAFS + lh_model.customersFuel(i, 0) > lh_model.instance.vehicleFuelCapacity) {
+      lh_model.model.add(lh_model.x[0][i] == 0);
+      lh_model.model.add(lh_model.x[i][0] == 0);
+      ++lh_model.nPreprocessings1;
+    }
+  }
 }

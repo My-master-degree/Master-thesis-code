@@ -15,6 +15,7 @@
 #include <string>
 #include <list>
 #include <iostream>
+#include <float.h>
 
 using namespace std;
 using namespace utils;
@@ -51,6 +52,96 @@ void Matheus_model_tests::run() {
 //    Gvrp_solution gvrp_solution = gfsh.run();
 //    Mip_start matheus_model (*gvrp_instance, execution_time, gvrp_solution);  
     Matheus_model matheus_model (*gvrp_instance, execution_time);  
+
+
+
+    //md preprocessings
+    list<list<int>> edgesMD;
+    list<pair<int, int>> edges_;
+    edges_ = get_invalid_edges_3 (*gvrp_instance, *matheus_model.gvrp_afs_tree);
+    for (const pair<int, int>& edge : edges_)
+      edgesMD.push_back({matheus_model.customersC0Indexes[edge.first], matheus_model.customersC0Indexes[edge.second]});
+    for (size_t i = 0; i < matheus_model.c0.size(); ++i) {
+      const Vertex * vertexI = matheus_model.c0[i];
+      for (size_t j = 0; j < matheus_model.c0.size(); ++j) {
+        const Vertex * vertexJ = matheus_model.c0[j];
+        for (size_t f_ = 0; f_ < matheus_model.f0.size(); ++f_) {
+          bool valid = false;
+          for (size_t f = 0; f < matheus_model.f0.size(); ++f) {
+            const Vertex * vertexF = matheus_model.f0[f];
+            for (size_t r = 0; r < matheus_model.f0.size(); ++r) {
+              const Vertex * vertexR = matheus_model.f0[r];
+              if (matheus_model.afsToCustomerFuel(f, i) + matheus_model.customerToAfsFuel(i, f_) <= matheus_model.instance.vehicleFuelCapacity 
+                  && matheus_model.afsToCustomerFuel(f_, j) + matheus_model.customerToAfsFuel(j, r) <= matheus_model.instance.vehicleFuelCapacity                      && matheus_model.gvrp_afs_tree->times[f] + matheus_model.instance.time(vertexF->id, vertexI->id) + matheus_model.time(i, f_, j) + vertexJ->serviceTime + matheus_model.instance.time(vertexJ->id, vertexR->id) + matheus_model.gvrp_afs_tree->times[r] <= matheus_model.instance.timeLimit) { 
+                valid = true;
+                f = matheus_model.f0.size();
+                break;
+              }
+            }
+          }
+          if (!valid) 
+            edgesMD.push_back({i, f_, j});
+        }
+      }
+    }
+    //lh reprocessings
+    list<list<int>> edgesLH;
+    for (const Vertex& i : matheus_model.instance.customers) 
+      for (const Vertex& j : matheus_model.instance.customers) {
+        //check if edge (i, j) can be feasible
+        double minFuelI = DBL_MAX, 
+               minFuelJ = DBL_MAX;
+        for (const Vertex& f : matheus_model.instance.afss) {
+          minFuelI = min(minFuelI, matheus_model.instance.fuel(f.id, i.id));
+          minFuelJ = min(minFuelJ, matheus_model.instance.fuel(j.id, f.id));
+        }
+        minFuelI = min(minFuelI, matheus_model.instance.fuel(matheus_model.instance.depot.id, i.id));
+        minFuelJ = min(minFuelJ, matheus_model.instance.fuel(j.id, matheus_model.instance.depot.id));
+        if (minFuelI + matheus_model.instance.fuel(i.id, j.id) + minFuelJ > matheus_model.instance.vehicleFuelCapacity || 
+            matheus_model.instance.time(matheus_model.instance.depot.id, i.id) + i.serviceTime + matheus_model.instance.time(i.id, j.id) + j.serviceTime + matheus_model.instance.time(j.id, matheus_model.instance.depot.id) > matheus_model.instance.timeLimit) 
+          edgesLH.push_back({matheus_model.customersC0Indexes[i.id], matheus_model.customersC0Indexes[j.id]});
+      }
+    double minFuelI, minFuelJ;
+    for (const Vertex& i : gvrp_instance->customers) {
+      //min fuel I
+      minFuelI = DBL_MAX;
+      for (const Vertex& f : gvrp_instance->afss) 
+        minFuelI = min(minFuelI, gvrp_instance->fuel(f.id, i.id));
+      minFuelI = min(minFuelI, gvrp_instance->fuel(gvrp_instance->depot.id, i.id));
+      for (const Vertex& j : gvrp_instance->customers) {
+        //min fuel J
+        minFuelJ = DBL_MAX;
+        for (const Vertex& f : gvrp_instance->afss) 
+          minFuelJ = min(minFuelJ, gvrp_instance->fuel(j.id, f.id));
+        minFuelJ = min(minFuelJ, gvrp_instance->fuel(j.id, gvrp_instance->depot.id));
+        for (const Vertex& f : gvrp_instance->afss) 
+          if (minFuelI + gvrp_instance->fuel(i.id, f.id) > gvrp_instance->vehicleFuelCapacity 
+              || gvrp_instance->fuel(f.id, j.id) + minFuelJ > gvrp_instance->vehicleFuelCapacity 
+              || gvrp_instance->time(gvrp_instance->depot.id, i.id) + gvrp_instance->time(i.id, f.id) + i.serviceTime + gvrp_instance->time(f.id, j.id) + f.serviceTime + gvrp_instance->time(j.id, gvrp_instance->depot.id) + j.serviceTime > gvrp_instance->timeLimit) { 
+            int fIndex = matheus_model.afssF0Indexes[f.id];
+            edgesLH.push_back({matheus_model.customersC0Indexes[i.id], fIndex, matheus_model.customersC0Indexes[j.id]});
+          }
+      }
+    }
+    //check
+    for (list<int> preproLH : edgesLH) {
+      bool valid = false;
+      for (list<int> preproMD : edgesMD) 
+        if (preproLH == preproMD) {
+          valid = true;
+          break;
+        }
+      if (!valid) {
+        cout<<"missing ";
+        for (int i : preproLH)
+          cout<<i<<", ";
+        cout<<endl;
+      }
+    }
+
+
+
+
     execute_model(matheus_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model.nGreedyLP<<";"<<matheus_model.nPreprocessings1<<";"<<matheus_model.nPreprocessings2<<";"<<matheus_model.nPreprocessings3<<";"<<matheus_model.nPreprocessings4<<endl;
     ++gvrp_instance;
