@@ -18,7 +18,7 @@ Invalid_edge_preprocessing_2::Invalid_edge_preprocessing_2 (Matheus_model& mathe
 }
 
 void Invalid_edge_preprocessing_2::add () {
-  list<pair<int, int>> edges = get_invalid_edges_2(matheus_model.instance);
+  list<pair<int, int>> edges = get_invalid_edges_2(matheus_model.instance, *matheus_model.gvrp_afs_tree);
   matheus_model.nPreprocessings2 = edges.size();
   for (const auto& [i, j] : edges)
     if (i == matheus_model.instance.depot.id)

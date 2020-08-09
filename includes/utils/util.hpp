@@ -32,7 +32,7 @@ namespace utils {
   double calculateGvrpLBByImprovedMSTTime (const vector<const Vertex *>& vertices, const vector<pair<double, double>> closestsTimes, const vector<vector<double>>& gvrpReducedGraphTimes);
   list<list<Vertex> > getGvrpConnectedComponents (const Gvrp_instance& gvrp_instance);
   list<pair<int, int>> get_invalid_edges_1 (const Gvrp_instance& gvrp_instance);
-  list<pair<int, int>> get_invalid_edges_2 (const Gvrp_instance& gvrp_instance);
+  list<pair<int, int>> get_invalid_edges_2 (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree);
   list<pair<int, int>> get_invalid_edges_3 (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree);
   list<pair<int, int>> get_invalid_edges_4 (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree);
   double calculateGvrpLB1 (const vector<pair<double, double>>& closestsDistances);

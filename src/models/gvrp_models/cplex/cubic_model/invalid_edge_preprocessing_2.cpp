@@ -15,7 +15,7 @@ Invalid_edge_preprocessing_2::Invalid_edge_preprocessing_2 (Cubic_model& cubic_m
 }
 
 void Invalid_edge_preprocessing_2::add () {
-  list<pair<int, int>> edges = get_invalid_edges_2(cubic_model.instance);
+  list<pair<int, int>> edges = get_invalid_edges_2(cubic_model.instance, *cubic_model.gvrp_afs_tree);
   cubic_model.nPreprocessings2 = edges.size();
   for (const auto& [i, j] : edges)
     for (int k = 0; k < cubic_model.instance.maxRoutes; k++) 

@@ -7,10 +7,6 @@
 #include "models/gvrp_models/gvrp_afs_tree.hpp" 
 #include "models/gvrp_models/gvrp_solution.hpp" 
 #include "models/gvrp_models/cplex/gvrp_model.hpp" 
-#include "models/gvrp_models/cplex/emh_model/user_constraint.hpp"
-#include "models/gvrp_models/cplex/emh_model/lazy_constraint.hpp"
-#include "models/gvrp_models/cplex/emh_model/preprocessing.hpp"
-#include "models/gvrp_models/cplex/emh_model/extra_constraint.hpp"
 
 #include <map>
 #include <set>
@@ -43,9 +39,6 @@ namespace models {
             IloNumVarArray t;
             IloNumVarArray e;
             Matrix2DVal x_vals;
-            list<User_constraint*> user_constraints;
-            list<Preprocessing*> preprocessings;
-            list<Extra_constraint*> extra_constraints;
           protected:
             void createVariables();
             void createObjectiveFunction();

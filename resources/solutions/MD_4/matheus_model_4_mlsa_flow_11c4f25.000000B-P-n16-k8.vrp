@@ -1,0 +1,6 @@
+Route 1: 0 10 2 13 7 5 13 9 13 8 10 0 (cost: 134) (time: 82.6275)
+Route 2: 0 10 3 10 4 15 11 15 12 10 1 0 (cost: 123) (time: 82.4118)
+Route 3: 0 6 0 (cost: 24) (time: 4.47059)
+Total cost: 281
+Infeasibilities found:
+Route 1: Edge (5,13) requires fuel capacity greater than the available -8

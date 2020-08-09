@@ -5,9 +5,6 @@
 #include "models/gvrp_models/gvrp_instance.hpp"
 #include "models/gvrp_models/cplex/gvrp_model.hpp"
 #include "models/gvrp_models/cplex/emh_model/emh_model.hpp"
-#include "models/gvrp_models/cplex/emh_model/preprocessing.hpp"
-#include "models/gvrp_models/cplex/emh_model/extra_constraint.hpp"
-#include "models/gvrp_models/cplex/emh_model/user_constraint.hpp"
 
 #include <sstream>
 #include <list>
@@ -54,12 +51,6 @@ EMH_model::EMH_model(const Gvrp_instance& instance, unsigned int time_limit) : G
 } 
 
 EMH_model::~EMH_model() {
-  for (Preprocessing * preprocessing : preprocessings)
-    delete preprocessing;  
-  for (User_constraint * user_constraint : user_constraints)
-    delete user_constraint;  
-  for (Extra_constraint * extra_constraint : extra_constraints)
-    delete extra_constraint;  
   delete depotDummy;
 }
 
@@ -178,8 +169,6 @@ void EMH_model::createModel() {
       int i = p.first;
       model.add(x[i][i] == 0);
     }
-    for (Preprocessing* preprocessing : preprocessings)
-      preprocessing->add();
     //\sum_{v_j \in V' : v_i \neq v_j} x_{ij} = 1, \forall v_i \in C
     for (const Vertex& customer : instance.customers){
       int i = customer.id;
@@ -309,13 +298,6 @@ void EMH_model::createModel() {
         expr = IloExpr(env);
       }
     }
-    //extra constraints
-    for (Extra_constraint* extra_constraint : extra_constraints)
-      extra_constraint->add();
-    //init
-    //user cuts
-    for (User_constraint* user_constraint : user_constraints)
-      cplex.use(user_constraint);
     cplex = IloCplex(model);
     //extra steps
     extraStepsAfterModelCreation();

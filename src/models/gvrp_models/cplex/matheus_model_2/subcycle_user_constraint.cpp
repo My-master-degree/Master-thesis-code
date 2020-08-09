@@ -60,6 +60,10 @@ void Subcycle_user_constraint::main() {
   vector<bool> visited (sc0, false);
   list<unordered_set<int>> components;
   queue<int> q;
+  //creating nodes
+  for (size_t i = 0; i < sc0; ++i) 
+    nodes[i] = graph.addNode();
+  ListGraph::EdgeMap<double> weight(graph); 
   //get values
   Matrix2DVal x_vals (env, sc0);
   Matrix3DVal y_vals (env, sc0);
@@ -71,72 +75,24 @@ void Subcycle_user_constraint::main() {
       y_vals[i][f] = IloNumArray (env, sc0, 0, 1, IloNumVar::Float);
       getValues(y_vals[i][f], matheus_model_2.y[i][f]);
     }
-  }
-  //creating nodes
-  for (size_t i = 0; i < sc0; ++i) 
-    nodes[i] = graph.addNode();
-  //get components
-  for (int i = 1; i < sc0; ++i) {
-    if (visited[i])
-      continue;
-    ListGraph::EdgeMap<double> weight(graph); 
-    //bfs
-    component.insert(i);
-    q.push(i);
-    while (!q.empty()) {
-      int curr = q.front();
-      visited[curr] = true;
-      q.pop();
-      for (int j = 0; j < sc0; ++j) {
-        double currToJFlow = 0.0, 
-               jToCurrFlow = 0.0;
-        bool flowExists = false;
-        if (x_vals[curr][j] > EPS) {
-          currToJFlow = x_vals[curr][j];
-          flowExists = true;
-          x_vals[curr][j] = 0;
-        }
-        if (x_vals[j][curr] > EPS) {
-          jToCurrFlow = x_vals[j][curr];
-          flowExists = true;
-          x_vals[j][curr] = 0;
-        }
-        for (size_t f = 0; f < sf0; ++f) {
-          if (y_vals[curr][f][j] > EPS) {
-            currToJFlow += y_vals[curr][f][j];
-            flowExists = true;
-            y_vals[curr][f][j] = 0;
-          }
-          if (y_vals[j][f][curr] > EPS) {
-            jToCurrFlow += y_vals[j][f][curr];
-            flowExists = true;
-            y_vals[j][f][curr] = 0;
-          }
-        }
-        if (flowExists) {
-          if (!visited[j]) {
-            component.insert(j);
-            q.push(j);
-          }
-          nodes[curr];
-          nodes[j];
-          auto e = graph.addEdge(nodes[curr], nodes[j]);
-          weight[e] = currToJFlow;
-          e = graph.addEdge(nodes[j], nodes[curr]);
-          weight[e] = jToCurrFlow;
-        }
-      } 
+    for (size_t j = 0; j < sc0; ++j) {
+      double cost = 0.0;
+      if (x_vals[i][j] > EPS)
+        cost += x_vals[i][j];
+      for (size_t f = 0; f < sf0; ++f) 
+        if (y_vals[i][f][j] > EPS)
+          cost += y_vals[i][f][j];
+      weight[graph.addEdge(nodes[i], nodes[j])] = cost;
     }
-    //gh
-    GomoryHu<ListGraph, ListGraph::EdgeMap<double> > gh (graph, weight);
-    gh.run();
-    //get subcycles
-    for (int i : component)
-      for (int j : component)
-        if (gh.minCutValue(nodes[j], nodes[j]) >= 2.0 - EPS) 
-          dsu.join(i, j);
-    component.clear();
   }
+  //gh
+  GomoryHu<ListGraph, ListGraph::EdgeMap<double> > gh (graph, weight);
+  gh.run();
+  //get subcycles
+  for (size_t i = 0; i < sc0; ++i) 
+    for (size_t j = 0; j < sc0; ++j) 
+      if (gh.minCutValue(nodes[j], nodes[j]) >= 2.0 - EPS) 
+        dsu.join(i, j);
   //get subcomponents
   for (int i = 0; i < sc0; ++i) 
     subcomponents.insert(make_pair(dsu.findSet(i), i));

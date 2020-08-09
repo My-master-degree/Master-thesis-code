@@ -2,11 +2,6 @@
 #include "models/gvrp_models/gvrp_instance.hpp"
 #include "models/gvrp_models/gvrp_solution.hpp"
 #include "models/gvrp_models/cplex/emh_model/emh_model.hpp"
-#include "models/gvrp_models/cplex/emh_model/invalid_edge_preprocessing.hpp"
-#include "models/gvrp_models/cplex/emh_model/invalid_edge_preprocessing_2.hpp"
-#include "models/gvrp_models/cplex/emh_model/invalid_edge_preprocessing_3.hpp"
-#include "models/gvrp_models/cplex/emh_model/invalid_edge_preprocessing_4.hpp"
-#include "models/gvrp_models/cplex/emh_model/subcycle_user_constraint.hpp"
 #include "utils/util.hpp"
 #include "SampleConfig.h"
 
@@ -48,13 +43,6 @@ void EMH_model_tests::run() {
   for (const string& instance : instances) {
     cout<<instance<<endl;
     EMH_model emh_model (*gvrp_instance, execution_time);  
-    /*
-    emh_model.preprocessings.push_back(new Invalid_edge_preprocessing(emh_model));
-    emh_model.preprocessings.push_back(new Invalid_edge_preprocessing_2(emh_model));
-    emh_model.preprocessings.push_back(new Invalid_edge_preprocessing_3(emh_model));
-    emh_model.preprocessings.push_back(new Invalid_edge_preprocessing_4(emh_model));
-    emh_model.user_constraints.push_back(new Subcycle_user_constraint(emh_model));
-    */
     execute_model(emh_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;

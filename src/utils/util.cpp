@@ -435,10 +435,11 @@ list<pair<int, int>> utils::get_invalid_edges_1 (const Gvrp_instance& gvrp_insta
   return edges;
 }
 
-list<pair<int, int>> utils::get_invalid_edges_2 (const Gvrp_instance& gvrp_instance) {
+list<pair<int, int>> utils::get_invalid_edges_2 (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree) {
   if (gvrp_instance.distances_enum != METRIC)
     throw string("The preprocessing 'Invalid edge preprocessing 2' only applies for metric instances");
   list<pair<int, int>> edges;
+  /*
   Gvrp_feasible_solution_heuristic gvrp_feasible_solution_heuristic (gvrp_instance);
   Gvrp_solution gvrp_solution =  gvrp_feasible_solution_heuristic.run();
   set<int> customers;
@@ -458,6 +459,24 @@ list<pair<int, int>> utils::get_invalid_edges_2 (const Gvrp_instance& gvrp_insta
     }
   }
   return edges;
+  */
+  for (const Vertex& customer : gvrp_instance.customers) {
+    if (gvrp_instance.fuel(customer.id, gvrp_instance.depot.id) > gvrp_instance.vehicleFuelCapacity/2.0) {
+      bool valid = false;
+      for (size_t f = 0; f < gvrp_afs_tree.f0.size(); ++f) {
+        if (gvrp_instance.fuel(gvrp_afs_tree.f0[f]->id, customer.id) + gvrp_instance.fuel(customer.id, gvrp_instance.depot.id) <= gvrp_instance.vehicleFuelCapacity
+            && gvrp_afs_tree.times[f] + gvrp_instance.fuel(gvrp_afs_tree.f0[f]->id, customer.id) + customer.serviceTime + gvrp_instance.time(customer.id, gvrp_instance.depot.id) <= gvrp_instance.vehicleFuelCapacity) {
+          valid = true;
+          break;
+        }
+      }
+      if (!valid) {
+        edges.push_back({customer.id, gvrp_instance.depot.id});
+      }
+    }
+  }
+  return edges;
+
 }
 
 list<pair<int, int>> utils::get_invalid_edges_3 (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree) {

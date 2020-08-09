@@ -20,28 +20,34 @@ Invalid_edge_preprocessing::Invalid_edge_preprocessing (Matheus_model& matheus_m
 void Invalid_edge_preprocessing::add () {
   //invalid edges
   list<pair<int, int>> edges = get_invalid_edges_1(matheus_model.instance);
-  matheus_model.nPreprocessings1 = edges.size();
+  matheus_model.nPreprocessings1 = 0;
   for (auto const& [i, j] : edges) {
     auto c1 = matheus_model.customersC0Indexes.find(i),
          c2 = matheus_model.customersC0Indexes.find(j);
     auto f1 = matheus_model.afssF0Indexes.find(i),
          f2 = matheus_model.afssF0Indexes.find(j);
     //both are customers
-    if (c1 != matheus_model.customersC0Indexes.end() && c2 != matheus_model.customersC0Indexes.end()) 
+    if (c1 != matheus_model.customersC0Indexes.end() && c2 != matheus_model.customersC0Indexes.end()) {
       matheus_model.model.add(matheus_model.x[c1->second][c2->second] == 0);
+      ++matheus_model.nPreprocessings1;
+    }
     //first is afs and second is customer
     if (f1 != matheus_model.afssF0Indexes.end() && c2 != matheus_model.customersC0Indexes.end()) 
-      for (size_t i = 0; i < matheus_model.c0.size(); ++i)
+      for (size_t i = 0; i < matheus_model.c0.size(); ++i) {
         matheus_model.model.add(matheus_model.y[i][f1->second][c2->second] == 0);
+        ++matheus_model.nPreprocessings1;
+      }
     //first is customer and second is afs 
     if (c1 != matheus_model.customersC0Indexes.end() && f2 != matheus_model.afssF0Indexes.end()) 
-      for (size_t i = 0; i < matheus_model.c0.size(); ++i)
+      for (size_t i = 0; i < matheus_model.c0.size(); ++i) {
         matheus_model.model.add(matheus_model.y[c1->second][f2->second][i] == 0);
+        ++matheus_model.nPreprocessings1;
+      }
     //first is an afs and second is afs 
     if (f1 != matheus_model.afssF0Indexes.end() && f2 != matheus_model.afssF0Indexes.end()) 
       for (size_t i_ = 0; i_ < matheus_model.c0.size(); ++i_)
         for (size_t j_ = 0; j_ < matheus_model.c0.size(); ++j_)
           for (size_t k = 0; k < matheus_model.c0.size(); ++k)
-          matheus_model.model.add(matheus_model.y[i_][f1->second][j_] + matheus_model.y[j_][f2->second][k] <= 1);
+            matheus_model.model.add(matheus_model.y[i_][f1->second][j_] + matheus_model.y[j_][f2->second][k] <= 1);
   }
 }
