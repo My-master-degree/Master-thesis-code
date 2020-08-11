@@ -11,7 +11,6 @@
 #include "models/gvrp_models/cplex/matheus_model_3/user_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model_3/lazy_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model_3/preprocessing.hpp"
-#include "models/gvrp_models/cplex/matheus_model_3/extra_constraint.hpp"
 
 #include <map>
 #include <unordered_map>
@@ -32,7 +31,6 @@ namespace models {
         class User_constraint;
         class Lazy_constraint;
         class Preprocessing;
-        class Extra_constraint;
         class Matheus_model_3 : public Gvrp_model {
           public:
             explicit Matheus_model_3(const Gvrp_instance& gvrp_instance, unsigned int time_limit); 
@@ -49,7 +47,6 @@ namespace models {
             list<User_constraint*> user_constraints;
             list<Preprocessing*> preprocessings;
             list<Heuristic_callback*> heuristic_callbacks;
-            list<Extra_constraint*> extra_constraints;
             vector<vector<double>> gvrpReducedGraphDistances;
             vector<vector<double>> gvrpReducedGraphTimes;
             unsigned long int nGreedyLP;

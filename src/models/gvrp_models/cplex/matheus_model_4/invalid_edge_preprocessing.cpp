@@ -33,16 +33,16 @@ void Invalid_edge_preprocessing::add () {
     }
     //first is afs and second is customer
     if (f1 != matheus_model_4.afss_FIndexes.end() && c2 != matheus_model_4.customersC0Indexes.end()) {
-      for (size_t i = 0; i < matheus_model_4.c0.size(); ++i)
-        for (size_t f = 0; f < matheus_model_4._f.size(); ++f) {
+      for (int i = 0; i < matheus_model_4.c0.size(); ++i)
+        for (int f = 0; f < matheus_model_4._f.size(); ++f) {
           matheus_model_4.model.add(matheus_model_4.y[i][f][f1->second][c2->second] == 0);
           ++matheus_model_4.nPreprocessings1;
         }
     }
     //first is customer and second is afs 
     if (c1 != matheus_model_4.customersC0Indexes.end() && f2 != matheus_model_4.afss_FIndexes.end()) {
-      for (size_t i = 0; i < matheus_model_4.c0.size(); ++i)
-        for (size_t f = 0; f < matheus_model_4._f.size(); ++f) {
+      for (int i = 0; i < matheus_model_4.c0.size(); ++i)
+        for (int f = 0; f < matheus_model_4._f.size(); ++f) {
           matheus_model_4.model.add(matheus_model_4.y[c1->second][f2->second][f][i] == 0);
           ++matheus_model_4.nPreprocessings1;
         }

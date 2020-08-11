@@ -23,17 +23,17 @@ void Mip_start::extraStepsAfterModelCreation () {
     x_vals = Matrix2DVal (env, c0.size());
     y_vals = Matrix3DVal (env, c0.size());
     //create vals
-    for (size_t i = 0; i < c0.size(); ++i) {
+    for (int i = 0; i < c0.size(); ++i) {
       //x
       x_vals[i] = IloNumArray (env, c0.size(), 0, 1, IloNumVar::Int);
-      for (size_t j = 0; j < c0.size(); ++j) 
+      for (int j = 0; j < c0.size(); ++j) 
         //x
         x_vals[i][j] = 0.0;
       //y var
       y_vals[i] = Matrix2DVal (env, f0.size());
-      for (size_t f = 0; f < f0.size(); ++f) {
+      for (int f = 0; f < f0.size(); ++f) {
         y_vals[i][f] = IloNumArray(env, c0.size(), 0, 1, IloNumVar::Int);
-        for (size_t j = 0; j < c0.size(); ++j) 
+        for (int j = 0; j < c0.size(); ++j) 
           y_vals[i][f][j] = 0.0;
       }
     }
@@ -77,7 +77,7 @@ void Mip_start::extraStepsAfterModelCreation () {
     IloCplex::MIPStartEffort effort = IloCplex::MIPStartCheckFeas;
     IloNumVarArray startVar(env);
     IloNumArray startVal(env);
-    for (size_t i = 0; i < c0.size(); ++i) {
+    for (int i = 0; i < c0.size(); ++i) {
       //e and t
       if (i > 0) {
         startVar.add(e[i - 1]);
@@ -85,23 +85,23 @@ void Mip_start::extraStepsAfterModelCreation () {
         startVar.add(t[i - 1]);
         startVal.add(t_vals[i - 1]);
       }
-      for (size_t j = 0; j < c0.size(); ++j) {
+      for (int j = 0; j < c0.size(); ++j) {
         //x
         startVar.add(x[i][j]);
         startVal.add(x_vals[i][j]);
       }
       //y 
-      for (size_t f = 0; f < f0.size(); ++f) 
-        for (size_t j = 0; j < c0.size(); ++j) {
+      for (int f = 0; f < f0.size(); ++f) 
+        for (int j = 0; j < c0.size(); ++j) {
           startVar.add(y[i][f][j]);
           startVal.add(y_vals[i][f][j]);
         }
     }
     cplex.addMIPStart (startVar, startVal, effort);
     //clean vals
-    for (size_t i = 0; i < c0.size(); ++i) {
+    for (int i = 0; i < c0.size(); ++i) {
       x_vals[i].end();
-      for (size_t f = 0; f < f0.size(); ++f) 
+      for (int f = 0; f < f0.size(); ++f) 
         y_vals[i][f].end();
       y_vals[i].end();
     }

@@ -59,7 +59,7 @@ Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit
   //set sol lb
   vector<const Vertex *> c0 (instance.customers.size() + 1);
   c0[0] = &instance.depot;
-  size_t i = 1;
+  int i = 1;
   for (const Vertex& customer : instance.customers) {
     c0[i] = &customer;
     ++i;
@@ -425,7 +425,7 @@ void Cubic_model::createModel() {
           constraintName.str("");
         }
     //n afs visits UB per route
-    for(size_t k = 0; k < instance.maxRoutes; ++k) {
+    for(int k = 0; k < instance.maxRoutes; ++k) {
       for (int afs : afss) {
         for (const pair<int, const Vertex *>& p : all) {
           expr += x[k][afs][p.first];
@@ -454,7 +454,7 @@ void Cubic_model::createModel() {
     expr.end();
     expr = IloExpr(env);
     //solution lb
-    for (size_t k = 0 ; k < instance.maxRoutes; ++k)
+    for (int k = 0 ; k < instance.maxRoutes; ++k)
       for (const pair<int, const Vertex *>& p : all){
         int i = p.first;
         for (const pair<int, const Vertex *>& p1 : all){

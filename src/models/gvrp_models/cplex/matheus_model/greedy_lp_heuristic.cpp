@@ -38,13 +38,13 @@ void Greedy_lp_heuristic::main() {
     if (depth > 10 && depth%10 == 0) 
       return;
     //setup
-    const size_t sc0 = matheus_model.c0.size(),
+    const int sc0 = matheus_model.c0.size(),
           sf0 = matheus_model.f0.size();
     IloEnv env = getEnv();
     IloExpr lhs (env);
     list<list<Vertex>> routes;
     list<Vertex> route;
-    size_t curr;    
+    int curr;    
     unordered_set<int> customers;
     bool valid = true,
          found,
@@ -58,22 +58,22 @@ void Greedy_lp_heuristic::main() {
     matheus_model.x_vals = Matrix2DVal (env, sc0);
     matheus_model.y_vals = Matrix3DVal (env, sc0);
     //get values
-    for (size_t i = 0; i < sc0; ++i) {
+    for (int i = 0; i < sc0; ++i) {
       matheus_model.x_vals[i] = IloNumArray (env, sc0, 0, 1, IloNumVar::Float);
       matheus_model.y_vals[i] = Matrix2DVal (env, sc0);
       getValues(matheus_model.x_vals[i], matheus_model.x[i]);
       //check y values
       if (!frac_sol)
-        for (size_t j = 0; j < sc0; ++j)
+        for (int j = 0; j < sc0; ++j)
           if (abs(round(matheus_model.x_vals[i][j]) - matheus_model.x_vals[i][j]) > matheus_model.INTEGRALITY_TOL) 
             frac_sol = true;
       //get y valsd
-      for (size_t f = 0; f < sf0; ++f) {
+      for (int f = 0; f < sf0; ++f) {
         matheus_model.y_vals[i][f] = IloNumArray (env, sc0, 0, 1, IloNumVar::Float);
         getValues(matheus_model.y_vals[i][f], matheus_model.y[i][f]);
         //check y values
         if (!frac_sol)
-          for (size_t j = 0; j < sc0; ++j)
+          for (int j = 0; j < sc0; ++j)
             if (abs(round(matheus_model.y_vals[i][f][j]) - matheus_model.y_vals[i][f][j]) > matheus_model.INTEGRALITY_TOL) 
               frac_sol = true;
       }
@@ -90,14 +90,14 @@ void Greedy_lp_heuristic::main() {
       nextAFS = 0;
       found = false;
       //get route beginning
-      for (size_t i = 1; i < matheus_model.c0.size(); ++i) 
+      for (int i = 1; i < matheus_model.c0.size(); ++i) 
         if (!customers.count(i)) {
           if (matheus_model.x_vals[0][i] > maxFirst) {
             maxFirst = matheus_model.x_vals[0][i];
             nextCustomer = i;
             found = true;
           } else
-            for (size_t f = 0; f < matheus_model.f0.size(); ++f)
+            for (int f = 0; f < matheus_model.f0.size(); ++f)
               if (matheus_model.y_vals[0][f][i] > maxFirst) {
                 maxFirst = matheus_model.y_vals[0][f][i];
                 nextAFS = f;
@@ -136,14 +136,14 @@ void Greedy_lp_heuristic::main() {
         nextCustomer = 0;
         nextAFS = 0;
         found = false;
-        for (size_t i = 0; i < matheus_model.c0.size(); ++i) 
+        for (int i = 0; i < matheus_model.c0.size(); ++i) 
           if (!customers.count(i)) {
             if (matheus_model.x_vals[curr][i] > maxFirst) {
               maxFirst = matheus_model.x_vals[curr][i];
               nextCustomer = i;
               found = true;
             } else
-              for (size_t f = 0; f < matheus_model.f0.size(); ++f)
+              for (int f = 0; f < matheus_model.f0.size(); ++f)
                 if (matheus_model.y_vals[curr][f][i] > 0) {
                   maxFirst = matheus_model.y_vals[curr][f][i];
                   nextAFS = f;
@@ -206,7 +206,7 @@ void Greedy_lp_heuristic::main() {
       matheus_model.x_vals = Matrix2DVal (matheus_model.env, sc0);
       matheus_model.y_vals = Matrix3DVal (matheus_model.env, sc0);
       //create vals
-      for (size_t i = 0; i < sc0; ++i) {
+      for (int i = 0; i < sc0; ++i) {
         //x, u, v, and a vars
         matheus_model.x_vals[i] = IloNumArray (matheus_model.env, sc0, 0, 1, IloNumVar::Int);
         u_vals[i] = IloNumArray (matheus_model.env, sc0, 0, matheus_model.instance.timeLimit, IloNumVar::Float);
@@ -214,10 +214,10 @@ void Greedy_lp_heuristic::main() {
         if (i > 0) {
           v_vals[i - 1] = IloNumArray (matheus_model.env, sf0, 0, matheus_model.instance.vehicleFuelCapacity, IloNumVar::Float);
           a_vals[i - 1] = IloNumArray (matheus_model.env, sc0 - 1, 0, matheus_model.instance.vehicleFuelCapacity, IloNumVar::Float);
-          for (size_t f = 0; f < sf0; ++f) 
+          for (int f = 0; f < sf0; ++f) 
             v_vals[i - 1][f] = 0.0;
         }
-        for (size_t j = 0; j < sc0; ++j) {
+        for (int j = 0; j < sc0; ++j) {
           //x
           matheus_model.x_vals[i][j] = 0.0;
           //u
@@ -228,9 +228,9 @@ void Greedy_lp_heuristic::main() {
         }
         //y var
         matheus_model.y_vals[i] = Matrix2DVal (env, sf0);
-        for (size_t f = 0; f < sf0; ++f) {
+        for (int f = 0; f < sf0; ++f) {
           matheus_model.y_vals[i][f] = IloNumArray(env, sc0, 0, 1, IloNumVar::Int);
-          for (size_t j = 0; j < sc0; ++j) 
+          for (int j = 0; j < sc0; ++j) 
             matheus_model.y_vals[i][f][j] = 0.0;
         }
       }
@@ -279,42 +279,42 @@ void Greedy_lp_heuristic::main() {
       Gvrp_solution gvrp_solution (routes, matheus_model.instance);
       cout<<gvrp_solution<<endl;
       cout<<" ";
-      for (size_t i = 0; i < matheus_model.c0.size(); ++i){
+      for (int i = 0; i < matheus_model.c0.size(); ++i){
         cout<<" ";
         if (i <=9)
           cout<<" ";
         cout<<i;
       }
       cout<<endl;
-      for (size_t i = 0; i < matheus_model.c0.size(); ++i){
+      for (int i = 0; i < matheus_model.c0.size(); ++i){
         cout<<i<<" ";
         if (i <= 9)
           cout<<" ";
-        for (size_t j = 0; j < matheus_model.c0.size(); ++j) {
+        for (int j = 0; j < matheus_model.c0.size(); ++j) {
           cout<<abs(matheus_model.x_vals[i][j])<<"  ";
         }
         cout<<endl;
       }
-      for (size_t f = 0; f < matheus_model.f0.size(); ++f){
+      for (int f = 0; f < matheus_model.f0.size(); ++f){
         cout<<"AFS: "<<f<<endl;
         cout<<" ";
-        for (size_t i = 0; i < matheus_model.c0.size(); ++i){
+        for (int i = 0; i < matheus_model.c0.size(); ++i){
           cout<<" ";
           if (i <=9)
             cout<<" ";
           cout<<i;
         }
         cout<<endl;
-        for (size_t i = 0; i < matheus_model.c0.size(); ++i){
+        for (int i = 0; i < matheus_model.c0.size(); ++i){
           cout<<i<<" ";
           if (i <= 9)
             cout<<" ";
-          for (size_t j = 0; j < matheus_model.c0.size(); ++j)
+          for (int j = 0; j < matheus_model.c0.size(); ++j)
             cout<<abs(matheus_model.y_vals[i][f][j])<<"  ";
           cout<<endl;
         }
       }
-      for (size_t i = 0; i < matheus_model.c0.size(); ++i)
+      for (int i = 0; i < matheus_model.c0.size(); ++i)
         cout<<i<<": "<<matheus_model.c0[i]->id<<endl;
     */
 
@@ -324,14 +324,14 @@ void Greedy_lp_heuristic::main() {
 
 
       //set values
-      for (size_t i = 0; i < sc0; ++i) {
+      for (int i = 0; i < sc0; ++i) {
         //v
         if (i > 0) 
-          for (size_t f = 0; f < sf0; ++f) {
+          for (int f = 0; f < sf0; ++f) {
             vars.add(matheus_model.v[i - 1][f]);
             vals.add(v_vals[i - 1][f]);
           }
-        for (size_t j = 0; j < sc0; ++j) {
+        for (int j = 0; j < sc0; ++j) {
           //x
           vars.add(matheus_model.x[i][j]);
           vals.add(matheus_model.x_vals[i][j]);
@@ -345,22 +345,22 @@ void Greedy_lp_heuristic::main() {
           }
         }
         //y 
-        for (size_t f = 0; f < sf0; ++f) 
-          for (size_t j = 0; j < sc0; ++j) {
+        for (int f = 0; f < sf0; ++f) 
+          for (int j = 0; j < sc0; ++j) {
             vars.add(matheus_model.y[i][f][j]);
             vals.add(matheus_model.y_vals[i][f][j]);
           }
       }
       setSolution(vars, vals, cost);
       //clean vals
-      for (size_t i = 0; i < sc0; ++i) {
+      for (int i = 0; i < sc0; ++i) {
         if (i > 0) {
           a_vals[i - 1].end();
           v_vals[i - 1].end();
         }
         u_vals[i].end();
         matheus_model.x_vals[i].end();
-        for (size_t f = 0; f < sf0; ++f) 
+        for (int f = 0; f < sf0; ++f) 
           matheus_model.y_vals[i][f].end();
         matheus_model.y_vals[i].end();
       }

@@ -17,15 +17,15 @@ Invalid_edge_preprocessing_4::Invalid_edge_preprocessing_4 (Matheus_model& mathe
 }
 
 void Invalid_edge_preprocessing_4::add () {
-  for (size_t i = 0; i < matheus_model.c0.size(); ++i) {
+  for (int i = 0; i < matheus_model.c0.size(); ++i) {
     const Vertex * vertexI = matheus_model.c0[i];
-    for (size_t j = 0; j < matheus_model.c0.size(); ++j) {
+    for (int j = 0; j < matheus_model.c0.size(); ++j) {
       const Vertex * vertexJ = matheus_model.c0[j];
-      for (size_t f_ = 0; f_ < matheus_model.f0.size(); ++f_) {
+      for (int f_ = 0; f_ < matheus_model.f0.size(); ++f_) {
         bool valid = false;
-        for (size_t f = 0; f < matheus_model.f0.size(); ++f) {
+        for (int f = 0; f < matheus_model.f0.size(); ++f) {
           const Vertex * vertexF = matheus_model.f0[f];
-          for (size_t r = 0; r < matheus_model.f0.size(); ++r) {
+          for (int r = 0; r < matheus_model.f0.size(); ++r) {
             const Vertex * vertexR = matheus_model.f0[r];
             if (matheus_model.afsToCustomerFuel(f, i) + matheus_model.customerToAfsFuel(i, f_) <= matheus_model.instance.vehicleFuelCapacity 
                 && matheus_model.afsToCustomerFuel(f_, j) + matheus_model.customerToAfsFuel(j, r) <= matheus_model.instance.vehicleFuelCapacity                      && matheus_model.gvrp_afs_tree->times[f] + matheus_model.instance.time(vertexF->id, vertexI->id) + matheus_model.time(i, f_, j) + vertexJ->serviceTime + matheus_model.instance.time(vertexJ->id, vertexR->id) + matheus_model.gvrp_afs_tree->times[r] <= matheus_model.instance.timeLimit) { 

@@ -39,7 +39,7 @@ void Greedy_lp_heuristic::main() {
       return;
     //setup
     int depot = cubic_model.instance.depot.id;
-    const size_t sall = cubic_model.all.size();
+    const int sall = cubic_model.all.size();
     IloEnv env = getEnv();
     IloExpr lhs (env);
     list<list<Vertex>> routes;
@@ -55,13 +55,13 @@ void Greedy_lp_heuristic::main() {
         nextNode;
     cubic_model.x_vals = Matrix3DVal (env, cubic_model.instance.maxRoutes);
     //get values
-    for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+    for (int k = 0; k < cubic_model.instance.maxRoutes; ++k) {
       cubic_model.x_vals[k] = Matrix2DVal (env, sall);
-      for (size_t i = 0; i < sall; ++i) {
+      for (int i = 0; i < sall; ++i) {
         cubic_model.x_vals[k][i] = IloNumArray (env, sall, 0, 1, IloNumVar::Float);
         getValues(cubic_model.x_vals[k][i], cubic_model.x[k][i]);
         //check x values
-        for (size_t j = 0; j < sall; ++j)
+        for (int j = 0; j < sall; ++j)
           if (abs(round(cubic_model.x_vals[k][i][j]) - cubic_model.x_vals[k][i][j]) > cubic_model.INTEGRALITY_TOL) 
             frac_sol = true;
       }
@@ -69,7 +69,7 @@ void Greedy_lp_heuristic::main() {
     if (!frac_sol) 
       return;
     //checking the depot neighboring
-    for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+    for (int k = 0; k < cubic_model.instance.maxRoutes; ++k) {
       //setup
       remainingFuel = cubic_model.instance.vehicleFuelCapacity;
       remainingTime = cubic_model.instance.timeLimit;
@@ -79,7 +79,7 @@ void Greedy_lp_heuristic::main() {
       //dfs
       do {
         maxVal = -1.0;
-        for (size_t j = 0; j < sall; ++j)
+        for (int j = 0; j < sall; ++j)
           if (cubic_model.x_vals[k][currNode][j] > maxVal) {
             nextNode = j;
             maxVal = cubic_model.x_vals[k][currNode][j];
@@ -124,11 +124,11 @@ void Greedy_lp_heuristic::main() {
         IloNumArray e_vals = IloNumArray (env, sall, 0, 1, IloNumVar::Float);
         cubic_model.x_vals = Matrix3DVal (cubic_model.env, sall);
         //create vals
-        for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+        for (int k = 0; k < cubic_model.instance.maxRoutes; ++k) {
           cubic_model.x_vals[k] = Matrix2DVal (cubic_model.env, sall);
-          for (size_t i = 0; i < sall; ++i) {
+          for (int i = 0; i < sall; ++i) {
             cubic_model.x_vals[k][i] = IloNumArray (cubic_model.env, sall, 0, 1, IloNumVar::Int);
-            for (size_t j = 0; j < sall; ++j) 
+            for (int j = 0; j < sall; ++j) 
               cubic_model.x_vals[k][i][j] = 0.0;
           }
         }
@@ -136,7 +136,7 @@ void Greedy_lp_heuristic::main() {
         IloNumVarArray vars (cubic_model.env);
         IloNumArray vals (cubic_model.env);
         double currFuel;
-        size_t k = 0;
+        int k = 0;
         for (const list<Vertex>& route : routes) {
           currFuel = cubic_model.instance.vehicleFuelCapacity;
           list<Vertex>::const_iterator curr = route.begin(), 
@@ -161,42 +161,42 @@ void Greedy_lp_heuristic::main() {
       Gvrp_solution gvrp_solution (routes, cubic_model.instance);
       cout<<gvrp_solution<<endl;
       cout<<" ";
-      for (size_t i = 0; i < cubic_model.c0.size(); ++i){
+      for (int i = 0; i < cubic_model.c0.size(); ++i){
         cout<<" ";
         if (i <=9)
           cout<<" ";
         cout<<i;
       }
       cout<<endl;
-      for (size_t i = 0; i < cubic_model.c0.size(); ++i){
+      for (int i = 0; i < cubic_model.c0.size(); ++i){
         cout<<i<<" ";
         if (i <= 9)
           cout<<" ";
-        for (size_t j = 0; j < cubic_model.c0.size(); ++j) {
+        for (int j = 0; j < cubic_model.c0.size(); ++j) {
           cout<<abs(cubic_model.x_vals[i][j])<<"  ";
         }
         cout<<endl;
       }
-      for (size_t f = 0; f < cubic_model.f0.size(); ++f){
+      for (int f = 0; f < cubic_model.f0.size(); ++f){
         cout<<"AFS: "<<f<<endl;
         cout<<" ";
-        for (size_t i = 0; i < cubic_model.c0.size(); ++i){
+        for (int i = 0; i < cubic_model.c0.size(); ++i){
           cout<<" ";
           if (i <=9)
             cout<<" ";
           cout<<i;
         }
         cout<<endl;
-        for (size_t i = 0; i < cubic_model.c0.size(); ++i){
+        for (int i = 0; i < cubic_model.c0.size(); ++i){
           cout<<i<<" ";
           if (i <= 9)
             cout<<" ";
-          for (size_t j = 0; j < cubic_model.c0.size(); ++j)
+          for (int j = 0; j < cubic_model.c0.size(); ++j)
             cout<<abs(cubic_model.y_vals[i][f][j])<<"  ";
           cout<<endl;
         }
       }
-      for (size_t i = 0; i < cubic_model.c0.size(); ++i)
+      for (int i = 0; i < cubic_model.c0.size(); ++i)
         cout<<i<<": "<<cubic_model.c0[i]->id<<endl;
     */
 
@@ -212,9 +212,9 @@ void Greedy_lp_heuristic::main() {
           vals.add(e_vals[i]);
         }
         //x
-        for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
-          for (size_t i = 0; i < sall; ++i) {
-            for (size_t j = 0; j < sall; ++j) {
+        for (int k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+          for (int i = 0; i < sall; ++i) {
+            for (int j = 0; j < sall; ++j) {
               vars.add(cubic_model.x[k][i][j]);
               vals.add(cubic_model.x_vals[k][i][j]);
             }
@@ -225,9 +225,9 @@ void Greedy_lp_heuristic::main() {
         e_vals.end();
       }
       //clean vals
-      for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+      for (int k = 0; k < cubic_model.instance.maxRoutes; ++k) {
         cubic_model.x_vals[k].end();
-        for (size_t i = 0; i < sall; ++i) 
+        for (int i = 0; i < sall; ++i) 
           cubic_model.x_vals[k][i].end();
       }
       cubic_model.x_vals.end();

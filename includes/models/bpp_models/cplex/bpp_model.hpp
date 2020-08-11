@@ -23,7 +23,7 @@ namespace models {
         public:
           explicit BPP_model(const BPP_instance& instance, unsigned int time_limit); 
           pair<BPP_solution, Mip_solution_info> run();
-          const size_t sitems;
+          const int sitems;
           IloNumVarArray y;
           Matrix2DVar x;
           IloNumArray y_vals;

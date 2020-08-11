@@ -29,7 +29,7 @@ namespace models {
           IloNumVar s;
           Matrix2DVar x;
           Matrix2DVal x_vals;
-          size_t n;
+          int n;
           int nAFSLB;
         protected:
           void createVariables();

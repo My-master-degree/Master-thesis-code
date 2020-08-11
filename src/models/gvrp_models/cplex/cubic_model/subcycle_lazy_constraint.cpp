@@ -75,7 +75,7 @@ void Subcycle_lazy_constraint::main() {
             q.push(p.first);
           }
       }
-      size_t i = 1;
+      int i = 1;
       vector<const Vertex *> vertices (customersComponent.size() + 1);
       vertices[0] = &cubic_model.instance.depot;
       for (int customer : customersComponent) {

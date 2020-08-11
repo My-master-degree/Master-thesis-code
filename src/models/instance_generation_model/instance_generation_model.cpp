@@ -33,7 +33,7 @@ Instance_generation_model::Instance_generation_model(const Vrp_instance& vrp_ins
   ids = vector<int> (sNodes);
   ids[0] = instance.depot.id;
   auto customer = instance.customers.begin();
-  for (size_t i = 1; i < sNodes; ++i, ++customer)
+  for (int i = 1; i < sNodes; ++i, ++customer)
     ids[i] = customer->id;
 }
 
@@ -82,14 +82,14 @@ void Instance_generation_model::createVariables(){
     x = Matrix2DVar (env, sNodes);
     z = IloNumVarArray (env, sNodes, 0, 1, IloNumVar::Int);
     //x var
-    for (size_t i = 0; i < sNodes; i++){
+    for (int i = 0; i < sNodes; i++){
       x[i] = IloNumVarArray(env, sNodes, 0, 1, IloNumVar::Int);
       nameStream<<"z["<<i<<"]";
       z[i].setName(nameStream.str().c_str());
       nameStream.clear();
       nameStream.str("");
       //setting names
-      for (size_t j = 0; j < sNodes; j++){
+      for (int j = 0; j < sNodes; j++){
         nameStream<<"x["<<i<<"]["<<j<<"]";
         x[i][j].setName(nameStream.str().c_str());
         nameStream.clear();
@@ -107,10 +107,10 @@ void Instance_generation_model::createObjectiveFunction() {
 //objective function
   try{
     IloExpr fo (env);
-    for (size_t i = 0; i < sNodes; i++) {
+    for (int i = 0; i < sNodes; i++) {
       fo += z[i];
       //setting names
-      for (size_t j = 0; j < sNodes; j++)
+      for (int j = 0; j < sNodes; j++)
         fo +=  instance.distances[i][j] * x[i][j];
     }
     model = IloModel (env);
@@ -132,11 +132,11 @@ void Instance_generation_model::createModel() {
     IloConstraint c;
     stringstream constraintName;
     //x[i][i] == 0, \forall v_i \in V
-    for (size_t i = 0; i < sNodes; i++) 
+    for (int i = 0; i < sNodes; i++) 
       model.add(x[i][i] == 0);
     //\sum_{v_j \in V : v_i \neq v_j} x_{ij} = 1, \forall v_i \in V 
-    for (size_t i = 0; i < sNodes; i++) {
-      for (size_t j = 0; j < sNodes; j++)
+    for (int i = 0; i < sNodes; i++) {
+      for (int j = 0; j < sNodes; j++)
         if (i != j)
           expr += x[i][j];
       c = IloConstraint (expr == 1);
@@ -146,8 +146,8 @@ void Instance_generation_model::createModel() {
       expr = IloExpr(env);
     }
     //x_{ij} - z_j \leqslant 0, \forall v_i, v_j \in V : v_ \neq v_j
-    for (size_t i = 0; i < sNodes; i++) 
-      for (size_t j = 0; j < sNodes; j++)
+    for (int i = 0; i < sNodes; i++) 
+      for (int j = 0; j < sNodes; j++)
         if (i != j) {
           expr = x[i][j] - z[j];
           c = IloConstraint (expr <= 0);
@@ -161,8 +161,8 @@ void Instance_generation_model::createModel() {
     c.setName("depot is a facility");
     model.add(c);
     //(x_{ij} + z_i + z_j - 2) e_{ij} \leqslant \beta, \forall v_i, v_j \in V : v_ \neq v_j
-    for (size_t i = 0; i < sNodes; i++) 
-      for (size_t j = 0; j < sNodes; j++)
+    for (int i = 0; i < sNodes; i++) 
+      for (int j = 0; j < sNodes; j++)
         if (i != j) {
           expr = (x[i][j] + z[i] + z[j] - 2) * instance.distances[ids[i]][ids[j]];
           c = IloConstraint (expr <= vehicleFuelCapacity);
@@ -172,8 +172,8 @@ void Instance_generation_model::createModel() {
           expr = IloExpr(env);
         }
     //(x_{ij} - z_i + z_j - 1) e_{ij} \leqslant \beta/2, \forall v_i, v_j \in V : v_ \neq v_j
-    for (size_t i = 0; i < sNodes; i++) 
-      for (size_t j = 0; j < sNodes; j++)
+    for (int i = 0; i < sNodes; i++) 
+      for (int j = 0; j < sNodes; j++)
         if (i != j) {
           expr = (x[i][j] - z[i] + z[j] - 1) * instance.distances[ids[i]][ids[j]];
           c = IloConstraint (expr <= vehicleFuelCapacity/2);
@@ -183,8 +183,8 @@ void Instance_generation_model::createModel() {
           expr = IloExpr(env);
         }
     //\sum_{v_j \in V : v_j \neq v_i \wedge e_{ji} \leqslant \beta/2 \wedge e_{0j} \leqslant \beta, \forall v_i \in V\backslash \{v_0\}
-    for (size_t i = 1; i < sNodes; i++) {
-      for (size_t j = 0; j < sNodes; j++)
+    for (int i = 1; i < sNodes; i++) {
+      for (int j = 0; j < sNodes; j++)
         if (i != j && instance.distances[ids[i]][ids[j]] <= vehicleFuelCapacity/2 && instance.distances[ids[j]][ids[0]] <= vehicleFuelCapacity) 
           expr += z[j];
       c = IloConstraint (expr >= 1 - z[i]);
@@ -254,7 +254,7 @@ void Instance_generation_model::fillVals(){
     x_vals = Matrix2DVal (env, sNodes);
     z_vals = IloNumArray (env, sNodes, 0, 1, IloNumVar::Int);
     cplex.getValues(z_vals, z);
-    for (size_t i = 0; i < sNodes; i++) {
+    for (int i = 0; i < sNodes; i++) {
       x_vals[i] = IloNumArray (env, sNodes, 0, 1, IloNumVar::Int);
       cplex.getValues(x_vals[i], x[i]);
     }
@@ -285,9 +285,9 @@ void Instance_generation_model::createGvrp_instance(){
     //create instance
     solution = new Gvrp_instance(afss, customers, instance.depot, vehicleFuelCapacity, instance.distances, instance.distances_enum, customers.size(), DBL_MAX, 1, 1);
     //set average speed
-    size_t sall = customers.size() + afss.size() + 1;
-    for (size_t i = 0; i < sall; ++i)
-      for (size_t j = 0; j < sall; ++j)
+    int sall = customers.size() + afss.size() + 1;
+    for (int i = 0; i < sall; ++i)
+      for (int j = 0; j < sall; ++j)
         solution->vehicleAverageSpeed = max(solution->vehicleAverageSpeed, instance.distances[i][j]);
     //customers service time
     customerServiceTime = solution->vehicleAverageSpeed / customers.size();
@@ -324,7 +324,7 @@ void Instance_generation_model::createGvrp_instance(){
 }
 
 void Instance_generation_model::endVars(){
-  for (size_t i = 0; i < sNodes; i++)
+  for (int i = 0; i < sNodes; i++)
     x[i].end();
   x.end();
   z.end(); 

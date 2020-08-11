@@ -14,7 +14,7 @@ Gvrp_afs_tree::Gvrp_afs_tree(const Gvrp_instance& gvrp_instance) {
   if (gvrp_instance.distances_enum != METRIC)
     throw string("The algorithm 'Gvrp AFS Tree' only works for METRIC instances.");
   //create F0 Set
-  size_t size = gvrp_instance.afss.size() + 1;
+  int size = gvrp_instance.afss.size() + 1;
   f0.reserve(size);
   f0.push_back(&gvrp_instance.depot);
   for (const Vertex& afs : gvrp_instance.afss)
@@ -22,10 +22,10 @@ Gvrp_afs_tree::Gvrp_afs_tree(const Gvrp_instance& gvrp_instance) {
   //reserve spaces
   pairTimes = vector<vector<double>> (size, vector<double> (size, DBL_MAX));
   pairCosts = vector<vector<double>> (size, vector<double> (size, DBL_MAX));
-  pairPreds = vector<vector<size_t>> (size, vector<size_t> (size));
+  pairPreds = vector<vector<int>> (size, vector<int> (size));
   //dijkstra
   //setup
-  size_t curr,
+  int curr,
          f,
          r;
   double cost, 

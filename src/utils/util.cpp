@@ -37,51 +37,50 @@ using namespace models::bpp_models::cplex;
 
 pair<vector<vector<double>>, vector<vector<double>>> utils::calculateGVRPReducedGraphs (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree) {
   int depotId = gvrp_instance.depot.id;
-  const size_t sc0 = gvrp_instance.customers.size() + 1.0,
+  const int sc0 = gvrp_instance.customers.size() + 1.0,
               stotal = gvrp_instance.distances.size();
   vector<const Vertex *> c0 (sc0);
   vector<vector<double>> closestTime (stotal, vector<double>(stotal, -1.0)); 
   vector<vector<double>> closestDistance (stotal, vector<double>(stotal, -1.0)); 
   //build c0
   c0[0] = &gvrp_instance.depot;
-  size_t i = 1;
+  int i = 1;
   for (const Vertex& customer : gvrp_instance.customers) {
     c0[i] = &customer;
     ++i;
   }
   //for each pair
-  for (size_t i = 0; i < sc0; ++i) {
+  for (int i = 0; i < sc0; ++i) {
     const Vertex * customerI =  c0[i];
-    for (size_t j = i + 1; j < sc0; ++j) {
+    for (int j = i + 1; j < sc0; ++j) {
       const Vertex * customerJ =  c0[j];
       if (customerI->id != customerJ->id && gvrp_instance.time(depotId, customerI->id) + customerI->serviceTime + gvrp_instance.time(customerI->id, customerJ->id) + customerJ->serviceTime + gvrp_instance.time(customerI->id, depotId) <= gvrp_instance.timeLimit) 
         //origin afs
-        for (size_t f = 0; f < gvrp_afs_tree.f0.size(); f++) {
+        for (int f = 0; f < gvrp_afs_tree.f0.size(); f++) {
           int fId = gvrp_afs_tree.f0[f]->id;
           double spentTime = gvrp_afs_tree.times[f] + gvrp_instance.time(fId, customerI->id) + customerI->serviceTime;
           double spentFuel = gvrp_instance.fuel(fId, customerI->id);
           if (spentFuel <= gvrp_instance.vehicleFuelCapacity && spentTime + gvrp_instance.time(customerI->id, customerJ->id) + customerJ->serviceTime + gvrp_instance.time(customerJ->id, depotId) <= gvrp_instance.timeLimit) 
               //destiny afs
-              for (size_t r = f; r < gvrp_afs_tree.f0.size(); r++) {
+              for (int r = f; r < gvrp_afs_tree.f0.size(); r++) {
                 int rId = gvrp_afs_tree.f0[r]->id;
-                if (spentTime + gvrp_instance.time(customerI->id, customerJ->id) + customerJ->serviceTime + gvrp_instance.time(customerJ->id, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) 
+                if (spentTime + gvrp_instance.time(customerI->id, customerJ->id) + customerJ->serviceTime + gvrp_instance.time(customerJ->id, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) {
                   //direct travel
                   if (spentFuel + gvrp_instance.fuel(customerI->id, customerJ->id) + gvrp_instance.fuel(customerJ->id, rId) <= gvrp_instance.vehicleFuelCapacity) {
                     double time = gvrp_instance.time(customerI->id, customerJ->id);
                     double cost = gvrp_instance.distances[customerI->id][customerJ->id];
-                    if (closestTime[customerI->id][customerJ->id] < 0.0 || time < closestTime[customerI->id][customerJ->id]) {
+                    if (closestTime[customerI->id][customerJ->id] < 0.0 || time < closestTime[customerI->id][customerJ->id]) 
                       closestTime[customerI->id][customerJ->id] = closestTime[customerJ->id][customerI->id] = time;
-                    }
                     if (closestDistance[customerI->id][customerJ->id] < 0.0 || cost < closestDistance[customerI->id][customerJ->id]) 
                       closestDistance[customerI->id][customerJ->id] = closestDistance[customerJ->id][customerI->id] = cost;
                   } else 
                     //intermediate travel
-                    for (size_t f_ = 0; f_ < gvrp_afs_tree.f0.size(); f_++) {
+                    for (int f_ = 0; f_ < gvrp_afs_tree.f0.size(); f_++) {
                       int f_Id = gvrp_afs_tree.f0[f_]->id;
                       //fuel and time feasible
                       if (spentFuel + gvrp_instance.fuel(customerI->id, f_Id) <= gvrp_instance.vehicleFuelCapacity && spentTime + gvrp_instance.time(customerI->id, f_Id) + gvrp_afs_tree.f0[f_]->serviceTime + gvrp_instance.time(f_Id, gvrp_instance.depot.id) <= gvrp_instance.timeLimit) 
                         //intermediate afs destiny
-                        for (size_t r_ = f_; r_ < gvrp_afs_tree.f0.size(); r_++) {
+                        for (int r_ = f_; r_ < gvrp_afs_tree.f0.size(); r_++) {
                           int r_Id = gvrp_afs_tree.f0[r_]->id;
                           //time feasible
                           if (gvrp_instance.fuel(r_Id, customerJ->id) + gvrp_instance.fuel(customerJ->id, rId) <= gvrp_instance.vehicleFuelCapacity && spentTime + gvrp_instance.time(customerI->id, f_Id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, customerJ->id) + customerJ->serviceTime + gvrp_instance.time(customerJ->id, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) {
@@ -94,15 +93,16 @@ pair<vector<vector<double>>, vector<vector<double>>> utils::calculateGVRPReduced
                           }
                         }
                     }
+                } 
               }
         }
     }
   } 
   //set unfinded distances
-  for (size_t i = 0; i < stotal; ++i) 
+  for (int i = 0; i < stotal; ++i) 
     closestDistance[i][i] = closestTime[i][i] = 0.0;
-  for (size_t i = 1; i < sc0; ++i)
-    for (size_t j = 1; j < sc0; ++j) {
+  for (int i = 1; i < sc0; ++i)
+    for (int j = 1; j < sc0; ++j) {
       int iId = c0[i]->id,
           jId = c0[j]->id;
       if (closestDistance[iId][jId] < 0.0) {
@@ -114,15 +114,14 @@ pair<vector<vector<double>>, vector<vector<double>>> utils::calculateGVRPReduced
 }
 
 vector<pair<double, double>> utils::calculateClosestsGVRPCustomers (const vector<vector<double>>& gvrpReducedGraph, const vector<const Vertex *>& vertices) {
-  const size_t svertices = vertices.size();
-  double distance;
+  const int svertices = vertices.size();
   const Vertex * customerI, 
         * customerJ;
   double cost;
   vector<pair<double, double>> closest (svertices, make_pair(DBL_MAX, DBL_MAX));
-  for (size_t i = 0; i < svertices; ++i) {
+  for (int i = 0; i < svertices; ++i) {
     customerI = vertices[i];
-    for (size_t j = 0; j < svertices; ++j) 
+    for (int j = 0; j < svertices; ++j) 
       if (i != j) {
         customerJ = vertices[j];
         cost = gvrpReducedGraph[customerI->id][customerJ->id];
@@ -139,9 +138,9 @@ vector<pair<double, double>> utils::calculateClosestsGVRPCustomers (const vector
 }
 
 int utils::calculateGVRP_BPP_NRoutesLB(const Gvrp_instance& gvrp_instance, const vector<const Vertex *>& vertices, const vector<pair<double, double>>& closestsTimes, unsigned int execution_time_limit) {
-  const size_t svertices = vertices.size();
+  const int svertices = vertices.size();
   vector<double> items (svertices); 
-  for (size_t i = 0; i < svertices; ++i) 
+  for (int i = 0; i < svertices; ++i) 
     items[i] = vertices[i]->serviceTime + (closestsTimes[i].first + closestsTimes[i].second)/2.0;
   BPP_instance bpp_instance (items, gvrp_instance.timeLimit);
   BPP_model bpp_model (bpp_instance, execution_time_limit);
@@ -175,13 +174,13 @@ double utils::calculateGvrpInstancePsi (const Gvrp_instance& gvrp_instance) {
 }
 
 double utils::calculateGvrpLBByImprovedMST (const vector<const Vertex *>& vertices, const vector<pair<double, double>> closests, const vector<vector<double>>& gvrpReducedGraph) {
-  const size_t svertices = vertices.size();
+  const int svertices = vertices.size();
   const Vertex * nodeI, * nodeJ, * nodeK;
   double bestLB = 0.0, cost;
   //boruvka
   vector<vector<bool>> adjMatrix (svertices, vector<bool> (svertices, false));
   DSU dsu(svertices);
-  size_t nTrees = svertices;
+  int nTrees = svertices;
   double MSTCost = 0.0;
   int setI, setJ, setK;
 //  cout<<"building mst"<<endl;
@@ -204,7 +203,7 @@ double utils::calculateGvrpLBByImprovedMST (const vector<const Vertex *>& vertic
     }
     //insert best edges
 //    cout<<"Edges: "<<endl;
-    for (size_t i = 0; i < svertices; ++i) {
+    for (int i = 0; i < svertices; ++i) {
       setI = dsu.findSet(i);
       //if edge exist
       if (bestEdge[setI].first != -1) {
@@ -224,12 +223,12 @@ double utils::calculateGvrpLBByImprovedMST (const vector<const Vertex *>& vertic
 //    cout<<endl;
 //    cout<<"Sets:"<<endl;
     set<int> sets;
-    for (size_t i = 0; i < svertices; ++i) 
+    for (int i = 0; i < svertices; ++i) 
       sets.insert(dsu.findSet(i));
     /*
     for (int components : sets) {
       cout<<"\t"<<components<<": ";
-      for (size_t i = 0; i < svertices; ++i) 
+      for (int i = 0; i < svertices; ++i) 
         if (dsu.findSet(i) == components)
           cout<<i<<", ";
       cout<<endl;
@@ -238,13 +237,13 @@ double utils::calculateGvrpLBByImprovedMST (const vector<const Vertex *>& vertic
   }
   //greedy boruvka
 //  cout<<"greedy borukva"<<endl;
-  for (size_t i = 0; i < svertices; ++i) {
+  for (int i = 0; i < svertices; ++i) {
 //    cout<<"\tIn vertex "<<i<<endl;
     nodeI = vertices[i];
     dsu.clean();
 //    cout<<"\tremoving "<<i<<" from the tree"<<endl;
     //remove i from the graph   
-    for (size_t j = 0; j < svertices; ++j) {
+    for (int j = 0; j < svertices; ++j) {
       nodeJ = vertices[j];
       if (adjMatrix[i][j] || adjMatrix[j][i]) {
         MSTCost -= gvrpReducedGraph[nodeI->id][nodeJ->id];
@@ -253,18 +252,18 @@ double utils::calculateGvrpLBByImprovedMST (const vector<const Vertex *>& vertic
     }
 //    cout<<"\tpopulating DSU"<<endl;
     //populate dsu
-    for (size_t j = 0; j < svertices; ++j) 
-      for (size_t k = 0; k < svertices; ++k) 
+    for (int j = 0; j < svertices; ++j) 
+      for (int k = 0; k < svertices; ++k) 
         if (adjMatrix[j][k])
             dsu.join(j, k);
 //    cout<<"\tSets:"<<endl;
     set<int> sets;
-    for (size_t i = 0; i < svertices; ++i) 
+    for (int i = 0; i < svertices; ++i) 
       sets.insert(dsu.findSet(i));
     /*
     for (int components : sets) {
       cout<<"\t\t"<<components<<": ";
-      for (size_t i = 0; i < svertices; ++i) 
+      for (int i = 0; i < svertices; ++i) 
         if (dsu.findSet(i) == components)
           cout<<i<<", ";
       cout<<endl;
@@ -297,7 +296,7 @@ double utils::calculateGvrpLBByImprovedMST (const vector<const Vertex *>& vertic
       }
       //insert best edges
 //      cout<<"\tInserted edges: "<<endl<<"\t\t";
-      for (size_t j = 0; j < svertices; ++j) {
+      for (int j = 0; j < svertices; ++j) {
         setJ = dsu.findSet(j);
         //if edge exist
         if (bestEdge[setJ].first != -1) {
@@ -317,12 +316,12 @@ double utils::calculateGvrpLBByImprovedMST (const vector<const Vertex *>& vertic
 //      cout<<endl;
 //      cout<<"\tSets:"<<endl;
       sets.clear();
-      for (size_t i = 0; i < svertices; ++i) 
+      for (int i = 0; i < svertices; ++i) 
         sets.insert(dsu.findSet(i));
       /*
       for (int components : sets) {
         cout<<"\t\t"<<components<<": ";
-        for (size_t i = 0; i < svertices; ++i) 
+        for (int i = 0; i < svertices; ++i) 
           if (dsu.findSet(i) == components)
             cout<<i<<", ";
         cout<<endl;
@@ -344,8 +343,8 @@ double utils::calculateGvrpLBByImprovedMSTTime (const vector<const Vertex *>& ve
 double utils::calculateCustomerMinRequiredTime (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer) {
   //min_{v_f, v_r \in F : t_{T[r]} + t_{fi} + s_i + t_{ir} + t_{T[r]} && e_{fi} + e_{ir} <= \beta} min(min(t_{T[f]} + t_{fi}, t_{ir} + t_{T[r]})) = minAfsFuel 
   double minAfsTime = DBL_MAX;
-  for (size_t f = 0; f < gvrp_afs_tree.f0.size(); f++) 
-    for (size_t r = 0; r < gvrp_afs_tree.f0.size(); r++) {
+  for (int f = 0; f < gvrp_afs_tree.f0.size(); f++) 
+    for (int r = 0; r < gvrp_afs_tree.f0.size(); r++) {
       double partI = gvrp_afs_tree.times[f] + gvrp_instance.time(gvrp_afs_tree.f0[f]->id, customer.id),
              partII = gvrp_instance.time(customer.id, gvrp_afs_tree.f0[r]->id) + gvrp_afs_tree.times[r];
       if (partI + customer.serviceTime + partII <= gvrp_instance.timeLimit && gvrp_instance.fuel(gvrp_afs_tree.f0[f]->id, customer.id) + gvrp_instance.fuel(customer.id, gvrp_afs_tree.f0[r]->id) <= gvrp_instance.vehicleFuelCapacity) 
@@ -357,8 +356,8 @@ double utils::calculateCustomerMinRequiredTime (const Gvrp_instance& gvrp_instan
 double utils::calculateCustomerMinRequiredFuel (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree, const Vertex& customer) {
   //min_{v_f, v_r \in F : t_{T[r]} + t_{fi} + s_i + t_{ir} + t_{T[r]} && e_{fi} + e_{ir} <= \beta} min(e_{fi}, e_{ri}) = minAfsFuel 
   double minAfsFuel = DBL_MAX;
-  for (size_t f = 0; f < gvrp_afs_tree.f0.size(); f++) 
-    for (size_t r = 0; r < gvrp_afs_tree.f0.size(); r++) {
+  for (int f = 0; f < gvrp_afs_tree.f0.size(); f++) 
+    for (int r = 0; r < gvrp_afs_tree.f0.size(); r++) {
       double partI = gvrp_instance.fuel(customer.id, gvrp_afs_tree.f0[r]->id),
              partII = gvrp_instance.fuel(customer.id, gvrp_afs_tree.f0[f]->id);
       if (gvrp_afs_tree.times[f] + gvrp_instance.time(gvrp_afs_tree.f0[f]->id, customer.id) + customer.serviceTime + gvrp_instance.time(customer.id, gvrp_afs_tree.f0[r]->id) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit && partI + partII <= gvrp_instance.vehicleFuelCapacity) 
@@ -426,8 +425,8 @@ list<pair<int, int>> utils::get_invalid_edges_1 (const Gvrp_instance& gvrp_insta
   if (gvrp_instance.distances_enum != METRIC)
     throw string("The preprocessing 'Invalid edge preprocessing 1' only applies for metric instances");
   list<pair<int, int>> edges;
-  for (size_t i = 0; i < gvrp_instance.distances.size(); i++)
-    for (size_t j = 0; j < gvrp_instance.distances.size(); j++) {
+  for (int i = 0; i < gvrp_instance.distances.size(); i++)
+    for (int j = 0; j < gvrp_instance.distances.size(); j++) {
       if (gvrp_instance.distances[i][j] * gvrp_instance.vehicleFuelConsumptionRate > gvrp_instance.vehicleFuelCapacity || gvrp_instance.distances[i][j] / gvrp_instance.vehicleAverageSpeed > gvrp_instance.timeLimit) {
         edges.push_back(make_pair(i, j));
       }
@@ -463,7 +462,7 @@ list<pair<int, int>> utils::get_invalid_edges_2 (const Gvrp_instance& gvrp_insta
   for (const Vertex& customer : gvrp_instance.customers) {
     if (gvrp_instance.fuel(customer.id, gvrp_instance.depot.id) > gvrp_instance.vehicleFuelCapacity/2.0) {
       bool valid = false;
-      for (size_t f = 0; f < gvrp_afs_tree.f0.size(); ++f) {
+      for (int f = 0; f < gvrp_afs_tree.f0.size(); ++f) {
         if (gvrp_instance.fuel(gvrp_afs_tree.f0[f]->id, customer.id) + gvrp_instance.fuel(customer.id, gvrp_instance.depot.id) <= gvrp_instance.vehicleFuelCapacity
             && gvrp_afs_tree.times[f] + gvrp_instance.fuel(gvrp_afs_tree.f0[f]->id, customer.id) + customer.serviceTime + gvrp_instance.time(customer.id, gvrp_instance.depot.id) <= gvrp_instance.vehicleFuelCapacity) {
           valid = true;
@@ -485,9 +484,9 @@ list<pair<int, int>> utils::get_invalid_edges_3 (const Gvrp_instance& gvrp_insta
   list<pair<int, int>> edges;
   //create induced graph
   const vector<const Vertex *>& f0 = gvrp_afs_tree.f0;
-  const vector<size_t>& pred = gvrp_afs_tree.pred;
+  const vector<int>& pred = gvrp_afs_tree.pred;
   const vector<double>& times = gvrp_afs_tree.times;
-  size_t sf0 = f0.size(),
+  int sf0 = f0.size(),
           r,
           f;
   //get invalid edges
@@ -523,9 +522,9 @@ list<pair<int, int>> utils::get_invalid_edges_4 (const Gvrp_instance& gvrp_insta
   list<pair<int, int>> edges;
   //create induced graph
   const vector<const Vertex *>& f0 = gvrp_afs_tree.f0;
-  const vector<size_t>& pred = gvrp_afs_tree.pred;
+  const vector<int>& pred = gvrp_afs_tree.pred;
   const vector<double>& times = gvrp_afs_tree.times;
-  size_t sf0 = f0.size(),
+  int sf0 = f0.size(),
           r,
           f;
   //get invalid edges
@@ -555,7 +554,7 @@ list<pair<int, int>> utils::get_invalid_edges_4 (const Gvrp_instance& gvrp_insta
 
 double utils::calculateGvrpLB1 (const vector<pair<double, double>>& closestsDistances) {
   double lb = 0.0;
-  for (size_t i = 0; i < closestsDistances.size(); ++i)
+  for (int i = 0; i < closestsDistances.size(); ++i)
     lb += (closestsDistances[i].first + closestsDistances[i].second)/2.0;
   return lb;
 }
@@ -674,7 +673,7 @@ Gvrp_instance utils::matheus_instance_reader(const string& file_path){
   }
   inFile.close();
   //calculate distances
-  const size_t sall = customers.size() + afss.size() + 1;
+  const int sall = customers.size() + afss.size() + 1;
   vector<vector<double>> distances (sall, vector<double> (sall));
   for (const Vertex& customer : customers) {
     distances[depot.id][customer.id] = floor(sqrt(pow(customer.x - depot.x, 2) + pow(customer.y - depot.y, 2)) + 0.5);
@@ -918,7 +917,7 @@ vector<vector<int>> utils::read_uchoa_vrp_solution (const string& file_path) {
   getline(inFile, line);
   getline(inFile, line);
   //get routes
-  for (size_t j = 0; j < nRoutes; ++j) {
+  for (int j = 0; j < nRoutes; ++j) {
     getline(inFile, line);
     ss.str(line);
     ss>>buff;

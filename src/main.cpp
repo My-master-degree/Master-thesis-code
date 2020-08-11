@@ -40,9 +40,6 @@ int main (int argc, char **argv)
     //instance generation model
   Model_tests model_tests (VERBOSE, execution_time, nIntSol);
   model_tests.run();
-    //local searchs
-  Local_searchs_tests local_searchs_tests;
-  local_searchs_tests.run();
     //EMH model
   cout<<"============    EMH MODEL    =============="<<endl;
   EMH_model_tests emh_model_tests (VERBOSE, execution_time, nIntSol);
@@ -71,7 +68,7 @@ int main (int argc, char **argv)
   cout<<"============    MATHEUS 3 MODEL    =============="<<endl;
   Matheus_model_3_tests matheus_model_3_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_3_tests.run();
-  */
+ */
     //Matheus model 4 
   cout<<"============    MATHEUS 4 MODEL    =============="<<endl;
   Matheus_model_4_tests matheus_model_4_tests (VERBOSE, execution_time, nIntSol);

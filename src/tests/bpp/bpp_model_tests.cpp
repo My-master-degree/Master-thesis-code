@@ -44,14 +44,14 @@ void BPP_model_tests::run() {
   i = 0;
   for (const string& instance : instances) {
     //create bpp instance
-    const size_t sc0 = gvrp_instance->customers.size() + 1;
+    const int sc0 = gvrp_instance->customers.size() + 1;
     vector<double> minTimes(sc0, INT_MAX);
     vector<reference_wrapper<const Vertex>> c0;
     c0.push_back(gvrp_instance->depot);
     for (auto customer = gvrp_instance->customers.begin(); customer != gvrp_instance->customers.end(); ++customer)
       c0.push_back(*customer);
-    for (size_t i = 0; i < sc0; ++i) {
-      for (size_t j = 0; j < sc0; ++j)
+    for (int i = 0; i < sc0; ++i) {
+      for (int j = 0; j < sc0; ++j)
         if (i != j) {
           minTimes[i] = min(minTimes[i], gvrp_instance->time(c0[i].get().id, c0[j].get().id));
         }

@@ -35,7 +35,7 @@ void Subcycle_user_constraint::main() {
   }
   IloEnv env = getEnv();
   IloExpr lhs(env);
-  size_t i,
+  int i,
          j, 
          k,
          curr;
@@ -52,7 +52,7 @@ void Subcycle_user_constraint::main() {
     instance_generation_model.x_vals = Matrix2DVal (env, instance_generation_model.sNodes);
     instance_generation_model.z_vals = IloNumArray (env, instance_generation_model.sNodes, 0, 1, IloNumVar::Float);
     getValues(instance_generation_model.z_vals, instance_generation_model.z);
-    for (size_t i = 0; i < instance_generation_model.sNodes; i++) {
+    for (int i = 0; i < instance_generation_model.sNodes; i++) {
       instance_generation_model.x_vals[i] = IloNumArray (env, instance_generation_model.sNodes, 0, 1, IloNumVar::Float);
       getValues(instance_generation_model.x_vals[i], instance_generation_model.x[i]);
     }

@@ -17,22 +17,22 @@ Invalid_edge_preprocessing_4::Invalid_edge_preprocessing_4 (Matheus_model_4& mat
 }
 
 void Invalid_edge_preprocessing_4::add () {
-  for (size_t i = 0; i < matheus_model_4.c0.size(); ++i) {
+  for (int i = 0; i < matheus_model_4.c0.size(); ++i) {
     const Vertex * vertexI = matheus_model_4.c0[i];
-    for (size_t j = 0; j < matheus_model_4.c0.size(); ++j) {
+    for (int j = 0; j < matheus_model_4.c0.size(); ++j) {
       const Vertex * vertexJ = matheus_model_4.c0[j];
-      for (size_t f_ = 0; f_ < matheus_model_4._f.size(); ++f_) {
-        for (size_t r_ = 0; r_ < matheus_model_4._f.size(); ++r_) {
+      for (int f_ = 0; f_ < matheus_model_4._f.size(); ++f_) {
+        for (int r_ = 0; r_ < matheus_model_4._f.size(); ++r_) {
           bool valid = false;
-          for (size_t f = 0; f < matheus_model_4.gvrp_afs_tree->f0.size(); ++f) {
+          for (int f = 0; f < matheus_model_4.gvrp_afs_tree->f0.size(); ++f) {
             const Vertex * vertexF = matheus_model_4.gvrp_afs_tree->f0[f];
-            for (size_t r = 0; r < matheus_model_4.gvrp_afs_tree->f0.size(); ++r) {
+            for (int r = 0; r < matheus_model_4.gvrp_afs_tree->f0.size(); ++r) {
               const Vertex * vertexR = matheus_model_4.gvrp_afs_tree->f0[r];
               if (matheus_model_4.instance.fuel(vertexF->id, i) + matheus_model_4.customerToAfsFuel(i, f_) <= matheus_model_4.instance.vehicleFuelCapacity 
                   && matheus_model_4.afsToCustomerFuel(r_, j) + matheus_model_4.instance.fuel(j, vertexR->id) <= matheus_model_4.instance.vehicleFuelCapacity) {
                 //get f_, and r_ indexes
-                size_t f__, r__;
-                for (size_t k = 0; k < matheus_model_4.gvrp_afs_tree->f0.size(); ++k) {
+                int f__, r__;
+                for (int k = 0; k < matheus_model_4.gvrp_afs_tree->f0.size(); ++k) {
                   if (matheus_model_4.gvrp_afs_tree->f0[k]->id == vertexF->id)
                     f__ = k;
                   if (matheus_model_4.gvrp_afs_tree->f0[k]->id == vertexR->id)

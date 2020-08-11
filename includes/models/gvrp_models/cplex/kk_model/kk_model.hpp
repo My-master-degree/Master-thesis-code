@@ -7,10 +7,6 @@
 #include "models/gvrp_models/gvrp_afs_tree.hpp" 
 #include "models/gvrp_models/gvrp_solution.hpp" 
 #include "models/gvrp_models/cplex/gvrp_model.hpp" 
-#include "models/gvrp_models/cplex/kk_model/user_constraint.hpp"
-#include "models/gvrp_models/cplex/kk_model/lazy_constraint.hpp"
-#include "models/gvrp_models/cplex/kk_model/preprocessing.hpp"
-#include "models/gvrp_models/cplex/kk_model/extra_constraint.hpp"
 
 #include <vector>
 #include <map>
@@ -29,10 +25,6 @@ namespace models {
   namespace gvrp_models {
     namespace cplex {
       namespace kk_model { 
-        class User_constraint;
-        class Lazy_constraint;
-        class Preprocessing;
-        class Extra_constraint;
         class KK_model : public Gvrp_model {
           public:
             explicit KK_model(const Gvrp_instance& gvrp_instance, unsigned int time_limit); 
@@ -44,9 +36,6 @@ namespace models {
             Matrix2DVal x_vals;
             IloNumVarArray t;
             IloNumVarArray e;
-            list<User_constraint*> user_constraints;
-            list<Preprocessing*> preprocessings;
-            list<Extra_constraint*> extra_constraints;
             map<int, int> customersC0Indexes;
             map<int, int> afssF0Indexes;
             vector<const Vertex *> c0;

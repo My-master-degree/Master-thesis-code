@@ -21,7 +21,7 @@ void Mip_start::extraStepsAfterModelCreation () {
     IloNumArray e_vals (env, all.size(), 0, instance.vehicleFuelCapacity, IloNumVar::Float);
     x_vals = Matrix3DVal (env, instance.customers.size());
     //create vals
-    for (size_t k = 0; k < instance.customers.size(); k++) {
+    for (int k = 0; k < instance.customers.size(); k++) {
       x_vals[k] = IloArray<IloNumArray> (env, all.size());
       for (const pair<int, const Vertex *>& p : all){
         int i = p.first;
@@ -60,7 +60,7 @@ void Mip_start::extraStepsAfterModelCreation () {
       startVar.add(e[p.first]);
       startVal.add(e_vals[p.first]);
     }
-    for (size_t k = 0; k < instance.customers.size(); k++)
+    for (int k = 0; k < instance.customers.size(); k++)
       for (const pair<int, const Vertex *>& p : all) {
         int i = p.first;
         for (const pair<int, const Vertex *>& p1 : all) {
@@ -71,7 +71,7 @@ void Mip_start::extraStepsAfterModelCreation () {
       }
     cplex.addMIPStart (startVar, startVal);
     //clean vals
-    for (size_t k = 0; k < instance.customers.size(); x_vals[k++].end()) 
+    for (int k = 0; k < instance.customers.size(); x_vals[k++].end()) 
       for (const pair<int, const Vertex *>& p : all)
         x_vals[k][p.first].end();
     x_vals.end();

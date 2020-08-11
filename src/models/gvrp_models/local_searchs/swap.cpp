@@ -31,7 +31,7 @@ Gvrp_solution Swap::run () {
   //create afss sets
   for (const Vertex& afs : instance.afss)
     afss.insert(afs.id);
-  size_t i = 0;
+  int i = 0;
   for (list<list<Vertex>>::iterator r1 = routes.begin(); r1 != routes.end(); ++r1) {
     cout<<"Route "<<i<<endl;
     ++i;

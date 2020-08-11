@@ -8,7 +8,7 @@ Gvrp_lp_kk_heuristic::Gvrp_lp_kk_heuristic (const KK_model& kk_model_, const Mat
 Gvrp_solution Gvrp_lp_kk_heuristic::run() {
   list<list<Vertex>> routes;
   list<Vertex> route;
-  size_t curr;    
+  int curr;    
   //checking the depot neighboring
   set<int> customers;
   bool valid = true;
@@ -19,14 +19,14 @@ Gvrp_solution Gvrp_lp_kk_heuristic::run() {
     int nextCustomer = 0,
            nextAFS = 0;
     bool found = false;
-    for (size_t i = 1; i < kk_model.c0.size(); ++i) {
+    for (int i = 1; i < kk_model.c0.size(); ++i) {
       if (!customers.count(i)) {
         if (x[0][i] > maxFirst) {
           maxFirst = x[0][i];
           nextCustomer = i;
           found = true;
         } else
-          for (size_t f = 0; f < kk_model.f0.size(); ++f)
+          for (int f = 0; f < kk_model.f0.size(); ++f)
             if (y[0][f][i] > maxFirst) {
               maxFirst = y[0][f][i];
               nextAFS = f;
@@ -63,14 +63,14 @@ Gvrp_solution Gvrp_lp_kk_heuristic::run() {
       nextCustomer = 0;
       nextAFS = 0;
       found = false;
-      for (size_t i = 0; i < kk_model.c0.size(); ++i) {
+      for (int i = 0; i < kk_model.c0.size(); ++i) {
         if (!customers.count(i)) {
           if (x[curr][i] > maxFirst) {
             maxFirst = x[curr][i];
             nextCustomer = i;
             found = true;
           } else
-            for (size_t f = 0; f < kk_model.f0.size(); ++f)
+            for (int f = 0; f < kk_model.f0.size(); ++f)
               if (y[curr][f][i] > 0) {
                 maxFirst = y[curr][f][i];
                 nextAFS = f;

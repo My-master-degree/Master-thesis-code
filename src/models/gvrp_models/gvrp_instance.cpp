@@ -33,8 +33,6 @@ Gvrp_instance::Gvrp_instance(list<Vertex> _afss, list<Vertex> _customers, Vertex
 
 void Gvrp_instance::write_in_csv(const string& file_path){
   ofstream instanceFile;
-  double fuel, 
-         time;
   instanceFile.open (file_path);
   //params
   instanceFile<<"Vehicle:"<<endl<<"Average speed:;"<<this->vehicleAverageSpeed<<endl<<"Time limit:;"<<this->timeLimit<<endl<<"Fuel comsumption rate:;"<<this->vehicleFuelConsumptionRate<<endl<<"Fuel Capacity:;"<<this->vehicleFuelCapacity<<endl;

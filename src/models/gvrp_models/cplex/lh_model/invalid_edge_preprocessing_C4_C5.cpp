@@ -20,9 +20,9 @@ Invalid_edge_preprocessing_C4_C5::Invalid_edge_preprocessing_C4_C5 (LH_model& lh
 void Invalid_edge_preprocessing_C4_C5::add () {
   //invalid edges
   lh_model.nPreprocessings1 = 0;
-  for (size_t i = 1; i < lh_model.c0.size(); ++i) {
+  for (int i = 1; i < lh_model.c0.size(); ++i) {
     double closestAFS = lh_model.customersFuel(0, i);
-    for (size_t f = 0; f < lh_model.f0.size(); ++f)
+    for (int f = 0; f < lh_model.f0.size(); ++f)
       closestAFS = min (closestAFS, lh_model.afsToCustomerFuel(f, i));
     if (closestAFS + lh_model.customersFuel(i, 0) > lh_model.instance.vehicleFuelCapacity) {
       lh_model.model.add(lh_model.x[0][i] == 0);

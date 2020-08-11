@@ -53,7 +53,7 @@ void Matheus_model_tests::run() {
 //    Mip_start matheus_model (*gvrp_instance, execution_time, gvrp_solution);  
     Matheus_model matheus_model (*gvrp_instance, execution_time);  
     execute_model(matheus_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
-    resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model.nGreedyLP<<";"<<matheus_model.nPreprocessings1<<";"<<matheus_model.nPreprocessings2<<";"<<matheus_model.nPreprocessings3<<";"<<matheus_model.nPreprocessings4<<endl;
+    resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model.nGreedyLP<<";"<<matheus_model.nBPPNRoutesLB<<";"<<matheus_model.nImprovedMSTNRoutesLB<<";"<<matheus_model.nPreprocessings1<<";"<<matheus_model.nPreprocessings2<<";"<<matheus_model.nPreprocessings3<<";"<<matheus_model.nPreprocessings4<<endl;
     ++gvrp_instance;
     ++i;
   }
@@ -78,7 +78,7 @@ void Matheus_model_tests::execute_model(Matheus_model& matheus_model, const stri
 
 void Matheus_model_tests::openResultFile (ofstream& resultsFile, string fileName) {
   resultsFile.open (fileName + string("md_results.csv"));
-  resultsFile<<"Instance;Solution;GAP;Cost;Time;Status;GreedyLP;preprocessing1;preprocessing2;preprocessing3;preprocessing4"<<endl;
+  resultsFile<<"Instance;Solution;GAP;Cost;Time;Status;GreedyLP;BPP;ImprovedMST;preprocessing1;preprocessing2;preprocessing3;preprocessing4"<<endl;
 }
 
 void Matheus_model_tests::closeResultFile (ofstream& resultsFile) {

@@ -24,7 +24,7 @@ void Mip_start::extraStepsAfterModelCreation () {
     x_vals = Matrix2DVal (env, c0.size());
     y_vals = Matrix3DVal (env, c0.size());
     //create vals
-    for (size_t i = 0; i < c0.size(); ++i) {
+    for (int i = 0; i < c0.size(); ++i) {
       //x, u, v, c, e, and a vars
       x_vals[i] = IloNumArray (env, c0.size(), 0, 1, IloNumVar::Int);
       u_vals[i] = IloNumArray (env, c0.size(), 0, instance.timeLimit, IloNumVar::Float);
@@ -32,10 +32,10 @@ void Mip_start::extraStepsAfterModelCreation () {
       if (i > 0) {
           v_vals[i - 1] = IloNumArray (env, f0.size(), 0, instance.vehicleFuelCapacity, IloNumVar::Float);
           a_vals[i - 1] = IloNumArray (env, c0.size() - 1, 0, instance.vehicleFuelCapacity, IloNumVar::Float);
-        for (size_t f = 0; f < f0.size(); ++f) 
+        for (int f = 0; f < f0.size(); ++f) 
           v_vals[i - 1][f] = 0.0;
       }
-      for (size_t j = 0; j < c0.size(); ++j) {
+      for (int j = 0; j < c0.size(); ++j) {
         //x
         x_vals[i][j] = 0.0;
         //u
@@ -46,16 +46,15 @@ void Mip_start::extraStepsAfterModelCreation () {
       }
       //y var
       y_vals[i] = Matrix2DVal (env, f0.size());
-      for (size_t f = 0; f < f0.size(); ++f) {
+      for (int f = 0; f < f0.size(); ++f) {
         y_vals[i][f] = IloNumArray(env, c0.size(), 0, 1, IloNumVar::Int);
-        for (size_t j = 0; j < c0.size(); ++j) 
+        for (int j = 0; j < c0.size(); ++j) 
           y_vals[i][f][j] = 0.0;
       }
     }
     //get values
     double currFuel, 
            currTime;
-    int nAFSs;
     for (const list<Vertex>& route : gvrp_solution.routes) {
       currFuel = instance.vehicleFuelCapacity;
       currTime = 0.0;
@@ -93,14 +92,14 @@ void Mip_start::extraStepsAfterModelCreation () {
     IloCplex::MIPStartEffort effort = IloCplex::MIPStartCheckFeas;
     IloNumVarArray startVar(env);
     IloNumArray startVal(env);
-    for (size_t i = 0; i < c0.size(); ++i) {
+    for (int i = 0; i < c0.size(); ++i) {
       //v
       if (i > 0) 
-        for (size_t f = 0; f < f0.size(); ++f) {
+        for (int f = 0; f < f0.size(); ++f) {
           startVar.add(v[i - 1][f]);
           startVal.add(v_vals[i - 1][f]);
         }
-      for (size_t j = 0; j < c0.size(); ++j) {
+      for (int j = 0; j < c0.size(); ++j) {
         //x
         startVar.add(x[i][j]);
         startVal.add(x_vals[i][j]);
@@ -116,22 +115,22 @@ void Mip_start::extraStepsAfterModelCreation () {
         }
       }
       //y 
-      for (size_t f = 0; f < f0.size(); ++f) 
-        for (size_t j = 0; j < c0.size(); ++j) {
+      for (int f = 0; f < f0.size(); ++f) 
+        for (int j = 0; j < c0.size(); ++j) {
           startVar.add(y[i][f][j]);
           startVal.add(y_vals[i][f][j]);
         }
     }
     cplex.addMIPStart (startVar, startVal, effort);
     //clean vals
-    for (size_t i = 0; i < c0.size(); ++i) {
+    for (int i = 0; i < c0.size(); ++i) {
       if (i > 0) {
         a_vals[i - 1].end();
         v_vals[i - 1].end();
       }
       u_vals[i].end();
       x_vals[i].end();
-      for (size_t f = 0; f < f0.size(); ++f) 
+      for (int f = 0; f < f0.size(); ++f) 
         y_vals[i][f].end();
       y_vals[i].end();
     }

@@ -67,6 +67,7 @@ add_compile_options(-Wall
   -lm 
   -lpthread 
   -ldl
+  -Wno-sign-compare
 )
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")

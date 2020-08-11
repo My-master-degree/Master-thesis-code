@@ -38,7 +38,7 @@ void Greedy_lp_heuristic::main() {
     if (depth > 10 && depth%10 == 0) 
       return;
     //setup
-    const size_t sall = matheus_model_3.all.size();
+    const int sall = matheus_model_3.all.size();
     int depot = matheus_model_3.instance.depot.id;
     IloEnv env = getEnv();
     IloExpr lhs (env);
@@ -46,7 +46,6 @@ void Greedy_lp_heuristic::main() {
     list<Vertex> route;
     unordered_set<int> visitedNodes;
     bool valid = true,
-         found,
          frac_sol = false;
     double maxVal,
            remainingFuel,
@@ -62,7 +61,7 @@ void Greedy_lp_heuristic::main() {
       getValues(matheus_model_3.x_vals[i], matheus_model_3.x[i]);
       //check y values
       if (!frac_sol)
-        for (size_t j = 0; j < sall; ++j)
+        for (int j = 0; j < sall; ++j)
           if (abs(round(matheus_model_3.x_vals[i][j]) - matheus_model_3.x_vals[i][j]) > matheus_model_3.INTEGRALITY_TOL) 
             frac_sol = true;
     }
@@ -81,7 +80,7 @@ void Greedy_lp_heuristic::main() {
         //dfs
         do {
           maxVal = -1.0;
-          for (size_t j = 0; j < sall; ++j)
+          for (int j = 0; j < sall; ++j)
             if (matheus_model_3.x_vals[curr][j] > maxVal) {
               next = j;
               maxVal = matheus_model_3.x_vals[curr][j];
@@ -131,11 +130,11 @@ void Greedy_lp_heuristic::main() {
         unordered_map<int, IloNum> e_vals;
         matheus_model_3.x_vals = Matrix2DVal (matheus_model_3.env, sall);
         //t
-        for (size_t i = 0; i < sall; ++i) 
+        for (int i = 0; i < sall; ++i) 
           t_vals[i] = 0.0;
         //x
-        for (size_t i = 0; i < sall; ++i)
-          for (size_t j = 0; j < sall; ++j)
+        for (int i = 0; i < sall; ++i)
+          for (int j = 0; j < sall; ++j)
             matheus_model_3.x_vals[i][j] = 0;
         //get values
         unordered_map<int, list<int>> afs_dummies = matheus_model_3.afs_dummies;
@@ -173,42 +172,42 @@ void Greedy_lp_heuristic::main() {
            Gvrp_solution gvrp_solution (routes, matheus_model_3.instance);
            cout<<gvrp_solution<<endl;
            cout<<" ";
-           for (size_t i = 0; i < matheus_model_3.c0.size(); ++i){
+           for (int i = 0; i < matheus_model_3.c0.size(); ++i){
            cout<<" ";
            if (i <=9)
            cout<<" ";
            cout<<i;
            }
            cout<<endl;
-           for (size_t i = 0; i < matheus_model_3.c0.size(); ++i){
+           for (int i = 0; i < matheus_model_3.c0.size(); ++i){
            cout<<i<<" ";
            if (i <= 9)
            cout<<" ";
-           for (size_t j = 0; j < matheus_model_3.c0.size(); ++j) {
+           for (int j = 0; j < matheus_model_3.c0.size(); ++j) {
            cout<<abs(matheus_model_3.x_vals[i][j])<<"  ";
            }
            cout<<endl;
            }
-           for (size_t f = 0; f < matheus_model_3.f0.size(); ++f){
+           for (int f = 0; f < matheus_model_3.f0.size(); ++f){
            cout<<"AFS: "<<f<<endl;
            cout<<" ";
-           for (size_t i = 0; i < matheus_model_3.c0.size(); ++i){
+           for (int i = 0; i < matheus_model_3.c0.size(); ++i){
            cout<<" ";
            if (i <=9)
            cout<<" ";
            cout<<i;
            }
            cout<<endl;
-           for (size_t i = 0; i < matheus_model_3.c0.size(); ++i){
+           for (int i = 0; i < matheus_model_3.c0.size(); ++i){
            cout<<i<<" ";
            if (i <= 9)
            cout<<" ";
-           for (size_t j = 0; j < matheus_model_3.c0.size(); ++j)
+           for (int j = 0; j < matheus_model_3.c0.size(); ++j)
            cout<<abs(matheus_model_3.y_vals[i][f][j])<<"  ";
            cout<<endl;
            }
            }
-           for (size_t i = 0; i < matheus_model_3.c0.size(); ++i)
+           for (int i = 0; i < matheus_model_3.c0.size(); ++i)
            cout<<i<<": "<<matheus_model_3.c0[i]->id<<endl;
            */
 
@@ -217,11 +216,11 @@ void Greedy_lp_heuristic::main() {
           vars.add(matheus_model_3.e[customer]);
           vals.add(e_vals[customer]);
         }
-        for (size_t i = 0; i < sall; ++i) {
+        for (int i = 0; i < sall; ++i) {
           //t
           vars.add(matheus_model_3.t[i]);
           vals.add(t_vals[i]);
-          for (size_t j = 0; j < sall; ++j) {
+          for (int j = 0; j < sall; ++j) {
             //x
             vars.add(matheus_model_3.x[i][j]);
             vals.add(matheus_model_3.x_vals[i][j]);
@@ -235,7 +234,7 @@ void Greedy_lp_heuristic::main() {
       } 
     }
     //clean vals
-    for (size_t i = 0; i < sall; ++i) 
+    for (int i = 0; i < sall; ++i) 
       matheus_model_3.x_vals[i].end();
     matheus_model_3.x_vals.end();
   } catch (IloException& e) {

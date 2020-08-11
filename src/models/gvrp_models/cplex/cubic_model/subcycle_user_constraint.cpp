@@ -35,7 +35,7 @@ void Subcycle_user_constraint::main() {
     abortCutLoop();
     return;
   }
-  const size_t sall = cubic_model.instance.distances.size();
+  const int sall = cubic_model.instance.distances.size();
   DSU dsu (sall);
   ListGraph graph;
   ListGraph::EdgeMap<double>  weight(graph); 
@@ -46,7 +46,7 @@ void Subcycle_user_constraint::main() {
   unordered_multimap<int, int> subcomponents (sall);
   vector<ListGraph::Node> nodes (sall);
   int depot = cubic_model.instance.depot.id;
-  size_t k;
+  int k;
   //get values
   Matrix3DVal x_vals (env, cubic_model.instance.maxRoutes);
   for (k = 0; k < cubic_model.instance.maxRoutes; k++) {
@@ -102,7 +102,7 @@ void Subcycle_user_constraint::main() {
   }
   //get subcycles
   //get subcomponents
-  for (size_t i = 0; i < sall; ++i) 
+  for (int i = 0; i < sall; ++i) 
     subcomponents.insert(make_pair(dsu.findSet(i), i));
   //store components
   unordered_multimap<int, int>::iterator it = subcomponents.begin();
@@ -127,7 +127,7 @@ void Subcycle_user_constraint::main() {
           customersComponent.push_back(customer);
       if (customersComponent.size() == 0)
         continue;
-      size_t i = 1;
+      int i = 1;
       vector<const Vertex *> vertices (customersComponent.size() + 1);
       vertices[0] = &cubic_model.instance.depot;
       for (int customer : customersComponent) {
@@ -148,7 +148,7 @@ void Subcycle_user_constraint::main() {
       try {
         //in edges
         //getting lhs
-        for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+        for (k = 0; k < cubic_model.instance.maxRoutes; ++k) {
           for (const pair<int, const Vertex *>& p2 : cubic_model.all) {
             int a = p2.first;
             if (!S.count(a))
@@ -163,7 +163,7 @@ void Subcycle_user_constraint::main() {
         lhs.end();
         lhs = IloExpr(env);
         //getting lhs
-        for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+        for (k = 0; k < cubic_model.instance.maxRoutes; ++k) {
           for (const pair<int, const Vertex *>& p2 : cubic_model.all) {
             int a = p2.first;
             if (!S.count(a))
@@ -177,10 +177,6 @@ void Subcycle_user_constraint::main() {
         lhs.end();
         lhs = IloExpr(env);
         //bfs to get all afss out and connected to this component
-        for (int node : S) {
-        //  cout<<node<<", "; 
-        }
-//        cout<<endl;
         queue<int> q; 
         for (int node : S)
           q.push(node);
@@ -201,7 +197,7 @@ void Subcycle_user_constraint::main() {
               S.insert(afs);
               //in edges
               //getting lhs
-              for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+              for (k = 0; k < cubic_model.instance.maxRoutes; ++k) {
                 for (const pair<int, const Vertex *>& p2 : cubic_model.all) {
                   int a = p2.first;
                   if (!S.count(a))
@@ -216,7 +212,7 @@ void Subcycle_user_constraint::main() {
               lhs.end();
               lhs = IloExpr(env);
               //getting lhs
-              for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k) {
+              for (k = 0; k < cubic_model.instance.maxRoutes; ++k) {
                 for (const pair<int, const Vertex *>& p2 : cubic_model.all) {
                   int a = p2.first;
                   if (!S.count(a))
@@ -244,7 +240,7 @@ void Subcycle_user_constraint::main() {
       lhs = IloExpr(env);
     }
   //end vars
-  for (size_t k = 0; k < cubic_model.instance.maxRoutes; ++k)
+  for (k = 0; k < cubic_model.instance.maxRoutes; ++k)
     for (const pair<int, const Vertex *>& p : cubic_model.all){
       int i = p.first;
       x_vals[k][i].end();

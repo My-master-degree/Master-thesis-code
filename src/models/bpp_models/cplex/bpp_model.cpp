@@ -61,7 +61,7 @@ void BPP_model::createVariables(){
     y = IloNumVarArray (env, sitems, 0, 1, IloNumVar::Int);
     //setting names
     stringstream nameStream;
-    for (size_t i = 0; i < sitems; ++i){
+    for (int i = 0; i < sitems; ++i){
       //y var
       nameStream<<"y["<<i<<"]";
       y[i].setName(nameStream.str().c_str());
@@ -69,7 +69,7 @@ void BPP_model::createVariables(){
       nameStream.str("");
       //x var
       x[i] = IloNumVarArray(env, sitems, 0, 1, IloNumVar::Int);
-      for (size_t j = 0; j < sitems; ++j){
+      for (int j = 0; j < sitems; ++j){
         nameStream<<"x["<<i<<"]["<<j<<"]";
         x[i][j].setName(nameStream.str().c_str());
         nameStream.clear();
@@ -87,7 +87,7 @@ void BPP_model::createObjectiveFunction() {
   //objective function
   try{
     IloExpr fo (env);
-    for (size_t j = 0; j < sitems; ++j)
+    for (int j = 0; j < sitems; ++j)
       fo += y[j];
     model = IloModel (env);
     model.add(IloMinimize(env, fo));
@@ -105,8 +105,8 @@ void BPP_model::createModel() {
     IloConstraint c;
     stringstream constraintName;
     //\sum_{j \in B} x_{ij} = 1, \forall v_i \in I
-    for (size_t i = 0; i < sitems; ++i) {
-      for (size_t j = 0; j < sitems; ++j)
+    for (int i = 0; i < sitems; ++i) {
+      for (int j = 0; j < sitems; ++j)
         expr += x[i][j];
       c = IloConstraint (expr == 1);
       constraintName<<"item "<<i<<" must be in exactly one bin";
@@ -118,8 +118,8 @@ void BPP_model::createModel() {
       constraintName.str("");
     }
     //\sum_{i \in I} x_{ij} p_i \leqslant C y_j, \forall j \in B
-    for (size_t j = 0; j < sitems; ++j) {
-      for (size_t i = 0; i < sitems; ++i)
+    for (int j = 0; j < sitems; ++j) {
+      for (int i = 0; i < sitems; ++i)
           expr += x[i][j] * instance.items[i];
       c = IloConstraint (expr <= instance.capacity * y[j]);
       constraintName<<"bin "<<j<<" consumed  must be less than "<<instance.capacity<<" if bin is openned";
@@ -131,8 +131,8 @@ void BPP_model::createModel() {
       constraintName.str("");
     }
     //\sum_{i \in I} x_{ij} p_i \leqslant C y_j, \forall j \in B
-    for (size_t j = 0; j < sitems; ++j) {
-      for (size_t i = 0; i < sitems; ++i) {
+    for (int j = 0; j < sitems; ++j) {
+      for (int i = 0; i < sitems; ++i) {
         c = IloConstraint (x[i][j] <= y[j]);
         constraintName<<"item "<<i<<" only is placed at bin "<<j<<" if bin "<<j<<" is openned";
         c.setName(constraintName.str().c_str());
@@ -144,7 +144,7 @@ void BPP_model::createModel() {
       }
     }
     //y_j \leqslant y_{j - 1}, \forall j \in \{1, ..., |B|\} \subset B
-    for (size_t j = 1; j < sitems; ++j) {
+    for (int j = 1; j < sitems; ++j) {
       c = IloConstraint (y[j] <= y[j - 1]);
       constraintName<<"bin "<<j<<" only will be openned if bin "<<j - 1<<" is openned";
       c.setName(constraintName.str().c_str());
@@ -174,7 +174,7 @@ void BPP_model::fillVals(){
     x_vals = Matrix2DVal (env, sitems);
     y_vals = IloNumArray (env, sitems);
     cplex.getValues(y_vals, y);
-    for (size_t i = 0; i < sitems; ++i) {
+    for (int i = 0; i < sitems; ++i) {
       x_vals[i] = IloNumArray (env, sitems, 0, 1, IloNumVar::Int);
       cplex.getValues(x_vals[i], x[i]);
     }
@@ -188,10 +188,10 @@ void BPP_model::fillVals(){
 void BPP_model::createBPP_solution(){
   try{
     solution = new BPP_solution ();
-    for (size_t j = 0; j < sitems; ++j) {
+    for (int j = 0; j < sitems; ++j) {
       if (y_vals[j] > 0) {
         vector<int> bin;
-        for (size_t i = 0; i < sitems; ++i) 
+        for (int i = 0; i < sitems; ++i) 
           if (x_vals[i][j] > 0)
             bin.push_back(i);
         solution->push_back(bin);
@@ -205,7 +205,7 @@ void BPP_model::createBPP_solution(){
 }
 
 void BPP_model::endVars(){
-  for (size_t i = 0; i < sitems; ++i) 
+  for (int i = 0; i < sitems; ++i) 
     x[i].end();
   y.end();
   x.end(); 

@@ -16,7 +16,7 @@ namespace models {
         friend ostream& operator<<(ostream& strm, const BPP_instance& bpp_instance){
           stringstream output;
           output<<"Items:"<<endl;
-          for (size_t i = 0; i < bpp_instance.items.size(); ++i) {
+          for (int i = 0; i < bpp_instance.items.size(); ++i) {
             output<<"\t"<<i<<": "<<bpp_instance.items[i]<<endl;
             output<<"Capacity: "<<bpp_instance.capacity<<endl;
             return strm << output.str();

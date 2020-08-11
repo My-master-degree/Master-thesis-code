@@ -12,7 +12,6 @@
 #include "models/gvrp_models/cplex/matheus_model_3/matheus_model_3.hpp"
 #include "models/gvrp_models/cplex/matheus_model_3/heuristic_callback.hpp"
 #include "models/gvrp_models/cplex/matheus_model_3/preprocessing.hpp"
-#include "models/gvrp_models/cplex/matheus_model_3/extra_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model_3/user_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model_3/subcycle_user_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model_3/invalid_edge_preprocessing.hpp"
@@ -40,7 +39,7 @@ using namespace models::gvrp_models::cplex::matheus_model_3;
 
 using namespace std;
 
-Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nGreedyLP(0), BPPTimeLimit(10000000), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0) {
+Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nGreedyLP(0), BPPTimeLimit(10000000), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //populating all map and customers set
@@ -66,12 +65,12 @@ Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int tim
     all[afs.id] = &afs;
     dummies[afs.id] = &afs;
   }
-  for (size_t f = 0; f < gvrp_afs_tree->f0.size(); ++f)
+  for (int f = 0; f < gvrp_afs_tree->f0.size(); ++f)
     timesLBs[gvrp_afs_tree->f0[f]->id] = gvrp_afs_tree->times[f];
   int dummy_id = all.rbegin()->second->id;
   //afs dummies
   for (const Vertex& afs: instance.afss)
-    for (size_t i = 1; i < nDummies; ++i) {
+    for (int i = 1; i < nDummies; ++i) {
       afs_dummies[afs.id].push_back(++dummy_id);
       all[dummy_id] = &afs;
       dummies[dummy_id] = &afs;
@@ -88,7 +87,7 @@ Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int tim
   gvrpReducedGraphTimes = gvrpReducedGraphs.second;
   //set sol lb
   vector<const Vertex *> c0 (instance.customers.size() + 1);
-  size_t i = 1;
+  int i = 1;
   c0[0] = &instance.depot;
   for (const Vertex& customer : instance.customers) {
     c0[i] = &customer;
@@ -133,8 +132,6 @@ Matheus_model_3::~Matheus_model_3() {
     delete preprocessing;  
   for (User_constraint * user_constraint : user_constraints)
     delete user_constraint;  
-  for (Extra_constraint * extra_constraint : extra_constraints)
-    delete extra_constraint;  
   for (Heuristic_callback * heuristic_callback : heuristic_callbacks)
     delete heuristic_callback;  
 }
@@ -352,6 +349,7 @@ void Matheus_model_3::createModel() {
         constraintName.str("");
       }
     }
+    /*
     for (int customer : customers) {
       c = IloConstraint (timesLBs[customer] - all[customer]->serviceTime <= t[customer] <= instance.timeLimit - timesLBs[customer]);
       constraintName<<customer<<" time lb and ub";
@@ -360,6 +358,7 @@ void Matheus_model_3::createModel() {
       constraintName.clear();
       constraintName.str("");
     }
+    */
     //energy
     //e_j - e_i + M2_{ij} x_{ij} + (M2_{ij} - (e_{ij} + e_{ji})) x_{ji} \leqslant M2_{ij} - e_{ij}, \forall v_i, v_j \in C
     for (int i : customers) 
@@ -372,7 +371,7 @@ void Matheus_model_3::createModel() {
           constraintName.clear();
           constraintName.str("");
         }
-    //\beta - c_{ij} x_{ij} \geq e_i \geq c_{ij} x_{ij}, \forall v_i, \forall v_f \in F
+    //\beta - c_{ij} x_{ij} \geq e_i \geq c_{ij} x_{ij}, \forall v_i \in C, \forall v_f \in V^{'}\backslash C
     for (int i : customers) 
       for (const pair<int, const Vertex *>& p : all) {
         int j = p.first;
@@ -431,9 +430,6 @@ void Matheus_model_3::createModel() {
     model.add(c);
     expr.end();
     expr = IloExpr(env);
-    //extra constraints
-    for (Extra_constraint* extra_constraint : extra_constraints)
-      extra_constraint->add();
     //init
     cplex = IloCplex(model);
     //user cuts

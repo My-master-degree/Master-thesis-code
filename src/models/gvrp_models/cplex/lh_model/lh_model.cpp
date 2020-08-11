@@ -133,7 +133,7 @@ void LH_model::createVariables(){
   try {
     //setting names
     stringstream nameStream;
-    for (size_t i = 0; i < c0.size(); ++i) {
+    for (int i = 0; i < c0.size(); ++i) {
       //x, u, v, and a vars
       x[i] = IloNumVarArray (env, c0.size(), 0, 1, IloNumVar::Int);
       a[i] = IloNumVarArray (env, c0.size() - 1, 0, instance.vehicleFuelCapacity, IloNumVar::Float);
@@ -141,14 +141,14 @@ void LH_model::createVariables(){
       //a
       if (i > 0) {
         v[i - 1] = IloNumVarArray (env, f0.size(), 0, instance.vehicleFuelCapacity, IloNumVar::Float);
-        for (size_t f = 0; f < f0.size(); ++f) {
+        for (int f = 0; f < f0.size(); ++f) {
           nameStream<<"v["<<i - 1<<"]["<<f<<"]=edge("<<c0[i]->id<<","<<f0[f]->id<<")";
           v[i - 1][f].setName(nameStream.str().c_str());
           nameStream.clear();
           nameStream.str("");
         }
       }
-      for (size_t j = 0; j < c0.size(); ++j) {
+      for (int j = 0; j < c0.size(); ++j) {
         //x
         nameStream<<"x["<<i<<"]["<<j<<"]=edge("<<c0[i]->id<<","<<c0[j]->id<<")";
         x[i][j].setName(nameStream.str().c_str());
@@ -169,9 +169,9 @@ void LH_model::createVariables(){
       }
       //y var
       y[i] = Matrix2DVar (env, f0.size());
-      for (size_t f = 0; f < f0.size(); ++f) {
+      for (int f = 0; f < f0.size(); ++f) {
         y[i][f] = IloNumVarArray(env, c0.size(), 0, 1, IloNumVar::Int);
-        for (size_t j = 0; j < c0.size(); ++j) {
+        for (int j = 0; j < c0.size(); ++j) {
           nameStream<<"y["<<i<<"]["<<f<<"]["<<j<<"]=path("<<c0[i]->id<<","<<f0[f]->id<<","<<c0[j]->id<<")";
           y[i][f][j].setName(nameStream.str().c_str());
           nameStream.clear();
@@ -190,10 +190,10 @@ void LH_model::createObjectiveFunction() {
   //objective function
   try{
     IloExpr fo (env);
-    for (size_t i = 0; i < c0.size(); ++i) 
-      for (size_t j = 0; j < c0.size(); ++j) {
+    for (int i = 0; i < c0.size(); ++i) 
+      for (int j = 0; j < c0.size(); ++j) {
         fo +=  instance.distances[c0[i]->id][c0[j]->id] * x[i][j];
-        for (size_t f = 0; f < f0.size(); ++f)
+        for (int f = 0; f < f0.size(); ++f)
           fo += (instance.distances[c0[i]->id][f0[f]->id] + instance.distances[f0[f]->id][c0[j]->id]) * y[i][f][j];
       }
     model = IloModel (env);
@@ -216,22 +216,22 @@ void LH_model::createModel() {
     IloConstraint c;
     stringstream constraintName;
     //x_{ii} = 0, \forall v_i \in C_0
-    for (size_t i = 0; i < c0.size(); ++i) 
+    for (int i = 0; i < c0.size(); ++i) 
       model.add(x[i][i] == 0);
     //y_{ifi} = 0, \forall v_i \in C_0, \forall v_f \in F
-    for (size_t i = 0; i < c0.size(); ++i) 
-      for (size_t f = 0; f < f0.size(); ++f)
+    for (int i = 0; i < c0.size(); ++i) 
+      for (int f = 0; f < f0.size(); ++f)
         model.add(y[i][f][i] == 0);
     //y_{00i} = y_{i00} = 0, \forall v_i \in C_0
-    for (size_t i = 0; i < c0.size(); ++i) {
+    for (int i = 0; i < c0.size(); ++i) {
       model.add(y[0][0][i] == 0);
       model.add(y[i][0][0] == 0);
     }
     //\sum_{v_j \in C_0} (x_{ij} + \sum_{v_f \in F_0} y_{ifj}) = 1, \forall v_i \in C
-    for (size_t i = 1; i < c0.size(); ++i) {
-      for (size_t j = 0; j < c0.size(); ++j) {
+    for (int i = 1; i < c0.size(); ++i) {
+      for (int j = 0; j < c0.size(); ++j) {
         expr += x[i][j];
-        for (size_t f = 1; f < f0.size(); ++f)
+        for (int f = 1; f < f0.size(); ++f)
           expr += y[i][f][j];
       }
       c = IloConstraint (expr == 1);
@@ -244,10 +244,10 @@ void LH_model::createModel() {
       constraintName.str("");
     }
     //\sum_{v_j \in C_0} (x_{ji} + \sum_{v_f \in F_0} y_{jfi}) = 1, \forall v_i \in C
-    for (size_t i = 1; i < c0.size(); ++i) {
-      for (size_t j = 0; j < c0.size(); ++j) {
+    for (int i = 1; i < c0.size(); ++i) {
+      for (int j = 0; j < c0.size(); ++j) {
         expr += x[j][i];
-        for (size_t f = 1; f < f0.size(); ++f)
+        for (int f = 1; f < f0.size(); ++f)
           expr += y[j][f][i];
       }
       c = IloConstraint (expr == 1);
@@ -260,9 +260,9 @@ void LH_model::createModel() {
       constraintName.str("");
     }
     //\sum_{v_j \in C_0} (x_{0j} + \sum_{v_f \in F_0} y_{0fj}) \leqslant m 
-    for (size_t j = 0; j < c0.size(); ++j) {
+    for (int j = 0; j < c0.size(); ++j) {
       expr += x[0][j];
-      for (size_t f = 0; f < f0.size(); ++f)
+      for (int f = 0; f < f0.size(); ++f)
         expr += y[0][f][j];
     }
     c = IloConstraint (expr <= instance.maxRoutes);
@@ -275,10 +275,10 @@ void LH_model::createModel() {
     constraintName.str("");
     //time constraints
     //\sum_{v_i \in C \cup \{v_0\}} u_{ji} = \sum_{v_i \in C \cup \{v_0\}} u_{ij} + \sum_{v_i \in C \cup \{v_0\}} t_{ij} x_{ij} + \sum_{v_i \in C \cup \{v_0\}} \sum_{v_f \in F_0} t_{irj} x_{irj}, \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
-      for (size_t i = 0; i < c0.size(); ++i) {
+    for (int j = 1; j < c0.size(); ++j) {
+      for (int i = 0; i < c0.size(); ++i) {
         expr += u[j][i] - u[i][j] - time(i, j) * x[i][j];
-        for (size_t f = 1; f < f0.size(); ++f)
+        for (int f = 1; f < f0.size(); ++f)
           expr -= time(i, f, j) * y[i][f][j];
       }
       c = IloConstraint (expr == 0);
@@ -291,9 +291,9 @@ void LH_model::createModel() {
       constraintName.str("");
     }
     //t_{0j}(x_{j0} + \sum_{v_f \in F} t_{jf0}) \leqslant u_{j0}, \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
+    for (int j = 1; j < c0.size(); ++j) {
       expr = x[j][0];
-      for (size_t f = 1; f < f0.size(); ++f)
+      for (int f = 1; f < f0.size(); ++f)
         expr += y[j][f][0];
       c = IloConstraint (time(0, j) * expr <= u[j][0]);
       constraintName<<"lb time in customer "<<c0[j]->id<<" to depot";
@@ -305,9 +305,9 @@ void LH_model::createModel() {
       constraintName.str("");
     }
     //u_{j0} \leqslant (T - t_{j0}) x_{j0} + \sum_{v_f \in F} (T - t_{jf0}) y_{jf0}, \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
+    for (int j = 1; j < c0.size(); ++j) {
       expr = (instance.timeLimit - time(j, 0)) * x[j][0];
-      for (size_t f = 1; f < f0.size(); ++f)
+      for (int f = 1; f < f0.size(); ++f)
         expr += (instance.timeLimit - time(j, f, 0)) * y[j][f][0];
       c = IloConstraint (expr >= u[j][0]);
       constraintName<<"ub time in customer "<<c0[j]->id<<" to depot";
@@ -319,7 +319,7 @@ void LH_model::createModel() {
       constraintName.str("");
     }
     //u_{0j} = 0, \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
+    for (int j = 1; j < c0.size(); ++j) {
       c = IloConstraint (u[0][j] == 0);
       constraintName<<"time in depot to "<<c0[j]->id<<" must be 0";
       c.setName(constraintName.str().c_str());
@@ -328,10 +328,10 @@ void LH_model::createModel() {
       constraintName.str("");
     }
     //u_{ij} \geqslant max(t_{0j} - t_{ij}, t_{0i}) x_{ij} + \sum_{v_f \in F} max(t_{0j} - t_{ifj}, t_{0i}) y_{ifj}, \forall v_i, v_j \in C
-    for (size_t i = 1; i < c0.size(); ++i) 
-      for (size_t j = 1; j < c0.size(); ++j) {
+    for (int i = 1; i < c0.size(); ++i) 
+      for (int j = 1; j < c0.size(); ++j) {
         expr = max(time(0, j) - time(i, j), time(0, i)) * x[i][j];
-        for (size_t f = 1; f < f0.size(); ++f)
+        for (int f = 1; f < f0.size(); ++f)
           expr += max(time(0, j) - time(i, f, j), time(0, i)) * y[i][f][j];
         c = IloConstraint (u[i][j] >= expr);
         constraintName<<"lb time in "<<c0[i]->id<<" to "<<c0[j]->id;
@@ -343,10 +343,10 @@ void LH_model::createModel() {
         constraintName.str("");
       }
     //u_{ij} \leqslant max(T - t_{j0} - t_{ij}, T - t_{i0}) x_{ij} + \sum_{v_f \in F} max(T - t_{j0} - t_{ifj}, T - t_{i0}) y_{ifj}, \forall v_i, v_j \in C
-    for (size_t i = 1; i < c0.size(); ++i) 
-      for (size_t j = 1; j < c0.size(); ++j) {
+    for (int i = 1; i < c0.size(); ++i) 
+      for (int j = 1; j < c0.size(); ++j) {
         expr = min(instance.timeLimit - time(j, 0) - time(i, j), instance.timeLimit - time(i, 0)) * x[i][j];
-        for (size_t f = 1; f < f0.size(); ++f)
+        for (int f = 1; f < f0.size(); ++f)
           expr += min(instance.timeLimit - time(j, 0) - time(i, f, j), instance.timeLimit - time(i, 0)) * y[i][f][j];
         c = IloConstraint (u[i][j] <= expr);
         constraintName<<"lb time in "<<c0[i]->id<<" to "<<c0[j]->id;
@@ -359,13 +359,13 @@ void LH_model::createModel() {
       }
     //energy constraints
     //\sum_{v_i \in C} a_{i, j} - a_{j, i} = \sum_{v_f \in F_0} v_{jr} + \sum_{v_i \in C} e_{ji} x_{ji} - \sum_{v_i \in C_0} \sum_{v_f \in F} (\beta - e_{fj}) y_{ifj} - (\beta - e_{0j}) x_{0j}, \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
-      for (size_t f = 0; f < f0.size(); ++f)
+    for (int j = 1; j < c0.size(); ++j) {
+      for (int f = 0; f < f0.size(); ++f)
         expr -= v[j - 1][f];
-      for (size_t i = 0; i < c0.size(); ++i) {
+      for (int i = 0; i < c0.size(); ++i) {
         if (i > 0) 
           expr += a[i - 1][j - 1] - a[j - 1][i - 1] - customersFuel(j, i) * x[j][i];
-        for (size_t f = 1; f < f0.size(); ++f)
+        for (int f = 1; f < f0.size(); ++f)
           expr += (instance.vehicleFuelCapacity - afsToCustomerFuel(f, j)) * y[i][f][j];
       }
       expr += (instance.vehicleFuelCapacity - customersFuel(0, j)) * x[0][j];
@@ -379,12 +379,12 @@ void LH_model::createModel() {
       constraintName.str("");
     }
     //a_{ij} >= x_{ij} * max (min_{v_f \in F_0} e_{jf}, min_{v_f \in F_0} e_{if} - e_{ij}), \forall v_i, v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) 
-      for (size_t i = 1; i < c0.size(); ++i) {
+    for (int j = 1; j < c0.size(); ++j) 
+      for (int i = 1; i < c0.size(); ++i) {
         //min_{v_f \in F_0} e_{jf} and min_{v_f \in F_0} e_{if}
         double closestAfsToJ = customerToAfsFuel(j, 0),
                closestAfsToI = customerToAfsFuel(i, 0);
-        for (size_t f = 1; f < f0.size(); ++f) {
+        for (int f = 1; f < f0.size(); ++f) {
           closestAfsToJ = min(closestAfsToJ, customerToAfsFuel(j, f));
           closestAfsToI = min(closestAfsToI, customerToAfsFuel(i, f));
         }
@@ -396,12 +396,12 @@ void LH_model::createModel() {
         constraintName.str("");
       }
     //a_{ij} <= x_{ij} * min (\beta - min_{v_f \in F_0} e_{fj}, \beta - min_{v_f \in F_0} e_{fi} - e_{ij}), \forall v_i, v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) 
-      for (size_t i = 1; i < c0.size(); ++i) {
+    for (int j = 1; j < c0.size(); ++j) 
+      for (int i = 1; i < c0.size(); ++i) {
         //min_{v_f \in F_0} e_{fj} and min_{v_f \in F_0} e_{fi}
         double closestAfsToJ = afsToCustomerFuel(0, j),
                closestAfsToI = afsToCustomerFuel(0, i);
-        for (size_t f = 1; f < f0.size(); ++f) {
+        for (int f = 1; f < f0.size(); ++f) {
           closestAfsToJ = min(closestAfsToJ, afsToCustomerFuel(f, j));
           closestAfsToI = min(closestAfsToI, afsToCustomerFuel(f, i));
         }
@@ -413,7 +413,7 @@ void LH_model::createModel() {
         constraintName.str("");
       }
     //v_{j0} \geqslant x_{j0} * e_{j0}, \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
+    for (int j = 1; j < c0.size(); ++j) {
       c = IloConstraint (v[j - 1][0] >= x[j][0] * customersFuel(j, 0));
       constraintName<<"v["<<j - 1<<"][0] lb";
       c.setName(constraintName.str().c_str());
@@ -422,10 +422,10 @@ void LH_model::createModel() {
       constraintName.str("");
     }
     //v_{j0} \leqslant x_{j0} * (\beta - min_{v_f \in F_0} e_{fj}), \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
+    for (int j = 1; j < c0.size(); ++j) {
       //min_{v_f \in F_0} e_{fj}
       double closestAfsToJ = afsToCustomerFuel(0, j);
-      for (size_t f = 1; f < f0.size(); ++f) 
+      for (int f = 1; f < f0.size(); ++f) 
         closestAfsToJ = min(closestAfsToJ, afsToCustomerFuel(f, j));
       c = IloConstraint (v[j - 1][0] <= x[j][0] * (instance.vehicleFuelCapacity - closestAfsToJ));
       constraintName<<"v["<<j - 1<<"][0] ub";
@@ -435,9 +435,9 @@ void LH_model::createModel() {
       constraintName.str("");
     }
     //v_{jr} \geqslant \sum_{v_i \in C_0} z_{jfi} * e_{jf}, \forall v_j \in C, \forall v_f \in F
-    for (size_t j = 1; j < c0.size(); ++j) {
-      for (size_t f = 1; f < f0.size(); ++f) {
-        for (size_t i = 0; i < c0.size(); ++i) 
+    for (int j = 1; j < c0.size(); ++j) {
+      for (int f = 1; f < f0.size(); ++f) {
+        for (int i = 0; i < c0.size(); ++i) 
           expr += y[j][f][i];
         c = IloConstraint (v[j - 1][f] >= expr * customerToAfsFuel(j, f));
         constraintName<<"v["<<j - 1<<"]["<<f<<"] lb";
@@ -450,13 +450,13 @@ void LH_model::createModel() {
       }
     }
     //v_{jr} \leqslant (\beta - min_{v_f \in F_0} e_{fj}) * \sum_{v_i \in C_0} z_{jfi}, \forall v_j \in C, \forall v_f \in F
-    for (size_t j = 1; j < c0.size(); ++j) {
-      for (size_t f = 1; f < f0.size(); ++f) {
-        for (size_t i = 0; i < c0.size(); ++i) 
+    for (int j = 1; j < c0.size(); ++j) {
+      for (int f = 1; f < f0.size(); ++f) {
+        for (int i = 0; i < c0.size(); ++i) 
           expr += y[j][f][i];
         //min_{v_f \in F_0} e_{jf}
         double closestAfsToJ = customerToAfsFuel(j, 0);
-        for (size_t f = 1; f < f0.size(); ++f) 
+        for (int f = 1; f < f0.size(); ++f) 
           closestAfsToJ = min(closestAfsToJ, customerToAfsFuel(j, f));
         c = IloConstraint (v[j - 1][f] <= expr * (instance.vehicleFuelCapacity - closestAfsToJ));
         constraintName<<"v["<<j - 1<<"]["<<f<<"] ub";
@@ -470,10 +470,10 @@ void LH_model::createModel() {
     }
     //no 2 subcycles
     //x_{ij} + x_{ji} + \sum_{v_f \in F} z_{jfi} + z_{ifj} \leqslant 1, \forall v_i, v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
-      for (size_t i = 1; i < c0.size(); ++i) {
+    for (int j = 1; j < c0.size(); ++j) {
+      for (int i = 1; i < c0.size(); ++i) {
         expr = x[i][j] + x[j][i];
-        for (size_t f = 1; f < f0.size(); ++f) 
+        for (int f = 1; f < f0.size(); ++f) 
           expr += y[j][f][i] + y[i][f][j];
         c = IloConstraint (expr <= 1);
         constraintName<<"no 2 subcyle between customers "<<i<<", and "<<j;
@@ -579,11 +579,11 @@ void LH_model::fillVals(){
   try{
     x_vals = Matrix2DVal (env, c0.size());
     y_vals = Matrix3DVal (env, c0.size());
-    for (size_t i = 0; i < c0.size(); ++i){
+    for (int i = 0; i < c0.size(); ++i){
       x_vals[i] = IloNumArray (env, c0.size(), 0, 1, IloNumVar::Int);
       y_vals[i] = Matrix2DVal (env, f0.size());
       cplex.getValues(x_vals[i], x[i]);
-      for (size_t f = 0; f < f0.size(); ++f){
+      for (int f = 0; f < f0.size(); ++f){
         y_vals[i][f] = IloNumArray(env, c0.size(), 0, 1, IloNumVar::Int);
         cplex.getValues(y_vals[i][f], y[i][f]);
       }
@@ -595,42 +595,42 @@ void LH_model::fillVals(){
   }
   /*
   cout<<" ";
-  for (size_t i = 0; i < c0.size(); ++i){
+  for (int i = 0; i < c0.size(); ++i){
     cout<<" ";
     if (i <=9)
       cout<<" ";
     cout<<i;
   }
   cout<<endl;
-  for (size_t i = 0; i < c0.size(); ++i){
+  for (int i = 0; i < c0.size(); ++i){
     cout<<i<<" ";
     if (i <= 9)
       cout<<" ";
-    for (size_t j = 0; j < c0.size(); ++j) {
+    for (int j = 0; j < c0.size(); ++j) {
       cout<<abs(x_vals[i][j])<<"  ";
     }
     cout<<endl;
   }
-  for (size_t f = 0; f < f0.size(); ++f){
+  for (int f = 0; f < f0.size(); ++f){
     cout<<"AFS: "<<f<<endl;
     cout<<" ";
-    for (size_t i = 0; i < c0.size(); ++i){
+    for (int i = 0; i < c0.size(); ++i){
       cout<<" ";
       if (i <=9)
         cout<<" ";
       cout<<i;
     }
     cout<<endl;
-    for (size_t i = 0; i < c0.size(); ++i){
+    for (int i = 0; i < c0.size(); ++i){
       cout<<i<<" ";
       if (i <= 9)
         cout<<" ";
-      for (size_t j = 0; j < c0.size(); ++j)
+      for (int j = 0; j < c0.size(); ++j)
         cout<<abs(y_vals[i][f][j])<<"  ";
       cout<<endl;
     }
   }
-  for (size_t i = 0; i < c0.size(); ++i)
+  for (int i = 0; i < c0.size(); ++i)
     cout<<i<<": "<<c0[i]->id<<endl;
     */
 }
@@ -639,12 +639,12 @@ void LH_model::createGvrp_solution(){
   try{
     list<list<Vertex>> routes;
     list<Vertex> route;
-    size_t curr;    
+    int curr;    
     bool next = false;
     //checking the depot neighboring
     while (true) {
       next = false;
-      for (size_t i = 1; i < c0.size() && !next; ++i) {
+      for (int i = 1; i < c0.size() && !next; ++i) {
         if (x_vals[0][i] > INTEGRALITY_TOL) {
           next = true;
           route.push_back(Vertex(*c0[0]));
@@ -652,7 +652,7 @@ void LH_model::createGvrp_solution(){
         } 
         if (!next)
           //on y[j][0][i]
-          for (size_t j = 0; j < c0.size(); ++j) 
+          for (int j = 0; j < c0.size(); ++j) 
             if (y_vals[j][0][i] > INTEGRALITY_TOL) {
               next = true;
               route.push_back(Vertex(*c0[0]));
@@ -661,7 +661,7 @@ void LH_model::createGvrp_solution(){
             }
         if (!next)
           //on y[0][f][i]
-          for (size_t f = 0; f < f0.size(); ++f)
+          for (int f = 0; f < f0.size(); ++f)
             if (y_vals[0][f][i] > INTEGRALITY_TOL) {
               next = true;
               route.push_back(Vertex(*c0[0]));
@@ -678,7 +678,7 @@ void LH_model::createGvrp_solution(){
         break;
       //dfs
       while (curr != 0) {
-        for (size_t i = 0; i < c0.size(); ++i) {
+        for (int i = 0; i < c0.size(); ++i) {
           next = false;
           if (x_vals[curr][i] > INTEGRALITY_TOL) {
             next = true;
@@ -687,7 +687,7 @@ void LH_model::createGvrp_solution(){
             curr = i;
             break;
           } else {
-            for (size_t f = 0; f < f0.size(); ++f)
+            for (int f = 0; f < f0.size(); ++f)
               if (y_vals[curr][f][i] > INTEGRALITY_TOL) {
                 next = true;
                 route.push_back(Vertex(*f0[f]));
@@ -718,8 +718,8 @@ void LH_model::createGvrp_solution(){
 
 void LH_model::endVals () {
   //end vals
-  for (size_t i = 0; i < c0.size(); ++i) {
-    for (size_t f = 0; f < f0.size(); ++f)
+  for (int i = 0; i < c0.size(); ++i) {
+    for (int f = 0; f < f0.size(); ++f)
       y_vals[i][f].end();
     y_vals[i].end();
     x_vals[i].end();
@@ -729,14 +729,14 @@ void LH_model::endVals () {
 }
 
 void LH_model::endVars(){
-  for (size_t i = 0; i < c0.size(); ++i) {
+  for (int i = 0; i < c0.size(); ++i) {
     if (i > 0) {
       a[i - 1].end();
       v[i - 1].end();
     }
     u[i].end();
     x[i].end();
-    for (size_t f = 0; f < f0.size(); ++f) 
+    for (int f = 0; f < f0.size(); ++f) 
       y[i][f].end();
     y[i].end();
   }

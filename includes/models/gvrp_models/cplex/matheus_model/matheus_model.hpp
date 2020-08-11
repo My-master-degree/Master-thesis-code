@@ -70,7 +70,11 @@ namespace models {
             int nPreprocessings2;
             int nPreprocessings3;
             int nPreprocessings4;
+            int nImprovedMSTNRoutesLB;
+            int nBPPNRoutesLB;
             unsigned long int nGreedyLP;
+            unsigned int BPPTimeLimit;
+            long int levelSubcycleCallback;
             int nRoutesLB;
             double solLB;
             double time(int i, int f, int j);

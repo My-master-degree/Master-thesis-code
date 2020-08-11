@@ -71,10 +71,10 @@ void Flow_model::createVariables(){
     nameStream.clear();
     nameStream.str("");
     //x var
-    for (size_t i = 0; i < n; i++){
+    for (int i = 0; i < n; i++){
       x[i] = IloNumVarArray(env, n - 1, 0, floatVarUB, IloNumVar::Float);
       //setting names
-      for (size_t j = 0; j < n - 1; j++) {
+      for (int j = 0; j < n - 1; j++) {
         nameStream<<"x["<<i<<"]["<<j<<"]";
         x[i][j].setName(nameStream.str().c_str());
         nameStream.clear();
@@ -98,7 +98,7 @@ void Flow_model::createObjectiveFunction() {
 //objective function
   try{
     IloExpr fo (env);
-    for (size_t i = 1; i < n; i++) 
+    for (int i = 1; i < n; i++) 
       fo +=  x[i][n - 1];
     model = IloModel (env);
     model.add(IloMaximize(env, fo));
@@ -116,7 +116,7 @@ void Flow_model::createModel() {
     IloConstraint c;
     stringstream constraintName;
     //s
-    for (size_t i = 1; i < n; i++) 
+    for (int i = 1; i < n; i++) 
       expr += x[i][n - 1];
     c = IloConstraint (s == expr);
     c.setName("s definition");
@@ -136,7 +136,7 @@ void Flow_model::createModel() {
     expr.end();
     expr = IloExpr(env);
     //\sum_{v_j \in V\backslash{v_t}} x_{rj} = n - 1 + s
-    for (size_t i = 0; i < n - 1; i++) 
+    for (int i = 0; i < n - 1; i++) 
       expr += x[0][i];
     c = IloConstraint (expr == n - 1 + s);
     c.setName("amount of flow from the root");
@@ -144,8 +144,8 @@ void Flow_model::createModel() {
     expr.end();
     expr = IloExpr(env);
     //\sum_{v_j \in V} x_{ji} - \sum_{v_k \in V \backslash \{v_r\}} x_{ik} = 1, \forall v_i \in V' \backslash \{v_r, v_t\}
-    for (size_t i = 1; i < n; i++) {
-      for (size_t j = 0; j < n; j++) 
+    for (int i = 1; i < n; i++) {
+      for (int j = 0; j < n; j++) 
         expr += x[j][i - 1] - x[i][j];
       constraintName<<"decrease the incoming amount of flow by 1 in "<<i;
       c = IloConstraint (expr == 1);
@@ -157,8 +157,8 @@ void Flow_model::createModel() {
       constraintName.str("");
     }
     //\sum_{v_j \in V \backslash \{v_r, v_t\}} f_{ij} + 2 * (n - 2) * f_{it} \leqslant 2 * (n - 2), \forall v_i \in V' \backslash \{v_r, v_t\} 
-    for (size_t i = 1; i < n; i++) {
-      for (size_t j = 0; j < n - 1; j++)
+    for (int i = 1; i < n; i++) {
+      for (int j = 0; j < n - 1; j++)
         expr += x[i][j];
       expr += 2 * (int(n) - 2) * x[i][n - 1];
       constraintName<<"if "<<i<<" is a sink";
@@ -171,8 +171,8 @@ void Flow_model::createModel() {
       constraintName.str("");
     }
     //x_{ij} = 0, \forall v_i \in V \backslash \{v_t\}, \forall v_j \in V \backslash \{v_t, v_r\}: e_{ij} > \beta
-    for (size_t i = 0; i < n; i++) {
-      for (size_t j = 0; j < n - 1; j++) {
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n - 1; j++) {
         if (instance.distances[i][j + 1] > vehicleFuelCapacity) {
           constraintName<<"edge ("<<i<<", "<<j + 1<<") preprocessing";
           c = IloConstraint (x[i][j] == 0.0);
@@ -184,9 +184,9 @@ void Flow_model::createModel() {
       }
     }
     //\sum_{v_j \in V : e_{ij} \leqslant \beta/2 && e_{jr} \leqslant \beta} 1 - x_{jt} \geqslant x_{it}, \forall v_i \in V' \backslash \{v_r, v_t\} : e_{ir} > \beta/2
-    for (size_t i = 1; i < n; ++i) {
+    for (int i = 1; i < n; ++i) {
       if (instance.distances[0][i] > vehicleFuelCapacity/2.0) {
-        for (size_t j = 0; j < n - 1; ++j) 
+        for (int j = 0; j < n - 1; ++j) 
           //if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0) 
           if (instance.distances[i][j + 1] <= vehicleFuelCapacity/2.0 && instance.distances[j + 1][0] <= vehicleFuelCapacity) 
             expr += 1 - x[j + 1][n - 1];
@@ -223,7 +223,7 @@ void Flow_model::fillVals(){
   //getresult
   try{
     x_vals = Matrix2DVal (env, n);
-    for (size_t i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
       x_vals[i] = IloNumArray (env, n - 1, 0, 1, IloNumVar::Float);
       x_vals[i].add(IloInt ());
       cplex.getValues(x_vals[i], x[i]);
@@ -255,9 +255,9 @@ void Flow_model::createGvrp_instance(){
     //create instance
     solution = new Gvrp_instance(afss, customers, instance.depot, vehicleFuelCapacity, instance.distances, instance.distances_enum, customers.size(), DBL_MAX, 1, 1);
     //set average speed
-    size_t sall = customers.size() + afss.size() + 1;
-    for (size_t i = 0; i < sall; ++i)
-      for (size_t j = 0; j < sall; ++j)
+    int sall = customers.size() + afss.size() + 1;
+    for (int i = 0; i < sall; ++i)
+      for (int j = 0; j < sall; ++j)
         solution->vehicleAverageSpeed = max(solution->vehicleAverageSpeed, instance.distances[i][j]);
     //customers service time
     customerServiceTime = floor(solution->vehicleAverageSpeed / customers.size());
@@ -295,7 +295,7 @@ void Flow_model::createGvrp_instance(){
 }
 
 void Flow_model::endVars(){
-  for (size_t i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++) {
     x[i].end();
   }
   x.end();

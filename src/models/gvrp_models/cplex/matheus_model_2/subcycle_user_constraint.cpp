@@ -45,7 +45,7 @@ void Subcycle_user_constraint::main() {
     return;
   }
   //setup
-  const size_t sc0 = matheus_model_2.c0.size(),
+  const int sc0 = matheus_model_2.c0.size(),
         sf0 = matheus_model_2.f0.size();
   int bppNRoutesLB, 
       improvedMSTNRoutesLB, 
@@ -61,25 +61,25 @@ void Subcycle_user_constraint::main() {
   list<unordered_set<int>> components;
   queue<int> q;
   //creating nodes
-  for (size_t i = 0; i < sc0; ++i) 
+  for (int i = 0; i < sc0; ++i) 
     nodes[i] = graph.addNode();
   ListGraph::EdgeMap<double> weight(graph); 
   //get values
   Matrix2DVal x_vals (env, sc0);
   Matrix3DVal y_vals (env, sc0);
-  for (size_t i = 0; i < sc0; ++i) {
+  for (int i = 0; i < sc0; ++i) {
     x_vals[i] = IloNumArray (env, sc0, 0, 1, IloNumVar::Float);
     y_vals[i] = Matrix2DVal (env, sc0);
     getValues(x_vals[i], matheus_model_2.x[i]);
-    for (size_t f = 0; f < sf0; ++f) {
+    for (int f = 0; f < sf0; ++f) {
       y_vals[i][f] = IloNumArray (env, sc0, 0, 1, IloNumVar::Float);
       getValues(y_vals[i][f], matheus_model_2.y[i][f]);
     }
-    for (size_t j = 0; j < sc0; ++j) {
+    for (int j = 0; j < sc0; ++j) {
       double cost = 0.0;
       if (x_vals[i][j] > EPS)
         cost += x_vals[i][j];
-      for (size_t f = 0; f < sf0; ++f) 
+      for (int f = 0; f < sf0; ++f) 
         if (y_vals[i][f][j] > EPS)
           cost += y_vals[i][f][j];
       weight[graph.addEdge(nodes[i], nodes[j])] = cost;
@@ -89,8 +89,8 @@ void Subcycle_user_constraint::main() {
   GomoryHu<ListGraph, ListGraph::EdgeMap<double> > gh (graph, weight);
   gh.run();
   //get subcycles
-  for (size_t i = 0; i < sc0; ++i) 
-    for (size_t j = 0; j < sc0; ++j) 
+  for (int i = 0; i < sc0; ++i) 
+    for (int j = 0; j < sc0; ++j) 
       if (gh.minCutValue(nodes[j], nodes[j]) >= 2.0 - EPS) 
         dsu.join(i, j);
   //get subcomponents
@@ -114,15 +114,15 @@ void Subcycle_user_constraint::main() {
     if (!S.count(0)) {
       //\sum_{v_i \in V'\S} \sum_{v_j \in S} x_{ij} + \sum_{v_f \in F_0} y_{ifj} \geqslant 1 
       //lhs
-      for (size_t i = 0; i < sc0; ++i) 
+      for (int i = 0; i < sc0; ++i) 
         if (!S.count(i)) 
           for (int j : S) {
             lhs += matheus_model_2.x[i][j];
-            for (size_t f = 0; f < sf0; ++f)
+            for (int f = 0; f < sf0; ++f)
               lhs += matheus_model_2.y[i][f][j];
           }
       //rhs
-      const size_t sS = S.size();
+      const int sS = S.size();
       vector<const Vertex *> vertices (sS + 1);
       int j = 0;
       for (int i : S) {
@@ -152,9 +152,9 @@ void Subcycle_user_constraint::main() {
       lhs = IloExpr(env);
     }
   //clean
-  for (size_t i = 0; i < sc0; ++i) {
+  for (int i = 0; i < sc0; ++i) {
     x_vals[i].end();
-    for (size_t f = 0; f < sf0; ++f) 
+    for (int f = 0; f < sf0; ++f) 
       y_vals[i][f].end();
     y_vals[i].end();
   }

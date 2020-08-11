@@ -36,7 +36,7 @@ namespace models {
         list<User_constraint*> user_constraints;
         double vehicleFuelCapacity;
         vector<int> ids;
-        size_t sNodes;
+        int sNodes;
         void fillVals();
       private:
         Lazy_constraint* separation_algorithm();

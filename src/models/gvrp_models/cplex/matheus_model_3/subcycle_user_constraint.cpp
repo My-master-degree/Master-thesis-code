@@ -39,7 +39,7 @@ void Subcycle_user_constraint::main() {
     return;
   }
   //setup
-  const size_t sall = matheus_model_3.all.size();
+  const int sall = matheus_model_3.all.size();
   DSU dsu (sall);
   IloEnv env = getEnv();
   IloExpr lhs(env);

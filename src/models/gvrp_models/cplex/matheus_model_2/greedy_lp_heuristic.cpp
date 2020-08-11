@@ -36,13 +36,13 @@ void Greedy_lp_heuristic::main() {
     if (depth > 10 && depth%10 == 0) 
       return;
     //setup
-    const size_t sc0 = matheus_model_2.c0.size(),
+    const int sc0 = matheus_model_2.c0.size(),
           sf0 = matheus_model_2.f0.size();
     IloEnv env = getEnv();
     IloExpr lhs (env);
     list<list<Vertex>> routes;
     list<Vertex> route;
-    size_t curr;    
+    int curr;    
     unordered_set<int> customers;
     bool valid = true,
          found,
@@ -56,22 +56,22 @@ void Greedy_lp_heuristic::main() {
     matheus_model_2.x_vals = Matrix2DVal (env, sc0);
     matheus_model_2.y_vals = Matrix3DVal (env, sc0);
     //get values
-    for (size_t i = 0; i < sc0; ++i) {
+    for (int i = 0; i < sc0; ++i) {
       matheus_model_2.x_vals[i] = IloNumArray (env, sc0, 0, 1, IloNumVar::Float);
       matheus_model_2.y_vals[i] = Matrix2DVal (env, sc0);
       getValues(matheus_model_2.x_vals[i], matheus_model_2.x[i]);
       //check y values
       if (!frac_sol)
-        for (size_t j = 0; j < sc0; ++j)
+        for (int j = 0; j < sc0; ++j)
           if (abs(round(matheus_model_2.x_vals[i][j]) - matheus_model_2.x_vals[i][j]) > matheus_model_2.INTEGRALITY_TOL) 
             frac_sol = true;
       //get y valsd
-      for (size_t f = 0; f < sf0; ++f) {
+      for (int f = 0; f < sf0; ++f) {
         matheus_model_2.y_vals[i][f] = IloNumArray (env, sc0, 0, 1, IloNumVar::Float);
         getValues(matheus_model_2.y_vals[i][f], matheus_model_2.y[i][f]);
         //check y values
         if (!frac_sol)
-          for (size_t j = 0; j < sc0; ++j)
+          for (int j = 0; j < sc0; ++j)
             if (abs(round(matheus_model_2.y_vals[i][f][j]) - matheus_model_2.y_vals[i][f][j]) > matheus_model_2.INTEGRALITY_TOL) 
               frac_sol = true;
       }
@@ -88,14 +88,14 @@ void Greedy_lp_heuristic::main() {
       nextAFS = 0;
       found = false;
       //get route beginning
-      for (size_t i = 1; i < matheus_model_2.c0.size(); ++i) 
+      for (int i = 1; i < matheus_model_2.c0.size(); ++i) 
         if (!customers.count(i)) {
           if (matheus_model_2.x_vals[0][i] > maxFirst) {
             maxFirst = matheus_model_2.x_vals[0][i];
             nextCustomer = i;
             found = true;
           } else
-            for (size_t f = 0; f < matheus_model_2.f0.size(); ++f)
+            for (int f = 0; f < matheus_model_2.f0.size(); ++f)
               if (matheus_model_2.y_vals[0][f][i] > maxFirst) {
                 maxFirst = matheus_model_2.y_vals[0][f][i];
                 nextAFS = f;
@@ -134,14 +134,14 @@ void Greedy_lp_heuristic::main() {
         nextCustomer = 0;
         nextAFS = 0;
         found = false;
-        for (size_t i = 0; i < matheus_model_2.c0.size(); ++i) 
+        for (int i = 0; i < matheus_model_2.c0.size(); ++i) 
           if (!customers.count(i)) {
             if (matheus_model_2.x_vals[curr][i] > maxFirst) {
               maxFirst = matheus_model_2.x_vals[curr][i];
               nextCustomer = i;
               found = true;
             } else
-              for (size_t f = 0; f < matheus_model_2.f0.size(); ++f)
+              for (int f = 0; f < matheus_model_2.f0.size(); ++f)
                 if (matheus_model_2.y_vals[curr][f][i] > 0) {
                   maxFirst = matheus_model_2.y_vals[curr][f][i];
                   nextAFS = f;
@@ -203,7 +203,7 @@ void Greedy_lp_heuristic::main() {
       matheus_model_2.x_vals = Matrix2DVal (matheus_model_2.env, sc0);
       matheus_model_2.y_vals = Matrix3DVal (matheus_model_2.env, sc0);
       //create vals
-      for (size_t i = 0; i < sc0; ++i) {
+      for (int i = 0; i < sc0; ++i) {
         //t and e
         if (i > 0) {
           t_vals[i - 1] = 0.0;
@@ -211,15 +211,15 @@ void Greedy_lp_heuristic::main() {
         }
         //x, u, v, c, and a vars
         matheus_model_2.x_vals[i] = IloNumArray (matheus_model_2.env, sc0, 0, 1, IloNumVar::Int);
-        for (size_t j = 0; j < sc0; ++j) {
+        for (int j = 0; j < sc0; ++j) {
           //x
           matheus_model_2.x_vals[i][j] = 0.0;
         }
         //y var
         matheus_model_2.y_vals[i] = Matrix2DVal (env, sf0);
-        for (size_t f = 0; f < sf0; ++f) {
+        for (int f = 0; f < sf0; ++f) {
           matheus_model_2.y_vals[i][f] = IloNumArray(env, sc0, 0, 1, IloNumVar::Int);
-          for (size_t j = 0; j < sc0; ++j) 
+          for (int j = 0; j < sc0; ++j) 
             matheus_model_2.y_vals[i][f][j] = 0.0;
         }
       }
@@ -262,7 +262,7 @@ void Greedy_lp_heuristic::main() {
         }
       }
       //set values
-      for (size_t i = 0; i < sc0; ++i) {
+      for (int i = 0; i < sc0; ++i) {
         if (i > 0) {
           //t
           vars.add(matheus_model_2.t[i - 1]);
@@ -271,23 +271,23 @@ void Greedy_lp_heuristic::main() {
           vars.add(matheus_model_2.e[i - 1]);
           vals.add(e_vals[i - 1]);
         }
-        for (size_t j = 0; j < sc0; ++j) {
+        for (int j = 0; j < sc0; ++j) {
           //x
           vars.add(matheus_model_2.x[i][j]);
           vals.add(matheus_model_2.x_vals[i][j]);
         }
         //y 
-        for (size_t f = 0; f < sf0; ++f) 
-          for (size_t j = 0; j < sc0; ++j) {
+        for (int f = 0; f < sf0; ++f) 
+          for (int j = 0; j < sc0; ++j) {
             vars.add(matheus_model_2.y[i][f][j]);
             vals.add(matheus_model_2.y_vals[i][f][j]);
           }
       }
       setSolution(vars, vals, cost);
       //clean vals
-      for (size_t i = 0; i < sc0; ++i) {
+      for (int i = 0; i < sc0; ++i) {
         matheus_model_2.x_vals[i].end();
-        for (size_t f = 0; f < sf0; ++f) 
+        for (int f = 0; f < sf0; ++f) 
           matheus_model_2.y_vals[i][f].end();
         matheus_model_2.y_vals[i].end();
       }

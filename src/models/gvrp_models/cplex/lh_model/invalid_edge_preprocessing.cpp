@@ -33,13 +33,13 @@ void Invalid_edge_preprocessing::add () {
     }
     //first is afs and second is customer
     if (f1 != lh_model.afssF0Indexes.end() && c2 != lh_model.customersC0Indexes.end()) 
-      for (size_t i = 0; i < lh_model.c0.size(); ++i) {
+      for (int i = 0; i < lh_model.c0.size(); ++i) {
         lh_model.model.add(lh_model.y[i][f1->second][c2->second] == 0);
         ++lh_model.nPreprocessings0;
       }
     //first is customer and second is afs 
     if (c1 != lh_model.customersC0Indexes.end() && f2 != lh_model.afssF0Indexes.end()) 
-      for (size_t i = 0; i < lh_model.c0.size(); ++i) {
+      for (int i = 0; i < lh_model.c0.size(); ++i) {
         lh_model.model.add(lh_model.y[c1->second][f2->second][i] == 0);
         ++lh_model.nPreprocessings0;
       }

@@ -22,7 +22,7 @@ Energy_lb_constraint::Energy_lb_constraint (Matheus_model_2& matheus_model_2) : 
 void Energy_lb_constraint::add () {
   IloConstraint c;
   IloExpr rhs (matheus_model_2.env);
-  for (size_t i = 1; i < matheus_model_2.c0.size(); ++i){
+  for (int i = 1; i < matheus_model_2.c0.size(); ++i){
     /*
     //e_i >= min (c_{i,0}, minAfsFuel)
     c = IloConstraint(matheus_model_2s.e[i - 1] >= calculateCustomerMinRequiredFuel(matheus_model_2s.instance, *matheus_model_2s.gvrp_afs_tree, *matheus_model_2s.c0[i]));

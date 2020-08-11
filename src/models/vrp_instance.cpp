@@ -7,5 +7,5 @@
 
 using namespace models;
 
-Vrp_instance::Vrp_instance (list<Vertex> customers_, Vertex depot_, vector<vector<double> > distances_, Distances_enum distances_enum_, int maxRoutes_) : customers (customers_), depot (depot_), distances (distances_), distances_enum(distances_enum_), maxRoutes(maxRoutes_) {
+Vrp_instance::Vrp_instance (list<Vertex> customers_, Vertex depot_, vector<vector<double> > distances_, Distances_enum distances_enum_, int maxRoutes_) : customers (customers_), maxRoutes(maxRoutes_), depot (depot_), distances (distances_), distances_enum(distances_enum_) {
 }

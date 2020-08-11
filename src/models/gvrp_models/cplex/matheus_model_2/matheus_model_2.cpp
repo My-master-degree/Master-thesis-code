@@ -67,11 +67,11 @@ Matheus_model_2::Matheus_model_2(const Gvrp_instance& instance, unsigned int tim
   heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
   //customer min required fuel
   customersMinRequiredFuel = vector<double> (c0.size()- 1);
-  for (size_t i = 1; i < c0.size(); ++i)
+  for (int i = 1; i < c0.size(); ++i)
     customersMinRequiredFuel[i - 1] = calculateCustomerMinRequiredFuel(instance, *gvrp_afs_tree, *c0[i]);
   //customer min required time 
   customersMinRequiredTime = vector<double> (c0.size());
-  for (size_t i = 1; i < c0.size(); ++i)
+  for (int i = 1; i < c0.size(); ++i)
     customersMinRequiredTime[i] = calculateCustomerMinRequiredTime(instance, *gvrp_afs_tree, *c0[i]);
   customersMinRequiredTime[0] = 0.0;
 } 
@@ -157,7 +157,7 @@ void Matheus_model_2::createVariables(){
   try {
     //setting names
     stringstream nameStream;
-    for (size_t i = 1; i < c0.size(); ++i) {
+    for (int i = 1; i < c0.size(); ++i) {
       //e var
       nameStream<<"e["<<i - 1<<"]=energy of customer "<<c0[i]->id;
       e[i - 1].setName(nameStream.str().c_str());
@@ -169,10 +169,10 @@ void Matheus_model_2::createVariables(){
       nameStream.clear();
       nameStream.str("");
     }
-    for (size_t i = 0; i < c0.size(); ++i) {
+    for (int i = 0; i < c0.size(); ++i) {
       //x vars
       x[i] = IloNumVarArray (env, c0.size(), 0, 1, IloNumVar::Int);
-      for (size_t j = 0; j < c0.size(); ++j) {
+      for (int j = 0; j < c0.size(); ++j) {
         nameStream<<"x["<<i<<"]["<<j<<"]=edge("<<c0[i]->id<<","<<c0[j]->id<<")";
         x[i][j].setName(nameStream.str().c_str());
         nameStream.clear();
@@ -180,9 +180,9 @@ void Matheus_model_2::createVariables(){
       }
       //y var
       y[i] = Matrix2DVar (env, f0.size());
-      for (size_t f = 0; f < f0.size(); ++f) {
+      for (int f = 0; f < f0.size(); ++f) {
         y[i][f] = IloNumVarArray(env, c0.size(), 0, 1, IloNumVar::Int);
-        for (size_t j = 0; j < c0.size(); ++j) {
+        for (int j = 0; j < c0.size(); ++j) {
           nameStream<<"y["<<i<<"]["<<f<<"]["<<j<<"]=path("<<c0[i]->id<<","<<f0[f]->id<<","<<c0[j]->id<<")";
           y[i][f][j].setName(nameStream.str().c_str());
           nameStream.clear();
@@ -201,10 +201,10 @@ void Matheus_model_2::createObjectiveFunction() {
   //objective function
   try{
     IloExpr fo (env);
-    for (size_t i = 0; i < c0.size(); ++i) 
-      for (size_t j = 0; j < c0.size(); ++j) {
+    for (int i = 0; i < c0.size(); ++i) 
+      for (int j = 0; j < c0.size(); ++j) {
         fo +=  instance.distances[c0[i]->id][c0[j]->id] * x[i][j];
-        for (size_t f = 0; f < f0.size(); ++f)
+        for (int f = 0; f < f0.size(); ++f)
           fo += (instance.distances[c0[i]->id][f0[f]->id] + instance.distances[f0[f]->id][c0[j]->id]) * y[i][f][j];
       }
     model = IloModel (env);
@@ -227,22 +227,22 @@ void Matheus_model_2::createModel() {
     IloConstraint c;
     stringstream constraintName;
     //x_{ii} = 0, \forall v_i \in C_0
-    for (size_t i = 0; i < c0.size(); ++i) 
+    for (int i = 0; i < c0.size(); ++i) 
       model.add(x[i][i] == 0);
     //y_{ifi} = 0, \forall v_i \in C_0, \forall v_f \in F
-    for (size_t i = 0; i < c0.size(); ++i) 
-      for (size_t f = 0; f < f0.size(); ++f)
+    for (int i = 0; i < c0.size(); ++i) 
+      for (int f = 0; f < f0.size(); ++f)
         model.add(y[i][f][i] == 0);
     //y_{00i} = y_{i00} = 0, \forall v_i \in C_0
-    for (size_t i = 0; i < c0.size(); ++i) {
+    for (int i = 0; i < c0.size(); ++i) {
       model.add(y[0][0][i] == 0);
       model.add(y[i][0][0] == 0);
     }
     //\sum_{v_j \in C_0} (x_{ij} + \sum_{v_f \in F_0} y_{ifj}) = 1, \forall v_i \in C
-    for (size_t i = 1; i < c0.size(); ++i) {
-      for (size_t j = 0; j < c0.size(); ++j) {
+    for (int i = 1; i < c0.size(); ++i) {
+      for (int j = 0; j < c0.size(); ++j) {
         expr += x[i][j];
-        for (size_t f = 0; f < f0.size(); ++f)
+        for (int f = 0; f < f0.size(); ++f)
           expr += y[i][f][j];
       }
       c = IloConstraint (expr == 1);
@@ -255,10 +255,10 @@ void Matheus_model_2::createModel() {
       constraintName.str("");
     }
     //\sum_{v_j \in C_0} ((x_{ij} - x_{ji}) + \sum_{v_f \in F_0} (y_{ifj} - y_{jfi})) = 0, \forall v_i \in C_0 
-    for (size_t i = 0; i < c0.size(); ++i) {
-      for (size_t j = 0; j < c0.size(); ++j) {
+    for (int i = 0; i < c0.size(); ++i) {
+      for (int j = 0; j < c0.size(); ++j) {
         expr += x[i][j] - x[j][i];
-        for (size_t f = 0; f < f0.size(); ++f)
+        for (int f = 0; f < f0.size(); ++f)
           expr += y[i][f][j] - y[j][f][i];
       }
       c = IloConstraint (expr == 0);
@@ -271,9 +271,9 @@ void Matheus_model_2::createModel() {
       constraintName.str("");
     }
     //\sum_{v_j \in C_0} (x_{0j} + \sum_{v_f \in F_0} y_{0fj}) \leqslant m 
-    for (size_t j = 0; j < c0.size(); ++j) {
+    for (int j = 0; j < c0.size(); ++j) {
       expr += x[0][j];
-      for (size_t f = 0; f < f0.size(); ++f)
+      for (int f = 0; f < f0.size(); ++f)
         expr += y[0][f][j];
     }
     c = IloConstraint (expr <= instance.maxRoutes);
@@ -289,9 +289,9 @@ void Matheus_model_2::createModel() {
     //                + (M1_{ifj} - t_{ij}) * y_{ifj}
     //                + (M1_{ifj} - t_{ij} - t_{ifj} - t_{jfi}) * y_{jfi}
     //                \leqslant M1_{ifj} - t_{ij} - t_{ifj} 
-    for (size_t i = 1; i < c0.size(); ++i)
-      for (size_t j = 1; j < c0.size(); ++j) 
-        for (size_t f = 0; f < f0.size(); ++f) {
+    for (int i = 1; i < c0.size(); ++i)
+      for (int j = 1; j < c0.size(); ++j) 
+        for (int f = 0; f < f0.size(); ++f) {
           expr = t[i - 1] - t[j - 1] + (M1(i, f, j) - time(i, f, j)) * x[i][j] 
                               + (M1(i, f, j) - time(i, f, j) - time(i, j) - time(j, i)) * x[j][i]
                              + (M1(i, f, j) - time(i, j)) * y[i][f][j] 
@@ -307,9 +307,9 @@ void Matheus_model_2::createModel() {
           constraintName.str("");
         }
     // \tau_j \geqslant t_{0j}) * x_{0j} + \sum_{v_f \in F_0} y_{0fj} t_{0fj} \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
+    for (int j = 1; j < c0.size(); ++j) {
       expr = time(0, j) * x[0][j];
-      for (size_t f = 0; f < f0.size(); ++f) 
+      for (int f = 0; f < f0.size(); ++f) 
         expr += time(0, f, j) * y[0][f][j];
       c = IloConstraint (t[j - 1] >= expr);
       constraintName<<"customer "<<c0[j]->id<<" time lb";
@@ -321,9 +321,9 @@ void Matheus_model_2::createModel() {
       constraintName.str("");
     }
     // \tau_j \leqslant T_{max} - (T_{max}^- t_{0j}) * x_{0j} - \sum_{v_f \in F_0} y_{0fj} * (T_{max} - t_{0fj}) \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
+    for (int j = 1; j < c0.size(); ++j) {
       expr = instance.timeLimit - (instance.timeLimit - time(0, j)) * x[0][j];
-      for (size_t f = 1; f < f0.size(); ++f) 
+      for (int f = 1; f < f0.size(); ++f) 
         expr -= (instance.timeLimit - time(0, f, j)) * y[0][f][j];
       c = IloConstraint (t[j - 1] <= expr);
       constraintName<<"customer "<<c0[j]->id<<" time ub";
@@ -335,9 +335,9 @@ void Matheus_model_2::createModel() {
       constraintName.str("");
     }
     // \tau_j \leqslant T_{max} - t_{j0} * x_{j0} - \sum_{v_f \in F_0} - t_{jf0} * y_{jf0} \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
+    for (int j = 1; j < c0.size(); ++j) {
       expr = instance.timeLimit - time(j, 0) * x[j][0];
-      for (size_t f = 1; f < f0.size(); ++f) 
+      for (int f = 1; f < f0.size(); ++f) 
         expr -= time(j, f, 0) * y[j][f][0];
       c = IloConstraint (t[j - 1] <= expr);
       constraintName<<"customer "<<c0[j]->id<<" time ub 2";
@@ -349,12 +349,12 @@ void Matheus_model_2::createModel() {
       constraintName.str("");
     }
     // \tau_j 
-    for (size_t j = 1; j < c0.size(); ++j) {
+    for (int j = 1; j < c0.size(); ++j) {
       model.add(customersMinRequiredTime[j] <= t[j - 1] <= instance.timeLimit - customersMinRequiredTime[j] - c0[j]->serviceTime);
     }
     // e_j - e_i + M2_{ij} * x_{ij} + (M2_{ij} - e_{ij} - e_{ji}) * x_{ji} \leqslant M2_{ij} - e_{ij} \forall v_i, v_j \in C
-    for (size_t i = 1; i < c0.size(); ++i) 
-      for (size_t j = 1; j < c0.size(); ++j) {
+    for (int i = 1; i < c0.size(); ++i) 
+      for (int j = 1; j < c0.size(); ++j) {
         expr = e[j - 1] - e[i - 1] + M2(i, j) * x[i][j] + (M2(i, j) - customersFuel(i, j) - customersFuel(j, i)) * x[j][i];
         c = IloConstraint (expr <= M2(i, j) - customersFuel(i, j));
         constraintName<<"edge ("<<c0[i]->id<<", "<<c0[j]->id<<") energy";
@@ -366,10 +366,10 @@ void Matheus_model_2::createModel() {
         constraintName.str("");
       }
     // e_j \leqslant \beta - e_{0j} * x_{0j} - \sum_{v_i \in C_0} \sum_{v_f \in F_0} e_{fj} * y_{ifj} \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
+    for (int j = 1; j < c0.size(); ++j) {
       expr = instance.vehicleFuelCapacity - afsToCustomerFuel(0, j) * x[0][j];
-      for (size_t i = 0; i < c0.size(); ++i) 
-        for (size_t f = 0; f < f0.size(); ++f) 
+      for (int i = 0; i < c0.size(); ++i) 
+        for (int f = 0; f < f0.size(); ++f) 
           expr -= afsToCustomerFuel(f, j) * y[i][f][j];
       c = IloConstraint (e[j - 1] <= expr);
       constraintName<<"customer "<<c0[j]->id<<" energy ub";
@@ -381,10 +381,10 @@ void Matheus_model_2::createModel() {
       constraintName.str("");
     }
     // e_j \geqslant e_{j0} * x_{j0} + \sum_{v_i \in C_0} \sum_{v_f \in F_0} e_{jf} * y_{jfi} \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
+    for (int j = 1; j < c0.size(); ++j) {
       expr = customerToAfsFuel(j, 0) * x[j][0];
-      for (size_t i = 0; i < c0.size(); ++i) 
-        for (size_t f = 0; f < f0.size(); ++f) 
+      for (int i = 0; i < c0.size(); ++i) 
+        for (int f = 0; f < f0.size(); ++f) 
           expr += customerToAfsFuel(j, f) * y[j][f][i];
       c = IloConstraint (e[j - 1] >= expr);
       constraintName<<"customer "<<c0[j]->id<<" energy lb";
@@ -396,7 +396,7 @@ void Matheus_model_2::createModel() {
       constraintName.str("");
     }
     // e_j \geqslant E^{LB}_j \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
+    for (int j = 1; j < c0.size(); ++j) {
       c = IloConstraint (e[j - 1] >= customersMinRequiredFuel[j - 1]);
       constraintName<<"customer "<<c0[j]->id<<" energy lb2";
       c.setName(constraintName.str().c_str());
@@ -405,7 +405,7 @@ void Matheus_model_2::createModel() {
       constraintName.str("");
     }
     // e_j \leqslant \beta - E^{LB}_j \forall v_j \in C
-    for (size_t j = 1; j < c0.size(); ++j) {
+    for (int j = 1; j < c0.size(); ++j) {
       c = IloConstraint (e[j - 1] <= instance.vehicleFuelCapacity - customersMinRequiredFuel[j - 1]);
       constraintName<<"customer "<<c0[j]->id<<" energy ub2";
       c.setName(constraintName.str().c_str());
@@ -415,10 +415,10 @@ void Matheus_model_2::createModel() {
     }
     //new inequalities
     //solution lb
-    for (size_t i = 0; i < c0.size(); ++i) 
-      for (size_t j = 0; j < c0.size(); ++j) {
+    for (int i = 0; i < c0.size(); ++i) 
+      for (int j = 0; j < c0.size(); ++j) {
         expr +=  instance.distances[c0[i]->id][c0[j]->id] * x[i][j];
-        for (size_t f = 0; f < f0.size(); ++f)
+        for (int f = 0; f < f0.size(); ++f)
           expr += (instance.distances[c0[i]->id][f0[f]->id] + instance.distances[f0[f]->id][c0[j]->id]) * y[i][f][j];
       }
     c = IloConstraint (expr >= solLB);
@@ -427,9 +427,9 @@ void Matheus_model_2::createModel() {
     expr.end();
     expr = IloExpr(env);
     //n routes LB
-    for (size_t i = 0; i < c0.size(); ++i) {
+    for (int i = 0; i < c0.size(); ++i) {
       expr += x[0][i];
-      for (size_t f = 0; f < f0.size(); ++f)
+      for (int f = 0; f < f0.size(); ++f)
         expr += y[0][f][i];
     }
     c = IloConstraint (expr >= nRoutesLB);
@@ -438,12 +438,12 @@ void Matheus_model_2::createModel() {
     expr.end();
     expr = IloExpr(env);
     //solution fuel lb alpha 1
-    for (size_t i = 0; i < c0.size(); ++i) {
-      for (size_t f = 0; f < f0.size(); ++f)
+    for (int i = 0; i < c0.size(); ++i) {
+      for (int f = 0; f < f0.size(); ++f)
         expr -= alpha * y[0][f][i];
-      for (size_t j = 0; j < c0.size(); ++j) {
+      for (int j = 0; j < c0.size(); ++j) {
         expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
-        for (size_t f = 0; f < f0.size(); ++f)
+        for (int f = 0; f < f0.size(); ++f)
           expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - instance.vehicleFuelCapacity/2.0) * y[i][f][j];
       }
     }
@@ -453,12 +453,12 @@ void Matheus_model_2::createModel() {
     expr.end();
     expr = IloExpr(env);
     //solution fuel lb alpha 2
-    for (size_t i = 0; i < c0.size(); ++i) {
-      for (size_t f = 0; f < f0.size(); ++f)
+    for (int i = 0; i < c0.size(); ++i) {
+      for (int f = 0; f < f0.size(); ++f)
         expr -= alpha * y[i][f][0];
-      for (size_t j = 0; j < c0.size(); ++j) {
+      for (int j = 0; j < c0.size(); ++j) {
         expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
-        for (size_t f = 0; f < f0.size(); ++f)
+        for (int f = 0; f < f0.size(); ++f)
           expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - instance.vehicleFuelCapacity/2.0) * y[i][f][j];
       }
     }
@@ -468,16 +468,16 @@ void Matheus_model_2::createModel() {
     expr.end();
     expr = IloExpr(env);
     //solution fuel lb alpha 3
-    for (size_t i_ = 1; i_ < c0.size(); ++i_) 
-      for (size_t j_ = 1; j_ < c0.size(); ++j_) {
-        for (size_t i = 0; i < c0.size(); ++i) {
-          for (size_t j = 0; j < c0.size(); ++j) {
+    for (int i_ = 1; i_ < c0.size(); ++i_) 
+      for (int j_ = 1; j_ < c0.size(); ++j_) {
+        for (int i = 0; i < c0.size(); ++i) {
+          for (int j = 0; j < c0.size(); ++j) {
             expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
-            for (size_t f = 0; f < f0.size(); ++f)
+            for (int f = 0; f < f0.size(); ++f)
               expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - instance.vehicleFuelCapacity/2.0) * y[i][f][j];
           }
         }
-        for (size_t f = 0; f < f0.size(); ++f)
+        for (int f = 0; f < f0.size(); ++f)
           expr -= alpha * y[i_][f][j_];
         c = IloConstraint (expr >= 0);
         constraintName<<"solution fuel LB alpha 3 in customer"<<c0[i_]->id<<" and "<<c0[j_]->id;
@@ -489,13 +489,13 @@ void Matheus_model_2::createModel() {
         constraintName.str("");
       }
     //solution fuel lb lambda 1
-    for (size_t i = 0; i < c0.size(); ++i) {
+    for (int i = 0; i < c0.size(); ++i) {
       expr += psi * x[i][0];
-      for (size_t f = 0; f < f0.size(); ++f)
+      for (int f = 0; f < f0.size(); ++f)
         expr -= 2 * lambda * y[0][f][i] + psi * y[0][f][i];
-      for (size_t j = 0; j < c0.size(); ++j) {
+      for (int j = 0; j < c0.size(); ++j) {
         expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
-        for (size_t f = 0; f < f0.size(); ++f)
+        for (int f = 0; f < f0.size(); ++f)
           expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - psi) * y[i][f][j];
       }
     }
@@ -505,13 +505,13 @@ void Matheus_model_2::createModel() {
     expr.end();
     expr = IloExpr(env);
     //solution fuel lb lambda 2
-    for (size_t i = 0; i < c0.size(); ++i) {
+    for (int i = 0; i < c0.size(); ++i) {
       expr += psi * x[0][i];
-      for (size_t f = 0; f < f0.size(); ++f)
+      for (int f = 0; f < f0.size(); ++f)
         expr -= (2 * lambda + psi) * y[i][f][0];
-      for (size_t j = 0; j < c0.size(); ++j) {
+      for (int j = 0; j < c0.size(); ++j) {
         expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
-        for (size_t f = 0; f < f0.size(); ++f)
+        for (int f = 0; f < f0.size(); ++f)
           expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - psi) * y[i][f][j];
       }
     }
@@ -521,17 +521,17 @@ void Matheus_model_2::createModel() {
     expr.end();
     expr = IloExpr(env);
     //solution fuel lb lambda 3
-    for (size_t i_ = 0; i_ < c0.size(); ++i_) 
-      for (size_t j_ = 0; j_ < c0.size(); ++j_) {
-        for (size_t f = 0; f < f0.size(); ++f)
+    for (int i_ = 0; i_ < c0.size(); ++i_) 
+      for (int j_ = 0; j_ < c0.size(); ++j_) {
+        for (int f = 0; f < f0.size(); ++f)
           expr -= 2 * lambda * y[i_][f][j_];
-        for (size_t i = 0; i < c0.size(); ++i) {
+        for (int i = 0; i < c0.size(); ++i) {
           expr += psi * x[0][i];
-          for (size_t f = 0; f < f0.size(); ++f)
+          for (int f = 0; f < f0.size(); ++f)
             expr += psi * y[0][f][i];
-          for (size_t j = 0; j < c0.size(); ++j) {
+          for (int j = 0; j < c0.size(); ++j) {
             expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
-            for (size_t f = 0; f < f0.size(); ++f)
+            for (int f = 0; f < f0.size(); ++f)
               expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - psi) * y[i][f][j];
           }
         }
@@ -676,11 +676,11 @@ void Matheus_model_2::fillVals(){
   try{
     x_vals = Matrix2DVal (env, c0.size());
     y_vals = Matrix3DVal (env, c0.size());
-    for (size_t i = 0; i < c0.size(); ++i){
+    for (int i = 0; i < c0.size(); ++i){
       x_vals[i] = IloNumArray (env, c0.size(), 0, 1, IloNumVar::Int);
       y_vals[i] = Matrix2DVal (env, f0.size());
       cplex.getValues(x_vals[i], x[i]);
-      for (size_t f = 0; f < f0.size(); ++f){
+      for (int f = 0; f < f0.size(); ++f){
         y_vals[i][f] = IloNumArray(env, c0.size(), 0, 1, IloNumVar::Int);
         cplex.getValues(y_vals[i][f], y[i][f]);
       }
@@ -692,42 +692,42 @@ void Matheus_model_2::fillVals(){
   }
   /*
   cout<<" ";
-  for (size_t i = 0; i < c0.size(); ++i){
+  for (int i = 0; i < c0.size(); ++i){
     cout<<" ";
     if (i <=9)
       cout<<" ";
     cout<<i;
   }
   cout<<endl;
-  for (size_t i = 0; i < c0.size(); ++i){
+  for (int i = 0; i < c0.size(); ++i){
     cout<<i<<" ";
     if (i <= 9)
       cout<<" ";
-    for (size_t j = 0; j < c0.size(); ++j) {
+    for (int j = 0; j < c0.size(); ++j) {
       cout<<abs(x_vals[i][j])<<"  ";
     }
     cout<<endl;
   }
-  for (size_t f = 0; f < f0.size(); ++f){
+  for (int f = 0; f < f0.size(); ++f){
     cout<<"AFS: "<<f<<endl;
     cout<<" ";
-    for (size_t i = 0; i < c0.size(); ++i){
+    for (int i = 0; i < c0.size(); ++i){
       cout<<" ";
       if (i <=9)
         cout<<" ";
       cout<<i;
     }
     cout<<endl;
-    for (size_t i = 0; i < c0.size(); ++i){
+    for (int i = 0; i < c0.size(); ++i){
       cout<<i<<" ";
       if (i <= 9)
         cout<<" ";
-      for (size_t j = 0; j < c0.size(); ++j)
+      for (int j = 0; j < c0.size(); ++j)
         cout<<abs(y_vals[i][f][j])<<"  ";
       cout<<endl;
     }
   }
-  for (size_t i = 0; i < c0.size(); ++i)
+  for (int i = 0; i < c0.size(); ++i)
     cout<<i<<": "<<c0[i]->id<<endl;
     */
 }
@@ -736,12 +736,12 @@ void Matheus_model_2::createGvrp_solution(){
   try{
     list<list<Vertex>> routes;
     list<Vertex> route;
-    size_t curr;    
+    int curr;    
     bool next = false;
     //checking the depot neighboring
     while (true) {
       next = false;
-      for (size_t i = 1; i < c0.size() && !next; ++i) {
+      for (int i = 1; i < c0.size() && !next; ++i) {
         if (x_vals[0][i] > INTEGRALITY_TOL) {
           next = true;
           route.push_back(Vertex(*c0[0]));
@@ -749,7 +749,7 @@ void Matheus_model_2::createGvrp_solution(){
         } 
         if (!next)
           //on y[j][0][i]
-          for (size_t j = 0; j < c0.size(); ++j) 
+          for (int j = 0; j < c0.size(); ++j) 
             if (y_vals[j][0][i] > INTEGRALITY_TOL) {
               next = true;
               route.push_back(Vertex(*c0[0]));
@@ -758,7 +758,7 @@ void Matheus_model_2::createGvrp_solution(){
             }
         if (!next)
           //on y[0][f][i]
-          for (size_t f = 0; f < f0.size(); ++f)
+          for (int f = 0; f < f0.size(); ++f)
             if (y_vals[0][f][i] > INTEGRALITY_TOL) {
               next = true;
               route.push_back(Vertex(*c0[0]));
@@ -775,7 +775,7 @@ void Matheus_model_2::createGvrp_solution(){
         break;
       //dfs
       while (curr != 0) {
-        for (size_t i = 0; i < c0.size(); ++i) {
+        for (int i = 0; i < c0.size(); ++i) {
           next = false;
           if (x_vals[curr][i] > INTEGRALITY_TOL) {
             next = true;
@@ -784,7 +784,7 @@ void Matheus_model_2::createGvrp_solution(){
             curr = i;
             break;
           } else {
-            for (size_t f = 0; f < f0.size(); ++f)
+            for (int f = 0; f < f0.size(); ++f)
               if (y_vals[curr][f][i] > INTEGRALITY_TOL) {
                 next = true;
                 route.push_back(Vertex(*f0[f]));
@@ -815,8 +815,8 @@ void Matheus_model_2::createGvrp_solution(){
 
 void Matheus_model_2::endVals () {
   //end vals
-  for (size_t i = 0; i < c0.size(); ++i) {
-    for (size_t f = 0; f < f0.size(); ++f)
+  for (int i = 0; i < c0.size(); ++i) {
+    for (int f = 0; f < f0.size(); ++f)
       y_vals[i][f].end();
     y_vals[i].end();
     x_vals[i].end();
@@ -826,9 +826,9 @@ void Matheus_model_2::endVals () {
 }
 
 void Matheus_model_2::endVars(){
-  for (size_t i = 0; i < c0.size(); ++i) {
+  for (int i = 0; i < c0.size(); ++i) {
     x[i].end();
-    for (size_t f = 0; f < f0.size(); ++f) 
+    for (int f = 0; f < f0.size(); ++f) 
       y[i][f].end();
     y[i].end();
   }

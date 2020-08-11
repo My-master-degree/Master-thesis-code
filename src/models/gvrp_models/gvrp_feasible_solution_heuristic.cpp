@@ -24,10 +24,10 @@ Gvrp_feasible_solution_heuristic::Gvrp_feasible_solution_heuristic (const Gvrp_i
 Gvrp_solution Gvrp_feasible_solution_heuristic::run () {
   //create induced graph
   vector<const Vertex *>& f0 = gvrp_afs_tree->f0;
-  vector<size_t>& pred = gvrp_afs_tree->pred;
+  vector<int>& pred = gvrp_afs_tree->pred;
   vector<double>& fuels = gvrp_afs_tree->fuels;
   vector<double>& times = gvrp_afs_tree->times;
-  size_t sf0 = f0.size(),
+  int sf0 = f0.size(),
          r,
          f;
   //build spanning tree
