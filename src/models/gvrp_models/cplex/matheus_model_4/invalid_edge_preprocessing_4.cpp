@@ -28,8 +28,8 @@ void Invalid_edge_preprocessing_4::add () {
             const Vertex * vertexF = matheus_model_4.gvrp_afs_tree->f0[f];
             for (int r = 0; r < matheus_model_4.gvrp_afs_tree->f0.size(); ++r) {
               const Vertex * vertexR = matheus_model_4.gvrp_afs_tree->f0[r];
-              if (matheus_model_4.instance.fuel(vertexF->id, i) + matheus_model_4.customerToAfsFuel(i, f_) <= matheus_model_4.instance.vehicleFuelCapacity 
-                  && matheus_model_4.afsToCustomerFuel(r_, j) + matheus_model_4.instance.fuel(j, vertexR->id) <= matheus_model_4.instance.vehicleFuelCapacity) {
+              if (matheus_model_4.instance.fuel(vertexF->id, vertexI->id) + matheus_model_4.customerToAfsFuel(i, f_) <= matheus_model_4.instance.vehicleFuelCapacity 
+                  && matheus_model_4.afsToCustomerFuel(r_, j) + matheus_model_4.instance.fuel(vertexJ->id, vertexR->id) <= matheus_model_4.instance.vehicleFuelCapacity) {
                 //get f_, and r_ indexes
                 int f__, r__;
                 for (int k = 0; k < matheus_model_4.gvrp_afs_tree->f0.size(); ++k) {

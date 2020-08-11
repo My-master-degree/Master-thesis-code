@@ -56,8 +56,6 @@ void Matheus_model_4_tests::run() {
     resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model_4.nBPPNRoutesLB<<";"<<matheus_model_4.nImprovedMSTNRoutesLB<<";"<<matheus_model_4.nPreprocessings1<<";"<<matheus_model_4.nPreprocessings2<<";"<<matheus_model_4.nPreprocessings3<<";"<<matheus_model_4.nPreprocessings4<<endl;
     ++gvrp_instance;
     ++i;
-    if ( i > 4)
-      break;
   }
   closeResultFile(resultsFile);
 }

@@ -569,12 +569,11 @@ void Matheus_model_4::createModel() {
 
 
 
-      /*
+    /*
     vector<vector<int>> routes_ = {
-    {0, 10, 2, 7, 14, 7, 3, 12, 10, 0},
-    {0, 7, 13, 7, 9, 7, 0},
+    {0, 7, 9, 7, 2, 10, 12, 3, 8, 10, 0},
     {0, 10, 15, 11, 4, 10, 1, 0},
-    {0, 6, 7, 5, 7, 3, 8, 3, 10, 0},
+    {0, 6, 7, 13, 7, 5, 7, 0},
     };
     list<list<Vertex>> routes;
     for (const vector<int>& route_ : routes_) {
@@ -586,6 +585,8 @@ void Matheus_model_4::createModel() {
           route.push_back(Vertex(*_f[afss_FIndexes[node]]));
       routes.push_back(route);
     }
+    Gvrp_solution gvrp_sol (routes, instance);
+    cout<<gvrp_sol<<endl;
     double currFuel, 
            currTime;
     for (const list<Vertex>& route : routes) {
