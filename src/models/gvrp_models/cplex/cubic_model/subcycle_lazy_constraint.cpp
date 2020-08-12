@@ -104,7 +104,8 @@ void Subcycle_lazy_constraint::main() {
           }
           //getting rhs
           for (int b : component)
-            lhs -= cubic_model.x[k_][b][customer_] * maxNRoutes;
+//            lhs -= cubic_model.x[k_][b][customer_] * maxNRoutes;
+            lhs -= cubic_model.x[k_][b][customer_] * 1;
           try {
             add(lhs >= 0).end();
           } catch(IloException& e) {
@@ -115,7 +116,24 @@ void Subcycle_lazy_constraint::main() {
           lhs = IloExpr(env);
         } 
       }
+      for (int k_ = 0; k_ < cubic_model.instance.maxRoutes; k_++) 
+        //getting lhs
+        for (const pair<int, const Vertex *>& p2 : cubic_model.all) {
+          int a = p2.first;
+          if (!component.count(a))
+            for (int b : component) 
+              lhs += cubic_model.x[k_][a][b];
+        }
+      try {
+        lhs -= maxNRoutes;
+        add(lhs >= 0).end();
+      } catch(IloException& e) {
+        cerr << "Exception while adding lazy constraint" << e.getMessage() << "\n";
+        throw;
+      }
     }
+    lhs.end();
+    lhs = IloExpr(env);
     for (const pair<int, const Vertex *>& p : cubic_model.all){
       int i = p.first;
       x_vals[k][i].end();

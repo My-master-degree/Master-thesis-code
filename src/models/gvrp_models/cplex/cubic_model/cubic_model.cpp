@@ -442,6 +442,20 @@ void Cubic_model::createModel() {
         constraintName.str("");
       }
     }
+    //route i + 1 is used only if route i is used
+    for (int k = 1; k < instance.maxRoutes; ++k) {
+      for (const pair<int, const Vertex *>& p : all) 
+        for (const pair<int, const Vertex *>& p1 : all) 
+          expr += x[k][p.first][p1.first] - x[k - 1][p.first][p1.first];
+      c = IloConstraint (expr <= 0);
+      constraintName<<"route "<<k<<" is used only if route "<<k - 1<<" is used";
+      c.setName(constraintName.str().c_str());
+      model.add(c);
+      expr.end();
+      expr = IloExpr(env);
+      constraintName.clear();
+      constraintName.str("");
+    }
     //n routes LB
     for (int k = 0; k < instance.maxRoutes; ++k) 
       for (const pair<int, const Vertex *>& p2 : all){
@@ -470,6 +484,51 @@ void Cubic_model::createModel() {
     //extra constraints
     for (Extra_constraint* extra_constraint : extra_constraints) 
       extra_constraint->add();
+
+
+
+
+
+
+
+
+    /*
+    list<list<int>> routesIds = {
+{0, 1, 10, 2, 13, 9, 14, 5, 7, 13, 8, 10, 3, 10, 0},
+{0, 6, 0},
+{0, 10, 4, 15, 11, 15, 12, 10, 0},
+    };
+    list<list<Vertex>> routes;
+    for (const list<int>& routeId : routesIds) {
+      list<Vertex> route;
+      for (int id : routeId)
+        route.push_back(Vertex(*all[id]));
+      routes.push_back(route);
+    }
+    Gvrp_solution gvrp_sol (routes, instance);
+    cout<<gvrp_sol<<endl;
+    int k = 0;
+    for (const list<Vertex>& route : routes) {
+      for (auto prev = route.begin(), curr = ++route.begin(); curr != route.end(); prev = curr, ++curr)
+        model.add(x[k][prev->id][curr->id] == 1);
+      ++k;
+    }
+    */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //init
     cplex = IloCplex(model);
     //lazy constraints
