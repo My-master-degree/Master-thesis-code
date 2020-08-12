@@ -371,12 +371,12 @@ void Matheus_model_3::createModel() {
           constraintName.clear();
           constraintName.str("");
         }
-    //\beta - c_{ij} x_{ij} \geq e_i \geq c_{ij} x_{ij}, \forall v_i \in C, \forall v_f \in V^{'}\backslash C
+    //\beta - c_{ij} x_{ij} \geq e_i, \forall v_i \in C, \forall v_f \in V^{'}\backslash C
     for (int i : customers) 
       for (const pair<int, const Vertex *>& p : all) {
         int j = p.first;
         if (!customers.count(j)) {
-          c = IloConstraint (fuel(i, j) * x[i][j] <= e[i] <= instance.vehicleFuelCapacity - fuel(j, i) * x[j][i]);
+          c = IloConstraint (fuel(i, j) * x[i][j] <= e[i]);
           constraintName<<i<<" fuel ub and lb";
           c.setName(constraintName.str().c_str());
           model.add(c);
@@ -384,9 +384,31 @@ void Matheus_model_3::createModel() {
           constraintName.str("");
         }
       }
-    //\beta - LB_i^E \geq e_i \geq LB_i^E, \forall v_i, \forall v_f \in F
+    //e_i \geq c_{ij} x_{ij}, \forall v_i \in C, \forall v_f \in V^{'}\backslash C
+    for (int i : customers) 
+      for (const pair<int, const Vertex *>& p : all) {
+        int j = p.first;
+        if (!customers.count(j)) {
+          c = IloConstraint (e[i] <= instance.vehicleFuelCapacity - fuel(j, i) * x[j][i]);
+          constraintName<<i<<" fuel ub and lb";
+          c.setName(constraintName.str().c_str());
+          model.add(c);
+          constraintName.clear();
+          constraintName.str("");
+        }
+      }
+    //\beta - LB_i^E \geq e_i, \forall v_i, \forall v_f \in F
     for (int i : customers) {
-      c = IloConstraint ( fuelsLBs[i] <= e[i] <= instance.vehicleFuelCapacity - fuelsLBs[i] );
+      c = IloConstraint ( fuelsLBs[i] <= e[i]);
+      constraintName<<i<<" time ub and lb";
+      c.setName(constraintName.str().c_str());
+      model.add(c);
+      constraintName.clear();
+      constraintName.str("");
+    }
+    //e_i \geq LB_i^E, \forall v_i, \forall v_f \in F
+    for (int i : customers) {
+      c = IloConstraint (e[i] <= instance.vehicleFuelCapacity - fuelsLBs[i] );
       constraintName<<i<<" time ub and lb";
       c.setName(constraintName.str().c_str());
       model.add(c);
@@ -406,6 +428,23 @@ void Matheus_model_3::createModel() {
       expr = IloExpr(env);
       constraintName.clear();
       constraintName.str("");
+    }
+    //dummy i + 1 will be used only if i is used
+    for (const pair<int, list<int>>& p : afs_dummies) {
+      for (list<int>::const_iterator prev = p.second.begin(), curr = next(prev); curr != p.second.end(); prev = curr, ++curr) {
+        for (const pair<int, const Vertex *>& p1 : all) {
+          int j = p1.first;
+          expr += x[j][*prev] - x[j][*curr];
+        }
+        c = IloConstraint (expr >= 0);
+        constraintName<<" afs "<<*curr<<" is used only if "<<*prev;
+        c.setName(constraintName.str().c_str());
+        model.add(c);
+        expr.end();
+        expr = IloExpr(env);
+        constraintName.clear();
+        constraintName.str("");
+      }
     }
     //n routes LB
     for (const pair<int, const Vertex *>& p2 : all){
@@ -430,6 +469,59 @@ void Matheus_model_3::createModel() {
     model.add(c);
     expr.end();
     expr = IloExpr(env);
+
+
+
+
+
+
+    /*
+    list<list<int>> routesIds = {
+      {0, 1, 10, 12, 3, 8, 10, 2, 0},
+      {0, 7, 13, 7, 5, 7, 9, 7, 6, 0},
+      {0, 10, 15, 11, 4, 0},
+    };
+    list<list<Vertex>> routes;
+    for (const list<int>& routeIds : routesIds) {
+      list<Vertex> route; 
+      for (int id : routeIds) 
+        route.push_back(Vertex(*all[id]));
+      routes.push_back(route);
+    }
+    Gvrp_solution gvrp_sol (routes, instance);
+    cout<<gvrp_sol<<endl;
+    unordered_map<int, list<int>> afs_dummies_ = afs_dummies;
+    for (const pair<int, list<int>>& p : afs_dummies_) {
+      cout<<p.first<<": ";
+      for (int id : p.second)
+        cout<<id<<", ";
+      cout<<endl;
+    }
+    for(list<Vertex>& route : routes) {
+      int prevId = route.begin()->id;
+      for (list<Vertex>::iterator curr = next(route.begin()); curr != route.end(); ++curr) {
+        int currId = curr->id;
+        //is an afs
+        if (afs_dummies_.count(currId) && currId != 0) {
+          int dummyId = afs_dummies_[currId].front();
+          afs_dummies_[currId].pop_front();
+          currId = dummyId;
+        } 
+        cout<<"("<<prevId<<", "<<currId<<")"<<endl;
+        model.add(x[prevId][currId] == 1);
+        prevId = currId;
+      }
+      cout<<endl;
+    }
+    */
+
+
+
+
+
+
+
+
     //init
     cplex = IloCplex(model);
     //user cuts
