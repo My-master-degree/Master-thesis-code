@@ -75,6 +75,9 @@ void Subcycle_user_constraint::main() {
   //creating nodes
   for (int i = 0; i < sc0; ++i) 
     nodes[i] = graph.addNode();
+  ListGraph::NodeMap<int> nodeId(graph);
+  for (int i = 0; i < sc0; ++i) 
+    nodeId[nodes[i]] = i;
   //get components
   for (int i = 1; i < sc0; ++i) {
     if (visited[i])
@@ -131,12 +134,17 @@ void Subcycle_user_constraint::main() {
     GomoryHu<ListGraph, ListGraph::EdgeMap<double> > gh (graph, weight);
     gh.run();
     //get subcycles
+    for (int i = 0; i < sc0; ++i) 
+      if (gh.predValue(nodes[i]) >= 2.0 - EPS) 
+        dsu.join(i, nodeId[gh.predNode(nodes[i])]);
+    /*
     for (int i : component)
       for (int j : component)
         if (gh.minCutValue(nodes[j], nodes[j]) >= 2.0) 
           dsu.join(i, j);
         else
           cout<<"ooooopssss "<<i<<" and "<<j<<endl;
+          */
     component.clear();
   }
   //get subcomponents
@@ -158,6 +166,11 @@ void Subcycle_user_constraint::main() {
   //inequallitites
   for (const unordered_set<int>& S : components) 
     if (!S.count(0)) {
+      /*
+      for (int j : S) 
+        cout<<j<<", ";
+      cout<<endl;
+      */
       //\sum_{v_i \in V'\S} \sum_{v_j \in S} x_{ij} + \sum_{v_f \in F_0} y_{ifj} \geqslant 1 
       //lhs
       for (int i = 0; i < sc0; ++i) 

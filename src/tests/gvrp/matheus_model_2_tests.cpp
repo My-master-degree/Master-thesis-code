@@ -34,12 +34,13 @@ void Matheus_model_2_tests::run() {
   list<string> instances = listFilesFromDir (PROJECT_INSTANCES_PATH + string("new/non-consec/"));
   list<Gvrp_instance> gvrp_instances;
   for (const string& instance : instances) {
-  //  Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
-   Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/non-consec/") + instance);
+    //  Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
+    Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/non-consec/") + instance);
     gvrp_instances.push_back(gvrp_instance);
   }
     //executions
   auto gvrp_instance = gvrp_instances.begin();
+  int i = 0;
   ofstream resultsFile;
       //model only
   solution_name = "matheus_model_2_";
@@ -54,6 +55,7 @@ void Matheus_model_2_tests::run() {
     execute_model(matheus_model_2, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model_2.nGreedyLP<<";"<<matheus_model_2.nBPPNRoutesLB<<";"<<matheus_model_2.nImprovedMSTNRoutesLB<<";"<<matheus_model_2.nPreprocessings1<<";"<<matheus_model_2.nPreprocessings2<<";"<<matheus_model_2.nPreprocessings3<<";"<<matheus_model_2.nPreprocessings4<<endl;
     ++gvrp_instance;
+    ++i;
   }
   closeResultFile(resultsFile);
 }

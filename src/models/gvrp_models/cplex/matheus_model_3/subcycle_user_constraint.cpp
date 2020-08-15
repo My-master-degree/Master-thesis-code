@@ -58,6 +58,9 @@ void Subcycle_user_constraint::main() {
   //creating nodes
   for (const pair<int, const Vertex *>& p : matheus_model_3.all) 
     nodes[p.first] = graph.addNode();
+  ListGraph::NodeMap<int> nodeId(graph);
+  for (const pair<int, const Vertex *>& p : matheus_model_3.all) 
+    nodeId[nodes[p.first]] = p.first;
   //get components
   set<int> visited;
   for (int customer : matheus_model_3.customers) {
@@ -88,9 +91,14 @@ void Subcycle_user_constraint::main() {
     gh.run();
     //get subcycles
     for (int i : component) 
+      if (gh.predValue(nodes[i]) >= 2.0 - EPS) 
+        dsu.join(i, nodeId[gh.predNode(nodes[i])]);
+    /*
+    for (int i : component) 
       for (int j : component) 
         if (gh.minCutValue(nodes[j], nodes[j]) >= 2.0 - EPS) 
           dsu.join(i, j);
+          */
     component.clear();
   }
   //get subcomponents

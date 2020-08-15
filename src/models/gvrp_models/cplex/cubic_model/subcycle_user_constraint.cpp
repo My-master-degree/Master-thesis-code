@@ -61,6 +61,9 @@ void Subcycle_user_constraint::main() {
   //creating nodes
   for (const pair<int, const Vertex *>& p : cubic_model.all) 
     nodes[p.first] = graph.addNode();
+  ListGraph::NodeMap<int> nodeId(graph);
+  for (const pair<int, const Vertex *>& p : cubic_model.all) 
+    nodeId[nodes[p.first]] = p.first;
   //creating edges
   for (const pair<int, const Vertex *>& p : cubic_model.all) {
     int i = p.first;
@@ -94,12 +97,19 @@ void Subcycle_user_constraint::main() {
   //get subcycles
   for (const pair<int, const Vertex *>& p : cubic_model.all) {
     int i = p.first;
+    if (gh.predValue(nodes[i]) >= 2.0 - EPS) 
+      dsu.join(i, nodeId[gh.predNode(nodes[i])]);
+  }
+  /*
+  for (const pair<int, const Vertex *>& p : cubic_model.all) {
+    int i = p.first;
     for (const pair<int, const Vertex *>& p1 : cubic_model.all) {
       int j = p1.first;
       if (gh.minCutValue(nodes[i], nodes[j]) >= 2.0 - EPS) 
         dsu.join(i, j);
     }
   }
+  */
   //get subcycles
   //get subcomponents
   for (int i = 0; i < sall; ++i) 

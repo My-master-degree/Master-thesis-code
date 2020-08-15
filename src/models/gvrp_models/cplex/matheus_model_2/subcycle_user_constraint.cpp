@@ -63,6 +63,9 @@ void Subcycle_user_constraint::main() {
   //creating nodes
   for (int i = 0; i < sc0; ++i) 
     nodes[i] = graph.addNode();
+  ListGraph::NodeMap<int> nodeId(graph);
+  for (int i = 0; i < sc0; ++i) 
+    nodeId[nodes[i]] = i;
   ListGraph::EdgeMap<double> weight(graph); 
   //get values
   Matrix2DVal x_vals (env, sc0);
@@ -90,9 +93,17 @@ void Subcycle_user_constraint::main() {
   gh.run();
   //get subcycles
   for (int i = 0; i < sc0; ++i) 
+    if (gh.predValue(nodes[i]) >= 2.0 - EPS) 
+      dsu.join(i, nodeId[gh.predNode(nodes[i])]);
+    /*
+  for (int i = 0; i < sc0; ++i) 
+    if (gh.minCutValue(nodes[i], gh.predNode(nodes[i])) >= 2.0 - EPS) 
+      dsu.join(i, nodeId[gh.predNode(nodes[i])]);
+  for (int i = 0; i < sc0; ++i) 
     for (int j = 0; j < sc0; ++j) 
       if (gh.minCutValue(nodes[j], nodes[j]) >= 2.0 - EPS) 
         dsu.join(i, j);
+        */
   //get subcomponents
   for (int i = 0; i < sc0; ++i) 
     subcomponents.insert(make_pair(dsu.findSet(i), i));
@@ -112,6 +123,11 @@ void Subcycle_user_constraint::main() {
   //inequallitites
   for (const unordered_set<int>& S : components) 
     if (!S.count(0)) {
+      /*
+      for (int j : S) 
+        cout<<j<<", ";
+      cout<<endl;
+      */
       //\sum_{v_i \in V'\S} \sum_{v_j \in S} x_{ij} + \sum_{v_f \in F_0} y_{ifj} \geqslant 1 
       //lhs
       for (int i = 0; i < sc0; ++i) 

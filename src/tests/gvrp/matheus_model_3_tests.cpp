@@ -39,6 +39,7 @@ void Matheus_model_3_tests::run() {
   }
     //executions
   auto gvrp_instance = gvrp_instances.begin();
+  int i = 0;
   ofstream resultsFile;
       //model only
   solution_name = "matheus_model_3_";
@@ -53,6 +54,7 @@ void Matheus_model_3_tests::run() {
     execute_model(matheus_model_3, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model_3.nGreedyLP<<";"<<matheus_model_3.nBPPNRoutesLB<<";"<<matheus_model_3.nImprovedMSTNRoutesLB<<";"<<matheus_model_3.nPreprocessings1<<";"<<matheus_model_3.nPreprocessings2<<";"<<matheus_model_3.nPreprocessings3<<";"<<matheus_model_3.nPreprocessings4<<endl;
     ++gvrp_instance;
+    ++i;
   }
   closeResultFile(resultsFile);
 }
