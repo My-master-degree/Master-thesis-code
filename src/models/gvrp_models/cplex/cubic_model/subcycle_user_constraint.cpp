@@ -97,7 +97,7 @@ void Subcycle_user_constraint::main() {
   //get subcycles
   for (const pair<int, const Vertex *>& p : cubic_model.all) {
     int i = p.first;
-    if (gh.predValue(nodes[i]) >= 2.0 - EPS) 
+    if (gh.predNode(nodes[i]) != INVALID && gh.predValue(nodes[i]) >= 2.0 - EPS) 
       dsu.join(i, nodeId[gh.predNode(nodes[i])]);
   }
   /*
@@ -235,9 +235,9 @@ void Subcycle_user_constraint::main() {
               add(lhs >= 0.0).end();
               lhs.end();
               lhs = IloExpr(env);
-//              for (int node : S) 
-//                cout<<node<<", "; 
-//              cout<<endl;
+              for (int node : S) 
+                cout<<node<<", "; 
+              cout<<endl;
             }
           }
         }

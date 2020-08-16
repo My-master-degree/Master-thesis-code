@@ -59,6 +59,8 @@ void Cubic_model_tests::run() {
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<cubic_model.nGreedyLP<<";"<<cubic_model.nBPPNRoutesLB<<";"<<cubic_model.nImprovedMSTNRoutesLB<<";"<<cubic_model.nPreprocessings1<<";"<<cubic_model.nPreprocessings2<<";"<<cubic_model.nPreprocessings3<<";"<<cubic_model.nPreprocessings4<<endl;
     gvrp_instance++;
     i++;
+    if (i > 4)
+      break;
   }
   closeResultFile(resultsFile);
 }

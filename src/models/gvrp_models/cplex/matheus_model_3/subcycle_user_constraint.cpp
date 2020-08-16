@@ -91,7 +91,7 @@ void Subcycle_user_constraint::main() {
     gh.run();
     //get subcycles
     for (int i : component) 
-      if (gh.predValue(nodes[i]) >= 2.0 - EPS) 
+      if (gh.predNode(nodes[i]) != INVALID && gh.predValue(nodes[i]) >= 2.0 - EPS) 
         dsu.join(i, nodeId[gh.predNode(nodes[i])]);
     /*
     for (int i : component) 
@@ -132,6 +132,9 @@ void Subcycle_user_constraint::main() {
     //\sum_{v_i \in V'\S} \sum_{v_j \in S} x_{ij} \geqslant N_ROUTES_LB(S) 
     if (!S.count(matheus_model_3.instance.depot.id)) {
       //get customers from component S
+      for (int node : S)
+        cout<<node<<", ";
+      cout<<endl;
       vector<const Vertex *> vertices;
       vertices.push_back(&matheus_model_3.instance.depot);
       for (int customer : matheus_model_3.customers)

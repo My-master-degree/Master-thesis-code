@@ -93,7 +93,7 @@ void Subcycle_user_constraint::main() {
   gh.run();
   //get subcycles
   for (int i = 0; i < sc0; ++i) 
-    if (gh.predValue(nodes[i]) >= 2.0 - EPS) 
+    if (gh.predNode(nodes[i]) != INVALID && gh.predValue(nodes[i]) >= 2.0 - EPS) 
       dsu.join(i, nodeId[gh.predNode(nodes[i])]);
     /*
   for (int i = 0; i < sc0; ++i) 

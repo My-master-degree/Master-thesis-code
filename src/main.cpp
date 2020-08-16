@@ -60,20 +60,20 @@ int main (int argc, char **argv)
   cout<<"============    MATHEUS 2 MODEL    =============="<<endl;
   Matheus_model_2_tests matheus_model_2_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_2_tests.run();
- */
   //cubic model
   cout<<"============    CUBIC MODEL    =============="<<endl;
   Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);
   cubic_model_tests.run();
-  /*
     //Matheus model 3
   cout<<"============    MATHEUS 3 MODEL    =============="<<endl;
   Matheus_model_3_tests matheus_model_3_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_3_tests.run();
+ */
     //Matheus model 4 
   cout<<"============    MATHEUS 4 MODEL    =============="<<endl;
   Matheus_model_4_tests matheus_model_4_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_4_tests.run();
+  /*
     //BBP model
   BPP_model_tests bpp_model_tests (VERBOSE, execution_time, nIntSol);
   bpp_model_tests.run();

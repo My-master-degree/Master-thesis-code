@@ -135,7 +135,7 @@ void Subcycle_user_constraint::main() {
     gh.run();
     //get subcycles
     for (int i = 0; i < sc0; ++i) 
-      if (gh.predValue(nodes[i]) >= 2.0 - EPS) 
+      if (gh.predNode(nodes[i]) != INVALID && gh.predValue(nodes[i]) >= 2.0 - EPS) 
         dsu.join(i, nodeId[gh.predNode(nodes[i])]);
     /*
     for (int i : component)
@@ -196,12 +196,10 @@ void Subcycle_user_constraint::main() {
       //bin packing
       bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(matheus_model.instance, vertices, closestsTimes, 10000000);
       maxNRoutes = max(improvedMSTNRoutesLB, bppNRoutesLB);
-      /*
       if (improvedMSTNRoutesLB == maxNRoutes) 
         ++matheus_model.nImprovedMSTNRoutesLB;
       if (bppNRoutesLB == maxNRoutes) 
         ++matheus_model.nBPPNRoutesLB;
-        */
       lhs -= maxNRoutes;
       try {
         add(lhs >= 0).end();
