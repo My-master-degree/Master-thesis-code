@@ -207,6 +207,7 @@ pair<Gvrp_solution, Mip_solution_info> Matheus_model_5::run(){
     clock_gettime(CLOCK_MONOTONIC, &start);
     if ( !cplex.solve() ) {
 //      env.error() << "Failed to optimize LP." << endl;
+//      cplex.exportModel("cplexcpp.lp");
       mipSolInfo = Mip_solution_info(-1, cplex.getStatus(), -1, -1);
       endVars();
       throw mipSolInfo;
@@ -652,8 +653,8 @@ void Matheus_model_5::createModel() {
 
     /*
     vector<vector<int>> routes_ = {
-      {0, 1, 10, 4, 11, 14, 11, 10, 16, 3, 16, 17, 16, 8, 16, 10, 0},
-      {0, 10, 2, 7, 6, 7, 18, 7, 9, 15, 13, 15, 5, 7, 10, 12, 10, 0}
+    {0, 6, 7, 9, 7, 2, 10, 1, 0},
+    {0, 10, 12, 3, 8, 10, 4, 11, 15, 10, 0}
     };
     list<list<Vertex>> routes;
     for (const vector<int>& route_ : routes_) {
@@ -679,6 +680,7 @@ void Matheus_model_5::createModel() {
         if (currIndex != customersC0Indexes.end()) {
           int j = currIndex->second;
           model.add(x[i][j] == 1);
+          cout<<i<<" "<<j<<endl;
         } else {
           //is an afs 
           int f = afss_FIndexes[curr->id];
@@ -686,6 +688,7 @@ void Matheus_model_5::createModel() {
           //get path
           for (currIndex = customersC0Indexes.find(curr->id); currIndex == customersC0Indexes.end(); r = afss_FIndexes[curr->id], ++curr, currIndex = customersC0Indexes.find(curr->id));
           int j = customersC0Indexes[curr->id];
+          cout<<i<<" "<<f<<" "<<r<<" "<<j<<endl;
           model.add(y[i][f][r][j] == 1);
         }
       }

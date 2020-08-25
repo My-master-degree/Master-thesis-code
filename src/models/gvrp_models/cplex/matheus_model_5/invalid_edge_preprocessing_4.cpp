@@ -28,8 +28,8 @@ void Invalid_edge_preprocessing_4::add () {
             const Vertex * vertexF = matheus_model_5.gvrp_afs_tree->f0[f];
             for (int r = 0; r < matheus_model_5.gvrp_afs_tree->f0.size(); ++r) {
               const Vertex * vertexR = matheus_model_5.gvrp_afs_tree->f0[r];
-              if (matheus_model_5.instance.fuel(vertexF->id, i) + matheus_model_5.customerToAfsFuel(i, f_) <= matheus_model_5.instance.vehicleFuelCapacity 
-                  && matheus_model_5.afsToCustomerFuel(r_, j) + matheus_model_5.instance.fuel(j, vertexR->id) <= matheus_model_5.instance.vehicleFuelCapacity) {
+              if (matheus_model_5.instance.fuel(vertexF->id, vertexI->id) + matheus_model_5.customerToAfsFuel(i, f_) <= matheus_model_5.instance.vehicleFuelCapacity 
+                  && matheus_model_5.afsToCustomerFuel(r_, j) + matheus_model_5.instance.fuel(vertexJ->id, vertexR->id) <= matheus_model_5.instance.vehicleFuelCapacity) {
                 //get f_, and r_ indexes
                 int f__, r__;
                 for (int k = 0; k < matheus_model_5.gvrp_afs_tree->f0.size(); ++k) {
@@ -41,7 +41,7 @@ void Invalid_edge_preprocessing_4::add () {
                 //check time
                 if (matheus_model_5.gvrp_afs_tree->times[f__] + matheus_model_5.instance.time(vertexF->id, vertexI->id) + matheus_model_5.time(i, f_, r_, j) + vertexJ->serviceTime + matheus_model_5.instance.time(vertexJ->id, vertexR->id) + matheus_model_5.gvrp_afs_tree->times[r__] <= matheus_model_5.instance.timeLimit) { 
                   valid = true;
-                  f = matheus_model_5._f.size();
+                  f = matheus_model_5.gvrp_afs_tree->f0.size();
                   break;
                 }
               }
