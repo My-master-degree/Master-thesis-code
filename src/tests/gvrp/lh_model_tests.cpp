@@ -43,6 +43,7 @@ void LH_model_tests::run() {
   for (const string& instance : instances) {
     cout<<instance<<endl;
     LH_model lh_model (*gvrp_instance, execution_time);  
+//    lh_model.RELAXED = true;
     execute_model(lh_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<lh_model.nPreprocessings0<<";"<<lh_model.nPreprocessings1<<";"<<lh_model.nPreprocessings2<<";"<<lh_model.nPreprocessings3<<endl;
     gvrp_instance++;

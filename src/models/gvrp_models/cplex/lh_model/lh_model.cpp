@@ -24,7 +24,7 @@ using namespace models::gvrp_models::cplex::lh_model;
 
 using namespace std;
 
-LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nPreprocessings0(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0) {
+LH_model::LH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nPreprocessings0(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), RELAXED(false) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //c_0
@@ -105,6 +105,11 @@ pair<Gvrp_solution, Mip_solution_info> LH_model::run(){
     }
     clock_gettime(CLOCK_MONOTONIC, &finish);
     elapsed = (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
+    if (RELAXED) {
+      endVars ();
+      throw mipSolInfo;
+    }
 //    cplex.exportModel("cplexcpp.lp");
 //    env.out() << "Solution value = " << cplex.getObjValue() << endl;
 //    cout<<"Getting x values"<<endl;
@@ -112,7 +117,6 @@ pair<Gvrp_solution, Mip_solution_info> LH_model::run(){
 //    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
     endVals ();
-    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
     endVars();
 //    env.end();
     return make_pair(*solution, mipSolInfo);
@@ -135,7 +139,7 @@ void LH_model::createVariables(){
     stringstream nameStream;
     for (int i = 0; i < c0.size(); ++i) {
       //x, u, v, and a vars
-      x[i] = IloNumVarArray (env, c0.size(), 0, 1, IloNumVar::Int);
+      x[i] = IloNumVarArray (env, c0.size(), 0, 1, RELAXED ? IloNumVar::Float : IloNumVar::Int);
       a[i] = IloNumVarArray (env, c0.size() - 1, 0, instance.vehicleFuelCapacity, IloNumVar::Float);
       u[i] = IloNumVarArray (env, c0.size(), 0, instance.timeLimit, IloNumVar::Float);
       //a
@@ -170,7 +174,7 @@ void LH_model::createVariables(){
       //y var
       y[i] = Matrix2DVar (env, f0.size());
       for (int f = 0; f < f0.size(); ++f) {
-        y[i][f] = IloNumVarArray(env, c0.size(), 0, 1, IloNumVar::Int);
+        y[i][f] = IloNumVarArray(env, c0.size(), 0, 1, RELAXED ? IloNumVar::Float : IloNumVar::Int);
         for (int j = 0; j < c0.size(); ++j) {
           nameStream<<"y["<<i<<"]["<<f<<"]["<<j<<"]=path("<<c0[i]->id<<","<<f0[f]->id<<","<<c0[j]->id<<")";
           y[i][f][j].setName(nameStream.str().c_str());

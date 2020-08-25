@@ -39,7 +39,7 @@ using namespace models::gvrp_models;
 using namespace models::gvrp_models::cplex;
 using namespace models::gvrp_models::cplex::cubic_model;
 
-Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit): Gvrp_model(instance, time_limit), afss(unordered_set<int> (instance.afss.size())), nGreedyLP(0), BPPTimeLimit(100000000), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0)  {
+Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit): Gvrp_model(instance, time_limit), afss(unordered_set<int> (instance.afss.size())), nGreedyLP(0), BPPTimeLimit(100000000), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0), RELAXED(false)  {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
   //fill all and customers
@@ -123,13 +123,18 @@ pair<Gvrp_solution, Mip_solution_info> Cubic_model::run(){
     }
     clock_gettime(CLOCK_MONOTONIC, &finish);
     elapsed = (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
+    if (RELAXED) {
+      endVars ();
+      throw mipSolInfo;
+    }
 //    cplex.exportModel("cplexcpp.lp");
 //    env.out() << "Solution value = " << cplex.getObjValue() << endl;
 //    cout<<"Getting x values"<<endl;
     fillX_vals();
 //    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
-    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
+    endVals();
     endVars();
 //    env.end();
     return make_pair(*solution, mipSolInfo);
@@ -159,7 +164,7 @@ void Cubic_model::createVariables(){
       x[k] = IloArray<IloNumVarArray> (env, all.size());
       for (const pair<int, const Vertex *>& p : all){
         int i = p.first;
-        x[k][i] = IloNumVarArray(env, all.size(), 0, 1, IloNumVar::Int);
+        x[k][i] = IloNumVarArray(env, all.size(), 0, 1, RELAXED ? IloNumVar::Float : IloNumVar::Int);
         //setting names
         for (const pair<int, const Vertex *>& p1 : all){
           int j = p1.first;

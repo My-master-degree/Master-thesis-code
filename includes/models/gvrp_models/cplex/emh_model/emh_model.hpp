@@ -39,6 +39,7 @@ namespace models {
             IloNumVarArray t;
             IloNumVarArray e;
             Matrix2DVal x_vals;
+            bool RELAXED;
           protected:
             void createVariables();
             void createObjectiveFunction();

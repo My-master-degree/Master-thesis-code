@@ -39,7 +39,7 @@ using namespace models::gvrp_models::cplex::matheus_model_3;
 
 using namespace std;
 
-Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nGreedyLP(0), BPPTimeLimit(10000000), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0) {
+Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), nGreedyLP(0), BPPTimeLimit(10000000), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0), RELAXED(false) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //populating all map and customers set
@@ -161,6 +161,11 @@ pair<Gvrp_solution, Mip_solution_info> Matheus_model_3::run(){
     }
     clock_gettime(CLOCK_MONOTONIC, &finish);
     elapsed = (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
+    if (RELAXED) {
+      endVars ();
+      throw mipSolInfo;
+    }
 //    cplex.exportModel("cplexcpp.lp");
 //    env.out() << "Solution value = " << cplex.getObjValue() << endl;
 //    cout<<"Getting x values"<<endl;
@@ -168,7 +173,6 @@ pair<Gvrp_solution, Mip_solution_info> Matheus_model_3::run(){
 //    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
     endVals();
-    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
     endVars();
     return make_pair(*solution, mipSolInfo);
   } catch (IloException& e) {
@@ -201,7 +205,7 @@ void Matheus_model_3::createVariables(){
       nameStream.clear();
       nameStream.str("");
       //x var
-      x[i] = IloNumVarArray(env, all.size(), 0, 1, IloNumVar::Int);
+      x[i] = IloNumVarArray(env, all.size(), 0, 1, RELAXED ? IloNumVar::Float : IloNumVar::Int);
       for (const pair<int, const Vertex *>& p1 : all){
         int j = p1.first;
         nameStream<<"x["<<i<<"]["<<j<<"]";

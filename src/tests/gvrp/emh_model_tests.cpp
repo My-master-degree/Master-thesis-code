@@ -43,6 +43,7 @@ void EMH_model_tests::run() {
   for (const string& instance : instances) {
     cout<<instance<<endl;
     EMH_model emh_model (*gvrp_instance, execution_time);  
+//    emh_model.RELAXED = true;
     execute_model(emh_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;

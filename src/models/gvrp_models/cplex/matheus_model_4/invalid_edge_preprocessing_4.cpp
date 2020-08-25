@@ -41,7 +41,7 @@ void Invalid_edge_preprocessing_4::add () {
                 //check time
                 if (matheus_model_4.gvrp_afs_tree->times[f__] + matheus_model_4.instance.time(vertexF->id, vertexI->id) + matheus_model_4.time(i, f_, r_, j) + vertexJ->serviceTime + matheus_model_4.instance.time(vertexJ->id, vertexR->id) + matheus_model_4.gvrp_afs_tree->times[r__] <= matheus_model_4.instance.timeLimit) { 
                   valid = true;
-                  f = matheus_model_4._f.size();
+                  f = matheus_model_4.gvrp_afs_tree->f0.size();
                   break;
                 }
               }

@@ -62,6 +62,7 @@ namespace models {
             int nRoutesLB;
             double solLB;
             Matrix3DVal x_vals;
+            bool RELAXED;
           protected:
             void createVariables();
             void createObjectiveFunction();

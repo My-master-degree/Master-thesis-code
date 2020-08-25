@@ -50,6 +50,7 @@ void Matheus_model_2_tests::run() {
     Gvrp_feasible_solution_heuristic gfsh (*gvrp_instance);
     Gvrp_solution gvrp_solution = gfsh.run();
     Matheus_model_2 matheus_model_2 (*gvrp_instance, execution_time);  
+//    matheus_model_2.RELAXED = true;
     //  Mip_start matheus_model_2 (*gvrp_instance, execution_time, gvrp_solution);  
     matheus_model_2.levelSubcycleCallback = 0;
     execute_model(matheus_model_2, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);

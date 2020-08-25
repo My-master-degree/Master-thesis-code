@@ -48,6 +48,7 @@ namespace models {
             int nPreprocessings1;
             int nPreprocessings2;
             int nPreprocessings3;
+            bool RELAXED;
             double time(int i, int f, int j);
             double time(int i, int j);
             double customersFuel(int i, int j);

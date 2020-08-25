@@ -60,6 +60,7 @@ namespace models {
             int nImprovedMSTNRoutesLB;
             int nBPPNRoutesLB;
             double solLB;
+            bool RELAXED;
             double time(int i, int j);
             double M1(int i, int j);
             double fuel(int i, int j);

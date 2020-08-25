@@ -19,7 +19,7 @@ using namespace models::gvrp_models::cplex::emh_model;
 
 using namespace std;
 
-EMH_model::EMH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), depotDummy(new Vertex(instance.depot.id, instance.depot.x, instance.depot.y, instance.afss.front().serviceTime))  {
+EMH_model::EMH_model(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), depotDummy(new Vertex(instance.depot.id, instance.depot.x, instance.depot.y, instance.afss.front().serviceTime)), RELAXED(false) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //populating all map and customers set
@@ -79,6 +79,11 @@ pair<Gvrp_solution, Mip_solution_info> EMH_model::run(){
     }
     clock_gettime(CLOCK_MONOTONIC, &finish);
     elapsed = (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
+    if (RELAXED) {
+      endVars ();
+      throw mipSolInfo;
+    }
 //    cplex.exportModel("cplexcpp.lp");
 //    env.out() << "Solution value = " << cplex.getObjValue() << endl;
 //    cout<<"Getting x values"<<endl;
@@ -86,7 +91,6 @@ pair<Gvrp_solution, Mip_solution_info> EMH_model::run(){
 //    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
     endVals();
-    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
     endVars();
     return make_pair(*solution, mipSolInfo);
   } catch (IloException& e) {
@@ -117,7 +121,7 @@ void EMH_model::createVariables(){
       nameStream.clear();
       nameStream.str("");
       //x var
-      x[i] = IloNumVarArray(env, all.size(), 0, 1, IloNumVar::Int);
+      x[i] = IloNumVarArray(env, all.size(), 0, 1, RELAXED ? IloNumVar::Float : IloNumVar::Int);
       for (const pair<int, const Vertex *>& p1 : all){
         int j = p1.first;
         nameStream<<"x["<<i<<"]["<<j<<"]";

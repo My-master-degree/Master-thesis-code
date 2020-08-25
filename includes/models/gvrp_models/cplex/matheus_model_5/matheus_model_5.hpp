@@ -46,8 +46,10 @@ namespace models {
             pair<Gvrp_solution, Mip_solution_info> run();
             Matrix4DVar y;
             Matrix2DVar x;
-            IloNumVarArray e;
-            IloNumVarArray t;
+            Matrix2DVar a;
+            Matrix2DVar u;
+            Matrix2DVar v;
+            Matrix2DVar e;
             Matrix4DVal y_vals;
             Matrix2DVal x_vals;
             list<User_constraint*> user_constraints;
@@ -74,6 +76,7 @@ namespace models {
             int nImprovedMSTNRoutesLB;
             int nBPPNRoutesLB;
             double solLB;
+            bool RELAXED;
             double time(int i, int f, int r, int j);
             double time(int i, int j);
             double customersFuel(int i, int j);

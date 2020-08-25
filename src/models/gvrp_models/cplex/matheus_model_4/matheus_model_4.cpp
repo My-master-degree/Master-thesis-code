@@ -34,7 +34,7 @@ using namespace models::gvrp_models::cplex::matheus_model_4;
 
 using namespace std;
 
-Matheus_model_4::Matheus_model_4(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), nGreedyLP(0), BPPTimeLimit(100000000), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0) {
+Matheus_model_4::Matheus_model_4(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), nGreedyLP(0), BPPTimeLimit(100000000), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0), RELAXED(false) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //c_0
@@ -213,6 +213,11 @@ pair<Gvrp_solution, Mip_solution_info> Matheus_model_4::run(){
     }
     clock_gettime(CLOCK_MONOTONIC, &finish);
     elapsed = (finish.tv_sec - start.tv_sec) + (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
+    if (RELAXED) {
+      endVars ();
+      throw mipSolInfo;
+    }
 //    cplex.exportModel("cplexcpp.lp");
 //    env.out() << "Solution value = " << cplex.getObjValue() << endl;
 //    cout<<"Getting x values"<<endl;
@@ -220,7 +225,6 @@ pair<Gvrp_solution, Mip_solution_info> Matheus_model_4::run(){
 //    cout<<"Creating GVRP solution"<<endl;
     createGvrp_solution();
     endVals ();
-    mipSolInfo = Mip_solution_info(cplex.getMIPRelativeGap(), cplex.getStatus(), elapsed, cplex.getObjValue());
     endVars();
     return make_pair(*solution, mipSolInfo);
   } catch (IloException& e) {
@@ -241,7 +245,7 @@ void Matheus_model_4::createVariables(){
     stringstream nameStream;
     for (int i = 0; i < c0.size(); ++i) {
       //x vars
-      x[i] = IloNumVarArray (env, c0.size(), 0, 1, IloNumVar::Int);
+      x[i] = IloNumVarArray (env, c0.size(), 0, 1, RELAXED ? IloNumVar::Float : IloNumVar::Int);
       //e and t vars
       if (i > 0) {
         nameStream<<"e["<<i - 1<<"]=energy in ("<<c0[i]->id<<")";
@@ -265,7 +269,7 @@ void Matheus_model_4::createVariables(){
       for (int f = 0; f < _f.size(); ++f) {
         y[i][f] = Matrix2DVar(env, _f.size());
         for (int r = 0; r < _f.size(); ++r) {
-          y[i][f][r] = IloNumVarArray(env, c0.size(), 0, 1, IloNumVar::Int);
+          y[i][f][r] = IloNumVarArray(env, c0.size(), 0, 1, RELAXED ? IloNumVar::Float : IloNumVar::Int);
           for (int j = 0; j < c0.size(); ++j) {
             nameStream<<"y["<<i<<"]["<<f<<"]["<<r<<"]["<<j<<"]=path("<<c0[i]->id<<", "<<_f[f]->id<<", "<<_f[r]->id<<", "<<c0[j]->id<<")";
             y[i][f][r][j].setName(nameStream.str().c_str());

@@ -40,6 +40,7 @@ namespace models {
             map<int, int> afssF0Indexes;
             vector<const Vertex *> c0;
             vector<const Vertex *> f0;
+            bool RELAXED;
             double time(int i, int f, int j) const;
             double time(int i, int j) const;
             double customersFuel(int i, int j) const;
