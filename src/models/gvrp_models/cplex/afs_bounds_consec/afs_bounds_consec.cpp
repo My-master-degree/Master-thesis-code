@@ -1,20 +1,21 @@
 #include "utils/util.hpp"
 #include "models/vertex.hpp"
+#include "models/objective_function_enum.hpp" 
 #include "models/distances_enum.hpp"
 #include "models/cplex/mip_solution_info.hpp"
 #include "models/cplex/depth_node_callback.hpp"
 #include "models/gvrp_models/gvrp_solution.hpp"
 #include "models/gvrp_models/gvrp_instance.hpp"
 #include "models/gvrp_models/cplex/gvrp_model.hpp"
-#include "models/gvrp_models/cplex/matheus_model_5/matheus_model_5.hpp"
-#include "models/gvrp_models/cplex/matheus_model_5/preprocessing.hpp"
-#include "models/gvrp_models/cplex/matheus_model_5/user_constraint.hpp"
-#include "models/gvrp_models/cplex/matheus_model_5/lazy_constraint.hpp"
-#include "models/gvrp_models/cplex/matheus_model_5/subcycle_user_constraint.hpp"
-#include "models/gvrp_models/cplex/matheus_model_5/invalid_edge_preprocessing.hpp"
-#include "models/gvrp_models/cplex/matheus_model_5/invalid_edge_preprocessing_2.hpp"
-#include "models/gvrp_models/cplex/matheus_model_5/invalid_edge_preprocessing_3.hpp"
-#include "models/gvrp_models/cplex/matheus_model_5/invalid_edge_preprocessing_4.hpp"
+#include "models/gvrp_models/cplex/afs_bounds_consec/afs_bounds_consec.hpp"
+#include "models/gvrp_models/cplex/afs_bounds_consec/preprocessing.hpp"
+#include "models/gvrp_models/cplex/afs_bounds_consec/user_constraint.hpp"
+#include "models/gvrp_models/cplex/afs_bounds_consec/lazy_constraint.hpp"
+#include "models/gvrp_models/cplex/afs_bounds_consec/subcycle_user_constraint.hpp"
+#include "models/gvrp_models/cplex/afs_bounds_consec/invalid_edge_preprocessing.hpp"
+#include "models/gvrp_models/cplex/afs_bounds_consec/invalid_edge_preprocessing_2.hpp"
+#include "models/gvrp_models/cplex/afs_bounds_consec/invalid_edge_preprocessing_3.hpp"
+#include "models/gvrp_models/cplex/afs_bounds_consec/invalid_edge_preprocessing_4.hpp"
 #include "models/gvrp_models/gvrp_feasible_solution_heuristic.hpp"
 
 #include <sstream>
@@ -30,13 +31,21 @@ using namespace models;
 using namespace models::cplex;
 using namespace models::gvrp_models;
 using namespace models::gvrp_models::cplex;
-using namespace models::gvrp_models::cplex::matheus_model_5;
+using namespace models::gvrp_models::cplex::afs_bounds_consec;
 
 using namespace std;
 
-Matheus_model_5::Matheus_model_5(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), nGreedyLP(0), BPPTimeLimit(100000000), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0), RELAXED(false) {
+Afs_bounds_consec::Afs_bounds_consec(const Gvrp_instance& instance, unsigned int time_limit, const Vertex& afs_, Objective_function_enum objective_function_enum_) : Gvrp_model(instance, time_limit), afs(afs_), c0(vector<const Vertex *> (instance.customers.size() + 1)), nGreedyLP(0), BPPTimeLimit(100000000), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0), RELAXED(false), objective_function_enum(objective_function_enum_) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
+  bool found = false;
+  for (const Vertex& afs_ : instance.afss)
+    if (afs_.id == afs.id) {
+      found = true;
+      break;
+    }
+  if (!found)
+    throw string("Error: The afs object does not belong to the G-VRP instance");
   //c_0
   c0[0] = &instance.depot;
   customersC0Indexes[instance.depot.id] = 0;
@@ -95,7 +104,7 @@ Matheus_model_5::Matheus_model_5(const Gvrp_instance& instance, unsigned int tim
   preprocessings.push_back(new Invalid_edge_preprocessing_4(*this));
 } 
 
-Matheus_model_5::~Matheus_model_5() {
+Afs_bounds_consec::~Afs_bounds_consec() {
   for (Preprocessing * preprocessing : preprocessings)
     delete preprocessing;  
   for (User_constraint * user_constraint : user_constraints)
@@ -108,7 +117,7 @@ Matheus_model_5::~Matheus_model_5() {
     delete heuristic_callback;  
 }
 
-double Matheus_model_5::distance (int i, int f, int r, int j) {
+double Afs_bounds_consec::distance (int i, int f, int r, int j) {
   int f_, r_;
   for (int i = 0; i < gvrp_afs_tree->f0.size(); ++i) {
     if (gvrp_afs_tree->f0[i]->id == _f[f]->id)
@@ -119,7 +128,7 @@ double Matheus_model_5::distance (int i, int f, int r, int j) {
   return instance.distances[c0[i]->id][_f[f]->id] + gvrp_afs_tree->pairCosts[f_][r_] + instance.distances[_f[r]->id][c0[j]->id];
 }
 
-double Matheus_model_5::time (int i, int f, int r, int j) {
+double Afs_bounds_consec::time (int i, int f, int r, int j) {
   int f_, r_;
   for (int k = 0; k < gvrp_afs_tree->f0.size(); ++k) {
     if (gvrp_afs_tree->f0[k]->id == _f[f]->id)
@@ -130,15 +139,15 @@ double Matheus_model_5::time (int i, int f, int r, int j) {
   return c0[i]->serviceTime + instance.time(c0[i]->id, _f[f]->id) + gvrp_afs_tree->pairTimes[f_][r_] + instance.time(_f[r]->id, c0[j]->id);
 }
 
-double Matheus_model_5::time(int i, int j) {
+double Afs_bounds_consec::time(int i, int j) {
   return c0[i]->serviceTime + instance.time(c0[i]->id, c0[j]->id);
 }
 
-double Matheus_model_5::customersFuel(int i, int j) {
+double Afs_bounds_consec::customersFuel(int i, int j) {
   return instance.fuel(c0[i]->id, c0[j]->id);
 }
 
-double Matheus_model_5::afsToCustomerFuel(int f, int i) {
+double Afs_bounds_consec::afsToCustomerFuel(int f, int i) {
   /*
   int f_;
   for (int i = 0; i < gvrp_afs_tree->f0.size(); ++i) 
@@ -151,7 +160,7 @@ double Matheus_model_5::afsToCustomerFuel(int f, int i) {
   return instance.fuel(_f[f]->id, c0[i]->id);
 }
 
-double Matheus_model_5::customerToAfsFuel(int i, int f) {
+double Afs_bounds_consec::customerToAfsFuel(int i, int f) {
   /*
   int f_;
   for (int i = 0; i < gvrp_afs_tree->f0.size(); ++i) 
@@ -164,7 +173,7 @@ double Matheus_model_5::customerToAfsFuel(int i, int f) {
   return instance.fuel(c0[i]->id, _f[f]->id);
 }
 
-list<Vertex> Matheus_model_5::getAFSsShortestPath (const Vertex& ori, const Vertex& dest) {
+list<Vertex> Afs_bounds_consec::getAFSsShortestPath (const Vertex& ori, const Vertex& dest) {
   //get vertexes
   int f, r;
   for (int i = 0; i < gvrp_afs_tree->f0.size(); ++i) {
@@ -180,7 +189,7 @@ list<Vertex> Matheus_model_5::getAFSsShortestPath (const Vertex& ori, const Vert
   return path;
 }
 
-pair<Gvrp_solution, Mip_solution_info> Matheus_model_5::run(){
+pair<Gvrp_solution, Mip_solution_info> Afs_bounds_consec::run(){
   //setup
   stringstream output_exception;
   Mip_solution_info mipSolInfo;
@@ -228,7 +237,7 @@ pair<Gvrp_solution, Mip_solution_info> Matheus_model_5::run(){
   }
 }
 
-void Matheus_model_5::createVariables(){
+void Afs_bounds_consec::createVariables(){
   y = Matrix4DVar (env, c0.size());
   x = Matrix2DVar (env, c0.size());
   a = Matrix2DVar (env, c0.size() - 1);
@@ -297,19 +306,26 @@ void Matheus_model_5::createVariables(){
   }
 }
 
-void Matheus_model_5::createObjectiveFunction() {
+void Afs_bounds_consec::createObjectiveFunction() {
   //objective function
   try{
     IloExpr fo (env);
-    for (int i = 0; i < c0.size(); ++i) 
-      for (int j = 0; j < c0.size(); ++j) {
-        fo += instance.distances[c0[i]->id][c0[j]->id] * x[i][j];
-        for (int f = 0; f < _f.size(); ++f)
-          for (int r = 0; r < _f.size(); ++r)
-            fo += distance(i, f, r, j) * y[i][f][r][j];
+    for (int f = 0; f < _f.size(); ++f)
+      for (int r = 0; r < _f.size(); ++r) {
+        list<Vertex> path = getAFSsShortestPath(*_f[f], *_f[r]);
+        for (const Vertex& afs_ : path)
+          if (afs_.id == afs.id) {
+            for (int i = 0; i < c0.size(); ++i) 
+              for (int j = 0; j < c0.size(); ++j) 
+                fo += y[i][f][r][j];
+            break;
+          }
       }
     model = IloModel (env);
-    model.add(IloMinimize(env, fo));
+    if (objective_function_enum == MIN)
+      model.add(IloMinimize(env, fo));
+    else if (objective_function_enum == MAX)
+      model.add(IloMaximize(env, fo));
   } catch (IloException& e) {
     throw e;
   } catch(...){
@@ -317,7 +333,7 @@ void Matheus_model_5::createObjectiveFunction() {
   }
 }
 
-void Matheus_model_5::createModel() {
+void Afs_bounds_consec::createModel() {
   try {
     //preprocessing conditions
     for (Preprocessing* preprocessing : preprocessings) {
@@ -719,11 +735,11 @@ void Matheus_model_5::createModel() {
   }
 }
 
-void Matheus_model_5::extraStepsAfterModelCreation() {
+void Afs_bounds_consec::extraStepsAfterModelCreation() {
   //
 }
 
-void Matheus_model_5::setCustomParameters(){
+void Afs_bounds_consec::setCustomParameters(){
   try{
     setParameters();
     //for the user cut callback, although this formulation does not make use of lazy constraints, (this parameter is being defined to standarize the experiments (since the cubic formulations makes use of user constraints)
@@ -739,7 +755,7 @@ void Matheus_model_5::setCustomParameters(){
   }
 }
 
-void Matheus_model_5::fillVals(){
+void Afs_bounds_consec::fillVals(){
   //getresult
   try{
     x_vals = Matrix2DVal (env, c0.size());
@@ -763,7 +779,7 @@ void Matheus_model_5::fillVals(){
   }
 }
 
-void Matheus_model_5::createGvrp_solution() {
+void Afs_bounds_consec::createGvrp_solution() {
   try {
     /*
     for (int f = 0; f < _f.size(); ++f)
@@ -856,7 +872,7 @@ void Matheus_model_5::createGvrp_solution() {
   }
 }
 
-void Matheus_model_5::endVals () {
+void Afs_bounds_consec::endVals () {
   //end vals
   for (int i = 0; i < c0.size(); ++i) {
     for (int f = 0; f < _f.size(); ++f) {
@@ -871,7 +887,7 @@ void Matheus_model_5::endVals () {
   x_vals.end();
 }
 
-void Matheus_model_5::endVars(){
+void Afs_bounds_consec::endVars(){
   //end vals
   for (int i = 0; i < c0.size(); ++i) {
     if (i > 0) {

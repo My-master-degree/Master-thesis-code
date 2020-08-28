@@ -61,45 +61,19 @@ void Subcycle_user_constraint::main() {
   ListGraph::NodeMap<int> nodeId(graph);
   for (const pair<int, const Vertex *>& p : matheus_model_3.all) 
     nodeId[nodes[p.first]] = p.first;
-  //get components
-  set<int> visited;
-  for (int customer : matheus_model_3.customers) {
-    if (visited.count(customer))
-      continue;
-    ListGraph::EdgeMap<double> weight(graph); 
-    //bfs
-    component.insert(customer);
-    q.push(customer);
-    while (!q.empty()) {
-      int curr = q.front();
-      visited.insert(curr);
-      q.pop();
-      for (const pair<int, const Vertex *>& p : matheus_model_3.all) 
-        if (x_vals[curr][p.first] > EPS || x_vals[p.first][curr] > EPS) {
-          if (!component.count(p.first)) {
-            component.insert(p.first);
-            q.push(p.first);
-          }
-          weight[graph.addEdge(nodes[curr], nodes[p.first])] = x_vals[curr][p.first] > EPS ? x_vals[curr][p.first] : 0;
-          weight[graph.addEdge(nodes[p.first], nodes[curr])] = x_vals[p.first][curr] > EPS ? x_vals[p.first][curr] : 0;
-          x_vals[p.first][curr] = 0;
-          x_vals[curr][p.first] = 0;
-        } 
-    }
-    //gh
-    GomoryHu<ListGraph, ListGraph::EdgeMap<double> > gh (graph, weight);
-    gh.run();
-    //get subcycles
-    for (int i : component) 
-      if (gh.predNode(nodes[i]) != INVALID && gh.predValue(nodes[i]) >= 2.0 - EPS) 
-        dsu.join(i, nodeId[gh.predNode(nodes[i])]);
-    /*
-    for (int i : component) 
-      for (int j : component) 
-        if (gh.minCutValue(nodes[j], nodes[j]) >= 2.0 - EPS) 
-          dsu.join(i, j);
-          */
-    component.clear();
+  ListGraph::EdgeMap<double> weight(graph); 
+  for (const pair<int, const Vertex *>& p : matheus_model_3.all) 
+    for (const pair<int, const Vertex *>& p1 : matheus_model_3.all) 
+      if (x_vals[p.first][p1.first] > EPS)
+        weight[graph.addEdge(nodes[p.first], nodes[p1.first])] = x_vals[p.first][p1.first];
+  //gh
+  GomoryHu<ListGraph, ListGraph::EdgeMap<double> > gh (graph, weight);
+  gh.run();
+  //get subcycles
+  for (const pair<int, const Vertex *>& p : matheus_model_3.all) {
+    int i = p.first;
+    if (gh.predNode(nodes[i]) != INVALID && gh.predValue(nodes[i]) >= 2.0 - EPS) 
+      dsu.join(i, nodeId[gh.predNode(nodes[i])]);
   }
   //get subcomponents
   for (const pair<int, const Vertex *>& p : matheus_model_3.all) 
@@ -128,7 +102,7 @@ void Subcycle_user_constraint::main() {
     }
   //end of multimap 
   //inequallitites
-  for (const set<int>& S : components) 
+  for (set<int>& S : components) 
     //\sum_{v_i \in V'\S} \sum_{v_j \in S} x_{ij} \geqslant N_ROUTES_LB(S) 
     if (!S.count(matheus_model_3.instance.depot.id)) {
       //get customers from component S
@@ -153,14 +127,76 @@ void Subcycle_user_constraint::main() {
         ++matheus_model_3.nImprovedMSTNRoutesLB;
       if (bppNRoutesLB == maxNRoutes) 
         ++matheus_model_3.nBPPNRoutesLB;
-      //lhs
-      for (const pair<int, const Vertex *>& p : matheus_model_3.all) 
-        if (!S.count(p.first))
-          for (int j : S) 
-            lhs += matheus_model_3.x[p.first][j];
-      lhs -= maxNRoutes;
       try {
+        //lhs
+        //in edges
+        for (const pair<int, const Vertex *>& p : matheus_model_3.all) 
+          if (!S.count(p.first))
+            for (int j : S) 
+              lhs += matheus_model_3.x[p.first][j];
+        lhs -= maxNRoutes;
         add(lhs >= 0).end();
+        lhs.end();
+        lhs = IloExpr(env);
+        //out edges
+        for (const pair<int, const Vertex *>& p : matheus_model_3.all) 
+          if (!S.count(p.first))
+            for (int j : S) 
+              lhs += matheus_model_3.x[j][p.first];
+        lhs -= maxNRoutes;
+        add(lhs >= 0).end();
+        lhs.end();
+        lhs = IloExpr(env);
+        //bfs to get all afss out and connected to this component
+        queue<int> q; 
+        for (int node : S)
+          q.push(node);
+        while (!q.empty()) {
+          int curr = q.front();
+          q.pop();
+          for (const pair<int, const Vertex *> p : matheus_model_3.dummies) {
+            int afs = p.first;
+            double weight = 0.0;
+            if (x_vals[curr][afs] > EPS)
+              weight += x_vals[curr][afs];
+            if (x_vals[afs][curr] > EPS)
+              weight += x_vals[afs][curr];
+            if (!S.count(afs) && weight > EPS) {
+//              cout<<"from "<<curr<<" to "<<afs<<endl;
+              q.push(afs);
+              S.insert(afs);
+              //in edges
+              //getting lhs
+              for (const pair<int, const Vertex *>& p1 : matheus_model_3.all) {
+                int a = p1.first;
+                if (!S.count(a))
+                  for (int b : S) 
+                    lhs += matheus_model_3.x[a][b];
+              }
+              //getting rhs
+              lhs -= maxNRoutes;
+              add(lhs >= 0.0).end();
+              //out edges
+              lhs.end();
+              lhs = IloExpr(env);
+              //getting lhs
+              for (const pair<int, const Vertex *>& p1 : matheus_model_3.all) {
+                int a = p1.first;
+                if (!S.count(a))
+                  for (int b : S) 
+                    lhs += matheus_model_3.x[b][a];
+              }
+              //getting rhs
+              lhs -= maxNRoutes;
+              add(lhs >= 0.0).end();
+              lhs.end();
+              lhs = IloExpr(env);
+              for (int node : S) 
+                cout<<node<<", "; 
+              cout<<endl;
+            }
+          }
+        }
       } catch(IloException& e) {
         cerr << "Exception while adding user constraint" << e.getMessage() << "\n";
         throw;

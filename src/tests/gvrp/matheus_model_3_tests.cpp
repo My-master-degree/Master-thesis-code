@@ -45,6 +45,12 @@ void Matheus_model_3_tests::run() {
   solution_name = "matheus_model_3_";
   openResultFile(resultsFile, solution_name);
   for (const string& instance : instances) {
+    if (i <= 1) {
+      ++gvrp_instance;
+      ++i;
+      continue;
+    }
+
     cout<<instance<<endl;
     Gvrp_feasible_solution_heuristic gfsh (*gvrp_instance);
     Gvrp_solution gvrp_solution = gfsh.run();
@@ -56,6 +62,8 @@ void Matheus_model_3_tests::run() {
     resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model_3.nGreedyLP<<";"<<matheus_model_3.nBPPNRoutesLB<<";"<<matheus_model_3.nImprovedMSTNRoutesLB<<";"<<matheus_model_3.nPreprocessings1<<";"<<matheus_model_3.nPreprocessings2<<";"<<matheus_model_3.nPreprocessings3<<";"<<matheus_model_3.nPreprocessings4<<endl;
     ++gvrp_instance;
     ++i;
+    if (i > 5)
+      break;
   }
   closeResultFile(resultsFile);
 }

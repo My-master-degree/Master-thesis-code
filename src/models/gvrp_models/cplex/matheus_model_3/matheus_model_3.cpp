@@ -1,5 +1,6 @@
 #include "utils/util.hpp"
 #include "models/vertex.hpp"
+#include "models/objective_function_enum.hpp" 
 #include "models/distances_enum.hpp"
 #include "models/cplex/mip_solution_info.hpp"
 #include "models/cplex/depth_node_callback.hpp"
@@ -19,6 +20,7 @@
 #include "models/gvrp_models/cplex/matheus_model_3/invalid_edge_preprocessing_3.hpp"
 #include "models/gvrp_models/cplex/matheus_model_3/invalid_edge_preprocessing_4.hpp"
 #include "models/gvrp_models/cplex/matheus_model_3/greedy_lp_heuristic.hpp"
+#include "models/gvrp_models/cplex/afs_bounds_consec/afs_bounds_consec.hpp"
 
 #include <sstream>
 #include <list>
@@ -36,6 +38,7 @@ using namespace models::gvrp_models;
 using namespace models::gvrp_models::local_searchs;
 using namespace models::gvrp_models::cplex;
 using namespace models::gvrp_models::cplex::matheus_model_3;
+using namespace models::gvrp_models::cplex::afs_bounds_consec;
 
 using namespace std;
 
@@ -52,14 +55,17 @@ Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int tim
     fuelsLBs[customer.id] = calculateCustomerMinRequiredFuel (instance, *gvrp_afs_tree, customer);
   }
   //creating dummies
-  //get ub on the number of dummies
-  Gvrp_feasible_solution_heuristic gfsh (instance);
-  Gvrp_solution heuristic_solution = gfsh.run();
-  All all_ls (instance, heuristic_solution, FIRST_IMPROVEMENT);
-  heuristic_solution = all_ls.run();
-  double routeFuelLimit = (instance.timeLimit - instance.customers.front().serviceTime) * instance.vehicleAverageSpeed * instance.vehicleFuelConsumptionRate;
-  int nDummies = min(min(floor(((routeFuelLimit - 2 * lambda)/psi) + 1), floor(2 * (routeFuelLimit - alpha)/instance.vehicleFuelCapacity)) * heuristic_solution.routes.size(), double(instance.customers.size() + instance.maxRoutes));
+  unordered_map<int, int> nDummies;
+  for (const Vertex& afs: instance.afss) {
+    Afs_bounds_consec afs_bounds_consec (instance, time_limit, afs, MAX);  
+    afs_bounds_consec.VERBOSE = false;
+    nDummies[afs.id] = int(afs_bounds_consec.run().second.cost);    
+    cout<<nDummies[afs.id]<<endl;
+    if (nDummies[afs.id] > 2* instance.customers.size())
+      cout<<"=====================OPSSSSSS==================="<<endl;
+  }
   //insert them
+  /*
   for (const Vertex& afs: instance.afss) {
     afs_dummies[afs.id].push_back(afs.id);
     all[afs.id] = &afs;
@@ -67,10 +73,11 @@ Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int tim
   }
   for (int f = 0; f < gvrp_afs_tree->f0.size(); ++f)
     timesLBs[gvrp_afs_tree->f0[f]->id] = gvrp_afs_tree->times[f];
+  */
   int dummy_id = all.rbegin()->second->id;
   //afs dummies
   for (const Vertex& afs: instance.afss)
-    for (int i = 1; i < nDummies; ++i) {
+    for (int i = 0; i < nDummies[afs.id]; ++i) {
       afs_dummies[afs.id].push_back(++dummy_id);
       all[dummy_id] = &afs;
       dummies[dummy_id] = &afs;

@@ -46,7 +46,7 @@ void Matheus_model_5_tests::run() {
 //    Gvrp_solution gvrp_solution = gfsh.run();
 //    Mip_start matheus_model_5 (*gvrp_instance, execution_time, gvrp_solution);  
     Matheus_model_5 matheus_model_5 (*gvrp_instance, execution_time);  
-//    matheus_model_5.RELAXED = true;
+    matheus_model_5.RELAXED = true;
     execute_model(matheus_model_5, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model_5.nBPPNRoutesLB<<";"<<matheus_model_5.nImprovedMSTNRoutesLB<<";"<<matheus_model_5.nPreprocessings1<<";"<<matheus_model_5.nPreprocessings2<<";"<<matheus_model_5.nPreprocessings3<<";"<<matheus_model_5.nPreprocessings4<<endl;
     ++gvrp_instance;

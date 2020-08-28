@@ -47,7 +47,7 @@ void KK_model_tests::run() {
     Mip_start kk_model (*gvrp_instance, execution_time, gvrp_solution);  
     */
     KK_model kk_model (*gvrp_instance, execution_time);  
-//    kk_model.RELAXED = true;
+    kk_model.RELAXED = true;
     execute_model(kk_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<endl;
     gvrp_instance++;
