@@ -559,6 +559,31 @@ double utils::calculateGvrpLB1 (const vector<pair<double, double>>& closestsDist
   return lb;
 }
 
+double utils::calculateGvrpBestLB (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree) {
+  vector<const Vertex *> c0 (gvrp_instance.customers.size() + 1);
+  size_t i = 0;
+  c0[i] = &gvrp_instance.depot;
+  for (const Vertex& customer : gvrp_instance.customers)
+    c0[++i] = &customer;
+  //reductions
+  vector<vector<double>> gvrpReducedGraphDistances = calculateGVRPReducedGraphs (gvrp_instance, gvrp_afs_tree).first;
+  //set sol lb
+  const auto& closestsDistances = calculateClosestsGVRPCustomers(gvrpReducedGraphDistances, c0);
+  return max(calculateGvrpLBByImprovedMST(c0, closestsDistances, gvrpReducedGraphDistances), calculateGvrpLB1(closestsDistances));
+}
+
+double utils::calculateGvrpBestNRoutesLB (const Gvrp_instance& gvrp_instance, const Gvrp_afs_tree& gvrp_afs_tree) {
+  vector<const Vertex *> c0 (gvrp_instance.customers.size() + 1);
+  size_t i = 0;
+  c0[i] = &gvrp_instance.depot;
+  for (const Vertex& customer : gvrp_instance.customers)
+    c0[++i] = &customer;
+  //reductions
+  vector<vector<double>> gvrpReducedGraphTimes = calculateGVRPReducedGraphs (gvrp_instance, gvrp_afs_tree).second;
+  //set sol lb
+  const auto& closestsTimes = calculateClosestsGVRPCustomers(gvrpReducedGraphTimes, c0);
+  return max(int(ceil(calculateGvrpLBByImprovedMSTTime(c0, closestsTimes, gvrpReducedGraphTimes)/gvrp_instance.timeLimit)), calculateGVRP_BPP_NRoutesLB(gvrp_instance, c0, closestsTimes, 1000000));
+}
 //reading
 Gvrp_instance utils::matheus_instance_reader(const string& file_path){
   string line, token;

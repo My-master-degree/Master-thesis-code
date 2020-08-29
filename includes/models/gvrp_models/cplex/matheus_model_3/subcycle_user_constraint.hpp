@@ -5,6 +5,7 @@
 #include "models/gvrp_models/cplex/matheus_model_3/matheus_model_3.hpp" 
 
 #include <ilcplex/ilocplex.h>
+#include <unordered_set>
 
 using namespace std;
 using namespace models;
@@ -18,6 +19,8 @@ namespace models {
             Subcycle_user_constraint (Matheus_model_3& matheus_model_3);
             [[nodiscard]] IloCplex::CallbackI* duplicateCallback() const override;
             void main() override;
+            void fracSeparationSubsets(unordered_set<int> S, unordered_set<int> remainingAFSs, const Matrix2DVal& x_vals);
+            int maxNRoutes;
         };
       } 
     } 

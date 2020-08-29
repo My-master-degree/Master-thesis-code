@@ -61,11 +61,8 @@ Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int tim
     afs_bounds_consec.VERBOSE = false;
     nDummies[afs.id] = int(afs_bounds_consec.run().second.cost);    
     cout<<nDummies[afs.id]<<endl;
-    if (nDummies[afs.id] > 2* instance.customers.size())
-      cout<<"=====================OPSSSSSS==================="<<endl;
   }
   //insert them
-  /*
   for (const Vertex& afs: instance.afss) {
     afs_dummies[afs.id].push_back(afs.id);
     all[afs.id] = &afs;
@@ -73,11 +70,10 @@ Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int tim
   }
   for (int f = 0; f < gvrp_afs_tree->f0.size(); ++f)
     timesLBs[gvrp_afs_tree->f0[f]->id] = gvrp_afs_tree->times[f];
-  */
   int dummy_id = all.rbegin()->second->id;
   //afs dummies
   for (const Vertex& afs: instance.afss)
-    for (int i = 0; i < nDummies[afs.id]; ++i) {
+    for (int i = 1; i < nDummies[afs.id]; ++i) {
       afs_dummies[afs.id].push_back(++dummy_id);
       all[dummy_id] = &afs;
       dummies[dummy_id] = &afs;

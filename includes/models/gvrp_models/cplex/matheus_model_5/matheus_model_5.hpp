@@ -63,18 +63,12 @@ namespace models {
             vector<const Vertex *> _f;
             vector<double> customersMinRequiredFuel;
             vector<double> customersMinRequiredTime;
-            vector<vector<double>> gvrpReducedGraphDistances;
-            vector<vector<double>> gvrpReducedGraphTimes;
             unsigned long int nGreedyLP;
-            unsigned int BPPTimeLimit;
-            long int levelSubcycleCallback;
             int nRoutesLB;
             int nPreprocessings1;
             int nPreprocessings2;
             int nPreprocessings3;
             int nPreprocessings4;
-            int nImprovedMSTNRoutesLB;
-            int nBPPNRoutesLB;
             double solLB;
             bool RELAXED;
             double time(int i, int f, int r, int j);

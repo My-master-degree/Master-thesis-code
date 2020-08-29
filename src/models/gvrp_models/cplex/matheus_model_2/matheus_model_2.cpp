@@ -630,9 +630,6 @@ void Matheus_model_2::createModel() {
 
 
 
-    //extra constraints
-    for (Extra_constraint* extra_constraint : extra_constraints) 
-      extra_constraint->add();
     //init
     cplex = IloCplex(model);
     //lazy constraints
@@ -647,7 +644,8 @@ void Matheus_model_2::createModel() {
     //extra steps
     extraStepsAfterModelCreation();
     //depth node callback
-    cplex.use(new Depth_node_callback(env));
+    depth_node_callback = new Depth_node_callback(env);
+    cplex.use(depth_node_callback);
   } catch (IloException& e) {
     throw e;
   } catch (string s) {

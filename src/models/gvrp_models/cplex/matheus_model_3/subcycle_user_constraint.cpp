@@ -6,7 +6,7 @@
 #include "models/gvrp_models/cplex/matheus_model_3/lazy_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model_3/subcycle_user_constraint.hpp"
 
-#include <set>
+#include <unordered_set>
 #include <queue>
 #include <list>
 #include <ilcplex/ilocplex.h>
@@ -24,10 +24,47 @@ using namespace models::gvrp_models::cplex::matheus_model_3;
 using namespace lemon;
 using namespace lemon::concepts;
 
-Subcycle_user_constraint::Subcycle_user_constraint (Matheus_model_3& matheus_model_3_) : User_constraint (matheus_model_3_) {}
+Subcycle_user_constraint::Subcycle_user_constraint (Matheus_model_3& matheus_model_3_) : User_constraint (matheus_model_3_), maxNRoutes(1) {}
 
 IloCplex::CallbackI* Subcycle_user_constraint::duplicateCallback() const {
   return new(getEnv()) Subcycle_user_constraint (*this);
+}
+
+void Subcycle_user_constraint::fracSeparationSubsets(unordered_set<int> S, unordered_set<int> remainingAFSs, const Matrix2DVal& x_vals) {
+  /*
+  cout<<"(";
+  for (int a : S)
+    cout<<a<<" ";
+  cout<<") (";
+  for (int a : remainingAFSs)
+    cout<<a<<" ";
+  cout<<")"<<endl;
+  cout<<"=================================="<<endl;
+  */
+  IloExpr lhs (getEnv());
+  //in edges
+  for (const pair<int, const Vertex *>& p : matheus_model_3.all) 
+    if (!S.count(p.first))
+      for (int j : S) 
+        lhs += matheus_model_3.x[p.first][j];
+  lhs -= maxNRoutes;
+  add(lhs >= 0).end();
+  lhs.end();
+  for (int afs : remainingAFSs) {
+    bool isConnected = false;
+    for (int node : S)
+      if (x_vals[node][afs] + x_vals[afs][node] > EPS) {
+        isConnected = true;
+        break;
+      }
+    if (isConnected) {
+      auto S_ = S,
+           remainingAFSs_ = remainingAFSs;
+      S_.insert(afs);
+      remainingAFSs_.erase(afs);
+      fracSeparationSubsets(S_, remainingAFSs_, x_vals);
+    }
+  }
 }
 
 void Subcycle_user_constraint::main() {
@@ -46,8 +83,8 @@ void Subcycle_user_constraint::main() {
   vector<ListGraph::Node> nodes (sall);
   ListGraph graph;
   multimap<int, int> subcomponents;
-  set<int> component;
-  list<set<int>> components;
+  unordered_set<int> component;
+  list<unordered_set<int>> components;
   queue<int> q;
   //get values
   Matrix2DVal x_vals (env, sall);
@@ -66,6 +103,12 @@ void Subcycle_user_constraint::main() {
     for (const pair<int, const Vertex *>& p1 : matheus_model_3.all) 
       if (x_vals[p.first][p1.first] > EPS)
         weight[graph.addEdge(nodes[p.first], nodes[p1.first])] = x_vals[p.first][p1.first];
+  /*
+  for (size_t i = 0; i < matheus_model_3.all.size(); ++i) 
+    for (size_t j = i + 1; j < matheus_model_3.all.size(); ++j) 
+      if (x_vals[i][j] + x_vals[j][i] > EPS)
+        cout<<i<<", "<<j<<": "<<x_vals[i][j] + x_vals[j][i]<<endl;
+        */
   //gh
   GomoryHu<ListGraph, ListGraph::EdgeMap<double> > gh (graph, weight);
   gh.run();
@@ -102,7 +145,7 @@ void Subcycle_user_constraint::main() {
     }
   //end of multimap 
   //inequallitites
-  for (set<int>& S : components) 
+  for (unordered_set<int>& S : components) 
     //\sum_{v_i \in V'\S} \sum_{v_j \in S} x_{ij} \geqslant N_ROUTES_LB(S) 
     if (!S.count(matheus_model_3.instance.depot.id)) {
       //get customers from component S
@@ -122,12 +165,30 @@ void Subcycle_user_constraint::main() {
       int improvedMSTNRoutesLB = int(ceil(calculateGvrpLBByImprovedMSTTime(vertices, closestsTimes, matheus_model_3.gvrpReducedGraphTimes)/matheus_model_3.instance.timeLimit));
       //bin packing
       int bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(matheus_model_3.instance, vertices, closestsTimes, matheus_model_3.BPPTimeLimit);
-      int maxNRoutes = max(improvedMSTNRoutesLB, bppNRoutesLB);
+      maxNRoutes = max(improvedMSTNRoutesLB, bppNRoutesLB);
       if (improvedMSTNRoutesLB == maxNRoutes) 
         ++matheus_model_3.nImprovedMSTNRoutesLB;
       if (bppNRoutesLB == maxNRoutes) 
         ++matheus_model_3.nBPPNRoutesLB;
       try {
+        //bfs to get all afss out and connected to this component
+        unordered_set<int> connectedAFSs;
+        queue<int> q; 
+        for (int node : S)
+          q.push(node);
+        while (!q.empty()) {
+          int curr = q.front();
+          q.pop();
+          for (const pair<int, const Vertex *> p : matheus_model_3.dummies) {
+            int afs = p.first;
+            if (!connectedAFSs.count(afs) && !S.count(afs) && x_vals[curr][afs] + x_vals[afs][curr] > EPS) {
+              q.push(afs);
+              connectedAFSs.insert(afs);
+            }
+          }
+        }
+        fracSeparationSubsets(S, connectedAFSs, x_vals);
+        /*
         //lhs
         //in edges
         for (const pair<int, const Vertex *>& p : matheus_model_3.all) 
@@ -147,56 +208,7 @@ void Subcycle_user_constraint::main() {
         add(lhs >= 0).end();
         lhs.end();
         lhs = IloExpr(env);
-        //bfs to get all afss out and connected to this component
-        queue<int> q; 
-        for (int node : S)
-          q.push(node);
-        while (!q.empty()) {
-          int curr = q.front();
-          q.pop();
-          for (const pair<int, const Vertex *> p : matheus_model_3.dummies) {
-            int afs = p.first;
-            double weight = 0.0;
-            if (x_vals[curr][afs] > EPS)
-              weight += x_vals[curr][afs];
-            if (x_vals[afs][curr] > EPS)
-              weight += x_vals[afs][curr];
-            if (!S.count(afs) && weight > EPS) {
-//              cout<<"from "<<curr<<" to "<<afs<<endl;
-              q.push(afs);
-              S.insert(afs);
-              //in edges
-              //getting lhs
-              for (const pair<int, const Vertex *>& p1 : matheus_model_3.all) {
-                int a = p1.first;
-                if (!S.count(a))
-                  for (int b : S) 
-                    lhs += matheus_model_3.x[a][b];
-              }
-              //getting rhs
-              lhs -= maxNRoutes;
-              add(lhs >= 0.0).end();
-              //out edges
-              lhs.end();
-              lhs = IloExpr(env);
-              //getting lhs
-              for (const pair<int, const Vertex *>& p1 : matheus_model_3.all) {
-                int a = p1.first;
-                if (!S.count(a))
-                  for (int b : S) 
-                    lhs += matheus_model_3.x[b][a];
-              }
-              //getting rhs
-              lhs -= maxNRoutes;
-              add(lhs >= 0.0).end();
-              lhs.end();
-              lhs = IloExpr(env);
-              for (int node : S) 
-                cout<<node<<", "; 
-              cout<<endl;
-            }
-          }
-        }
+        */
       } catch(IloException& e) {
         cerr << "Exception while adding user constraint" << e.getMessage() << "\n";
         throw;

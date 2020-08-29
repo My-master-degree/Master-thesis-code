@@ -10,7 +10,7 @@
 #include "models/gvrp_models/cplex/matheus_model_5/preprocessing.hpp"
 #include "models/gvrp_models/cplex/matheus_model_5/user_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model_5/lazy_constraint.hpp"
-#include "models/gvrp_models/cplex/matheus_model_5/subcycle_user_constraint.hpp"
+#include "models/gvrp_models/cplex/matheus_model_5/greedy_lp_heuristic.hpp"
 #include "models/gvrp_models/cplex/matheus_model_5/invalid_edge_preprocessing.hpp"
 #include "models/gvrp_models/cplex/matheus_model_5/invalid_edge_preprocessing_2.hpp"
 #include "models/gvrp_models/cplex/matheus_model_5/invalid_edge_preprocessing_3.hpp"
@@ -34,7 +34,7 @@ using namespace models::gvrp_models::cplex::matheus_model_5;
 
 using namespace std;
 
-Matheus_model_5::Matheus_model_5(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), nGreedyLP(0), BPPTimeLimit(100000000), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0), RELAXED(false) {
+Matheus_model_5::Matheus_model_5(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), nGreedyLP(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), RELAXED(false) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //c_0
@@ -76,23 +76,17 @@ Matheus_model_5::Matheus_model_5(const Gvrp_instance& instance, unsigned int tim
       ++f;
     }
   }
-  //reductions
-  const auto& gvrpReducedGraphs = calculateGVRPReducedGraphs (instance, *gvrp_afs_tree);
-  gvrpReducedGraphDistances = gvrpReducedGraphs.first;
-  gvrpReducedGraphTimes = gvrpReducedGraphs.second;
   //set sol lb
-  const auto& closestsDistances = calculateClosestsGVRPCustomers(gvrpReducedGraphDistances, c0);
-  solLB = max(calculateGvrpLBByImprovedMST(c0, closestsDistances, gvrpReducedGraphDistances), calculateGvrpLB1(closestsDistances));
+  solLB = calculateGvrpBestLB (instance, *gvrp_afs_tree);
   //set n routes lb
-  const auto& closestsTimes = calculateClosestsGVRPCustomers(gvrpReducedGraphTimes, c0);
-  nRoutesLB = max(int(ceil(calculateGvrpLBByImprovedMSTTime(c0, closestsTimes, gvrpReducedGraphTimes)/instance.timeLimit)), calculateGVRP_BPP_NRoutesLB(instance, c0, closestsTimes, 1000000));
-  //user constraints
-  user_constraints.push_back(new Subcycle_user_constraint(*this));
+  nRoutesLB = calculateGvrpBestNRoutesLB (instance, *gvrp_afs_tree);
   //preprocessings
   preprocessings.push_back(new Invalid_edge_preprocessing(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_2(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_3(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_4(*this));
+  //heuristics callbacks
+  heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
 } 
 
 Matheus_model_5::~Matheus_model_5() {

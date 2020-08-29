@@ -11,6 +11,7 @@
 #include "models/gvrp_models/cplex/matheus_model_4/user_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model_4/lazy_constraint.hpp"
 #include "models/gvrp_models/cplex/matheus_model_4/subcycle_user_constraint.hpp"
+#include "models/gvrp_models/cplex/matheus_model_4/greedy_lp_heuristic.hpp"
 #include "models/gvrp_models/cplex/matheus_model_4/invalid_edge_preprocessing.hpp"
 #include "models/gvrp_models/cplex/matheus_model_4/invalid_edge_preprocessing_2.hpp"
 #include "models/gvrp_models/cplex/matheus_model_4/invalid_edge_preprocessing_3.hpp"
@@ -93,6 +94,8 @@ Matheus_model_4::Matheus_model_4(const Gvrp_instance& instance, unsigned int tim
   preprocessings.push_back(new Invalid_edge_preprocessing_2(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_3(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_4(*this));
+  //heuristic callback
+  heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
 } 
 
 Matheus_model_4::~Matheus_model_4() {
@@ -639,9 +642,6 @@ void Matheus_model_4::createModel() {
 
 
 
-    //extra constraints
-    for (Extra_constraint* extra_constraint : extra_constraints) 
-      extra_constraint->add();
     //init
     cplex = IloCplex(model);
     //lazy constraints
@@ -651,7 +651,7 @@ void Matheus_model_4::createModel() {
     for (User_constraint* user_constraint : user_constraints)
       cplex.use(user_constraint);
     //heuristic callback
-    for (Heuristic_callback* heuristic_callback : heuristic_callbacks)
+    for (Heuristic_callback* heuristic_callback : heuristic_callbacks) 
       cplex.use(heuristic_callback);
     //extra steps
     extraStepsAfterModelCreation();

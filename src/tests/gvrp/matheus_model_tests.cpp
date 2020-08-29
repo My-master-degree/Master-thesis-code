@@ -8,7 +8,6 @@
 #include "models/gvrp_models/cplex/matheus_model/invalid_edge_preprocessing_2.hpp"
 #include "models/gvrp_models/cplex/matheus_model/invalid_edge_preprocessing_3.hpp"
 #include "models/gvrp_models/cplex/matheus_model/invalid_edge_preprocessing_4.hpp"
-#include "models/gvrp_models/cplex/matheus_model/subcycle_user_constraint.hpp"
 #include "utils/util.hpp"
 #include "SampleConfig.h"
 
@@ -38,7 +37,6 @@ void Matheus_model_tests::run() {
 //    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
     Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/non-consec/") + instance);
     gvrp_instances.push_back(gvrp_instance);
-    cout<<instance<<";"<<gvrp_instance.customers.size()<<";"<<gvrp_instance.afss.size()<<";"<<gvrp_instance.vehicleFuelCapacity<<";"<<gvrp_instance.timeLimit<<";"<<gvrp_instance.customers.front().serviceTime<<";"<<gvrp_instance.afss.front().serviceTime<<endl;
   }
     //executions
   auto gvrp_instance = gvrp_instances.begin();
@@ -53,11 +51,13 @@ void Matheus_model_tests::run() {
 //    Gvrp_solution gvrp_solution = gfsh.run();
 //    Mip_start matheus_model (*gvrp_instance, execution_time, gvrp_solution);  
     Matheus_model matheus_model (*gvrp_instance, execution_time);  
-    matheus_model.RELAXED = true;
+//    matheus_model.RELAXED = true;
     execute_model(matheus_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
-    resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model.nGreedyLP<<";"<<matheus_model.nBPPNRoutesLB<<";"<<matheus_model.nImprovedMSTNRoutesLB<<";"<<matheus_model.nPreprocessings1<<";"<<matheus_model.nPreprocessings2<<";"<<matheus_model.nPreprocessings3<<";"<<matheus_model.nPreprocessings4<<endl;
+    resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model.nGreedyLP<<";"<<matheus_model.nPreprocessings1<<";"<<matheus_model.nPreprocessings2<<";"<<matheus_model.nPreprocessings3<<";"<<matheus_model.nPreprocessings4<<endl;
     ++gvrp_instance;
     ++i;
+    if (i > 3)
+      break;
   }
   closeResultFile(resultsFile);
 }
@@ -80,7 +80,7 @@ void Matheus_model_tests::execute_model(Matheus_model& matheus_model, const stri
 
 void Matheus_model_tests::openResultFile (ofstream& resultsFile, string fileName) {
   resultsFile.open (fileName + string("md_results.csv"));
-  resultsFile<<"Instance;Solution;GAP;Cost;Time;Status;GreedyLP;BPP;ImprovedMST;preprocessing1;preprocessing2;preprocessing3;preprocessing4"<<endl;
+  resultsFile<<"Instance;Solution;GAP;Cost;Time;Status;GreedyLP;preprocessing1;preprocessing2;preprocessing3;preprocessing4"<<endl;
 }
 
 void Matheus_model_tests::closeResultFile (ofstream& resultsFile) {

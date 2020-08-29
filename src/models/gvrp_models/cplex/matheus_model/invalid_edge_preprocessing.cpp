@@ -43,11 +43,5 @@ void Invalid_edge_preprocessing::add () {
         matheus_model.model.add(matheus_model.y[c1->second][f2->second][i] == 0);
         ++matheus_model.nPreprocessings1;
       }
-    //first is an afs and second is afs 
-    if (f1 != matheus_model.afssF0Indexes.end() && f2 != matheus_model.afssF0Indexes.end()) 
-      for (int i_ = 0; i_ < matheus_model.c0.size(); ++i_)
-        for (int j_ = 0; j_ < matheus_model.c0.size(); ++j_)
-          for (int k = 0; k < matheus_model.c0.size(); ++k)
-            matheus_model.model.add(matheus_model.y[i_][f1->second][j_] + matheus_model.y[j_][f2->second][k] <= 1);
   }
 }

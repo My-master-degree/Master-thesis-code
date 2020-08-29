@@ -45,12 +45,11 @@ void Matheus_model_3_tests::run() {
   solution_name = "matheus_model_3_";
   openResultFile(resultsFile, solution_name);
   for (const string& instance : instances) {
-    if (i <= 1) {
+    if (i == 0) {
       ++gvrp_instance;
       ++i;
       continue;
     }
-
     cout<<instance<<endl;
     Gvrp_feasible_solution_heuristic gfsh (*gvrp_instance);
     Gvrp_solution gvrp_solution = gfsh.run();
