@@ -69,6 +69,7 @@ namespace models {
             int nPreprocessings2;
             int nPreprocessings3;
             int nPreprocessings4;
+            int nPreprocessings5;
             double solLB;
             bool RELAXED;
             double time(int i, int f, int r, int j);

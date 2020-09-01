@@ -132,7 +132,7 @@ void Greedy_lp_heuristic::main() {
       curr = nextCustomer;
       //dfs
       while (curr != 0) {
-        maxFirst = 0;
+        maxFirst = -1;
         nextCustomer = 0;
         nextAFS = 0;
         found = false;
@@ -144,7 +144,7 @@ void Greedy_lp_heuristic::main() {
               found = true;
             } else
               for (int f = 0; f < matheus_model.f0.size(); ++f)
-                if (matheus_model.y_vals[curr][f][i] > 0) {
+                if (matheus_model.y_vals[curr][f][i] > maxFirst) {
                   maxFirst = matheus_model.y_vals[curr][f][i];
                   nextAFS = f;
                   nextCustomer = i;

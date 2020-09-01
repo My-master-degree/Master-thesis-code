@@ -33,10 +33,8 @@ void Greedy_lp_heuristic::main() {
     //node callback
     Depth const* const d = (Depth *) getNodeData();
     IloInt depth = d ? d->depth : 0;
-    /*
     if (depth > 10 && depth%10 == 0) 
       return;
-      */
     //setup
     const int sc0 = matheus_model_4.c0.size(),
           s_f = matheus_model_4._f.size();
@@ -292,7 +290,7 @@ void Greedy_lp_heuristic::main() {
         }
         //y 
         for (int f = 0; f < s_f; ++f) 
-          for (int r = 0; f < s_f; ++r) 
+          for (int r = 0; r < s_f; ++r) 
             for (int j = 0; j < sc0; ++j) {
               vars.add(matheus_model_4.y[i][f][r][j]);
               vals.add(matheus_model_4.y_vals[i][f][r][j]);

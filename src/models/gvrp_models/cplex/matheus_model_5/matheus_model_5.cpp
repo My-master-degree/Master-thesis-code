@@ -15,6 +15,7 @@
 #include "models/gvrp_models/cplex/matheus_model_5/invalid_edge_preprocessing_2.hpp"
 #include "models/gvrp_models/cplex/matheus_model_5/invalid_edge_preprocessing_3.hpp"
 #include "models/gvrp_models/cplex/matheus_model_5/invalid_edge_preprocessing_4.hpp"
+#include "models/gvrp_models/cplex/matheus_model_5/invalid_edge_preprocessing_5.hpp"
 #include "models/gvrp_models/gvrp_feasible_solution_heuristic.hpp"
 
 #include <sstream>
@@ -34,7 +35,7 @@ using namespace models::gvrp_models::cplex::matheus_model_5;
 
 using namespace std;
 
-Matheus_model_5::Matheus_model_5(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), nGreedyLP(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), RELAXED(false) {
+Matheus_model_5::Matheus_model_5(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), nGreedyLP(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nPreprocessings5(0), RELAXED(false) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //c_0
@@ -85,8 +86,9 @@ Matheus_model_5::Matheus_model_5(const Gvrp_instance& instance, unsigned int tim
   preprocessings.push_back(new Invalid_edge_preprocessing_2(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_3(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_4(*this));
+  preprocessings.push_back(new Invalid_edge_preprocessing_5(*this));
   //heuristics callbacks
-  heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
+//  heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
 } 
 
 Matheus_model_5::~Matheus_model_5() {

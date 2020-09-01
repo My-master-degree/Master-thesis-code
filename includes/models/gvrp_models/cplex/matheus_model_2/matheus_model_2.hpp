@@ -68,6 +68,7 @@ namespace models {
             int nPreprocessings2;
             int nPreprocessings3;
             int nPreprocessings4;
+            int nPreprocessings5;
             int nImprovedMSTNRoutesLB;
             int nBPPNRoutesLB;
             double solLB;

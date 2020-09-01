@@ -41,6 +41,11 @@ void Matheus_model_5_tests::run() {
   openResultFile(resultsFile, solution_name);
   int i = 0;
   for (const string& instance : instances) {
+    if (i < 2) {
+      ++gvrp_instance;
+      ++i;
+      continue;
+    }
     cout<<instance<<endl;
 //    Gvrp_feasible_solution_heuristic gfsh (*gvrp_instance);
 //    Gvrp_solution gvrp_solution = gfsh.run();
@@ -48,11 +53,9 @@ void Matheus_model_5_tests::run() {
     Matheus_model_5 matheus_model_5 (*gvrp_instance, execution_time);  
 //    matheus_model_5.RELAXED = true;
     execute_model(matheus_model_5, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
-    resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model_5.nPreprocessings1<<";"<<matheus_model_5.nPreprocessings2<<";"<<matheus_model_5.nPreprocessings3<<";"<<matheus_model_5.nPreprocessings4<<endl;
+    resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model_5.nPreprocessings1<<";"<<matheus_model_5.nPreprocessings2<<";"<<matheus_model_5.nPreprocessings3<<";"<<matheus_model_5.nPreprocessings4<<";"<<matheus_model_5.nPreprocessings5<<endl;
     ++gvrp_instance;
     ++i;
-    if (i > 3)
-      break;
   }
   closeResultFile(resultsFile);
 }
@@ -75,7 +78,7 @@ void Matheus_model_5_tests::execute_model(Matheus_model_5& matheus_model_5, cons
 
 void Matheus_model_5_tests::openResultFile (ofstream& resultsFile, string fileName) {
   resultsFile.open (fileName + string("md_results.csv"));
-  resultsFile<<"Instance;Solution;GAP;Cost;Time;Status;preprocessing1;preprocessing2;preprocessing3;preprocessing4"<<endl;
+  resultsFile<<"Instance;Solution;GAP;Cost;Time;Status;preprocessing1;preprocessing2;preprocessing3;preprocessing4;preprocessing5"<<endl;
 }
 
 void Matheus_model_5_tests::closeResultFile (ofstream& resultsFile) {

@@ -136,7 +136,7 @@ void Greedy_lp_heuristic::main() {
       curr = nextCustomer;
       //dfs
       while (curr != 0) {
-        maxFirst = 0;
+        maxFirst = -1;
         nextCustomer = 0;
         nextAFSs = {0, 0};
         found = false;
@@ -149,7 +149,7 @@ void Greedy_lp_heuristic::main() {
             } else
               for (int f = 0; f < matheus_model_5._f.size(); ++f)
                 for (int r = 0; r < matheus_model_5._f.size(); ++r)
-                  if (matheus_model_5.y_vals[curr][f][r][i] > 0) {
+                  if (matheus_model_5.y_vals[curr][f][r][i] > maxFirst) {
                     maxFirst = matheus_model_5.y_vals[curr][f][r][i];
                     nextAFSs = {f, r};
                     nextCustomer = i;
@@ -194,8 +194,8 @@ void Greedy_lp_heuristic::main() {
     if (valid) {
       Gvrp_solution gvrp_solution (routes, matheus_model_5.instance);
 
-      FsRemove fsRemove (matheus_model_5.instance, gvrp_solution);
-      gvrp_solution = fsRemove.run();
+//      FsRemove fsRemove (matheus_model_5.instance, gvrp_solution);
+//      gvrp_solution = fsRemove.run();
       routes = gvrp_solution.routes;
 
       cost = gvrp_solution.calculateCost();
@@ -204,6 +204,8 @@ void Greedy_lp_heuristic::main() {
     if (valid && cost - getIncumbentObjValue() < -1e-6) {
       ++matheus_model_5.nGreedyLP;
       cout.precision(17);
+      Gvrp_solution gvrp_solution (routes, matheus_model_5.instance);
+      cout<<gvrp_solution<<endl;
       cout<<getIncumbentObjValue()<<" to "<<cost<<endl;
       //set new solution
       //reset all the values
@@ -305,7 +307,7 @@ void Greedy_lp_heuristic::main() {
         }
         //y 
         for (int f = 0; f < s_f; ++f) 
-          for (int r = 0; f < s_f; ++r) 
+          for (int r = 0; r < s_f; ++r) 
             for (int j = 0; j < sc0; ++j) {
               vars.add(matheus_model_5.y[i][f][r][j]);
               vals.add(matheus_model_5.y_vals[i][f][r][j]);

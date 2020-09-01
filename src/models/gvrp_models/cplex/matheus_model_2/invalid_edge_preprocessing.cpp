@@ -37,10 +37,5 @@ void Invalid_edge_preprocessing::add () {
     if (c1 != matheus_model_2.customersC0Indexes.end() && f2 != matheus_model_2.afssF0Indexes.end()) 
       for (int i = 0; i < matheus_model_2.c0.size(); ++i)
         matheus_model_2.model.add(matheus_model_2.y[c1->second][f2->second][i] == 0);
-    if (f1 != matheus_model_2.afssF0Indexes.end() && f2 != matheus_model_2.afssF0Indexes.end()) 
-      for (int i_ = 0; i_ < matheus_model_2.c0.size(); ++i_)
-        for (int j_ = 0; j_ < matheus_model_2.c0.size(); ++j_)
-          for (int k = 0; k < matheus_model_2.c0.size(); ++k)
-            matheus_model_2.model.add(matheus_model_2.y[i_][f1->second][j_] + matheus_model_2.y[j_][f2->second][k] <= 1);
   }
 }
