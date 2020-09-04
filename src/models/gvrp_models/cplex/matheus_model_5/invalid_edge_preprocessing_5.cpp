@@ -53,6 +53,7 @@ void Invalid_edge_preprocessing_5::add () {
                     matheus_model_5.gvrp_afs_tree->pairCosts[f2][r2] <= matheus_model_5.gvrp_afs_tree->pairCosts[f1][r1]) { 
                   ++matheus_model_5.nPreprocessings5;
                   matheus_model_5.model.add(matheus_model_5.y[i][f][r][j] == 0);
+                  ++matheus_model_5.nPreprocessings5;
                   f_ = matheus_model_5.gvrp_afs_tree->f0.size();
                   break;
                 }

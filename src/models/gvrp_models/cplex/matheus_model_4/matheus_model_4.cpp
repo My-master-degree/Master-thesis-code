@@ -330,6 +330,18 @@ void Matheus_model_4::createModel() {
       for (int f = 0; f < _f.size(); ++f)
         for (int r = 0; r < _f.size(); ++r)
         model.add(y[i][f][r][i] == 0);
+    //y_{ifrj} = 0, \forall v_i, v_j \in C, \forall v_f, v_r \in F^{''} : v_0 \in P_{fr}^{G[F_0]}
+    for (int f = 0; f < _f.size(); ++f)
+      for (int r = 0; r < _f.size(); ++r) {
+        list<Vertex> path = getAFSsShortestPath(*_f[f], *_f[r]);
+        for (const Vertex& afs : path)
+          if (afs.id == instance.depot.id) {
+            for (int i = 0; i < c0.size(); ++i) 
+              for (int i = 0; i < c0.size(); ++i) 
+                model.add(y[i][f][r][i] == 0);
+            break;
+          }
+      }
     //\sum_{v_j \in C_0} (x_{ij} + \sum_{v_f, v_r \in F^{''}} y_{ifrj}) = 1, \forall v_i \in C
     for (int i = 1; i < c0.size(); ++i) {
       for (int j = 0; j < c0.size(); ++j) {

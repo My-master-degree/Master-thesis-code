@@ -261,6 +261,10 @@ void Matheus_model::createModel() {
       model.add(y[0][0][i] == 0);
       model.add(y[i][0][0] == 0);
     }
+    //y_{j0i} = 0, \forall v_i, v_j \in C
+    for (int i = 1; i < c0.size(); ++i) 
+      for (int j = 1; j < c0.size(); ++j) 
+        model.add(y[i][0][j] == 0);
     //\sum_{v_j \in C_0} (x_{ij} + \sum_{v_f \in F_0} y_{ifj}) = 1, \forall v_i \in C
     for (int i = 1; i < c0.size(); ++i) {
       for (int j = 0; j < c0.size(); ++j) {
