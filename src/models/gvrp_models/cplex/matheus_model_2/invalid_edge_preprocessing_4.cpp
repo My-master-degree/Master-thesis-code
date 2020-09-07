@@ -29,7 +29,8 @@ void Invalid_edge_preprocessing_4::add () {
           for (int r = 0; r < matheus_model_2.f0.size(); ++r) {
             const Vertex * vertexR = matheus_model_2.f0[r];
             if (matheus_model_2.afsToCustomerFuel(f, i) + matheus_model_2.customerToAfsFuel(i, f_) <= matheus_model_2.instance.vehicleFuelCapacity 
-                && matheus_model_2.afsToCustomerFuel(f_, j) + matheus_model_2.customerToAfsFuel(j, r) <= matheus_model_2.instance.vehicleFuelCapacity                      && matheus_model_2.gvrp_afs_tree->times[f] + matheus_model_2.instance.time(vertexF->id, vertexI->id) + matheus_model_2.time(i, f_, j) + vertexJ->serviceTime + matheus_model_2.instance.time(vertexJ->id, vertexR->id) + matheus_model_2.gvrp_afs_tree->times[r] <= matheus_model_2.instance.timeLimit) { 
+                && matheus_model_2.afsToCustomerFuel(f_, j) + matheus_model_2.customerToAfsFuel(j, r) <= matheus_model_2.instance.vehicleFuelCapacity                      
+                && matheus_model_2.gvrp_afs_tree->times[f] + matheus_model_2.instance.time(vertexF->id, vertexI->id) + matheus_model_2.time(i, f_, j) + vertexJ->serviceTime + matheus_model_2.instance.time(vertexJ->id, vertexR->id) + matheus_model_2.gvrp_afs_tree->times[r] <= matheus_model_2.instance.timeLimit) { 
               valid = true;
               f = matheus_model_2.f0.size();
               break;
@@ -39,6 +40,22 @@ void Invalid_edge_preprocessing_4::add () {
         if (!valid) {
           matheus_model_2.model.add(matheus_model_2.y[i][f_][j] == 0);
           ++matheus_model_2.nPreprocessings4;
+        } else {
+          const Vertex * vertexF_ = matheus_model_2.f0[f_];
+          for (int f = 0; f < matheus_model_2.f0.size(); ++f) {
+            const Vertex * vertexF = matheus_model_2.f0[f];
+            if (f_ != f &&
+                matheus_model_2.customerToAfsFuel(i, f) <= matheus_model_2.customerToAfsFuel(i, f_) && 
+                matheus_model_2.afsToCustomerFuel(f, j) <= matheus_model_2.afsToCustomerFuel(f_, j) &&
+                matheus_model_2.instance.time(vertexI->id, vertexF->id) <= matheus_model_2.instance.time(vertexI->id, vertexF_->id) && 
+                matheus_model_2.instance.time(vertexF->id, vertexJ->id) <= matheus_model_2.instance.time(vertexF_->id, vertexJ->id) && 
+                matheus_model_2.instance.distances[vertexI->id][vertexF->id] <= matheus_model_2.instance.distances[vertexI->id][vertexF_->id] && 
+                matheus_model_2.instance.distances[vertexF->id][vertexJ->id] <= matheus_model_2.instance.distances[vertexF_->id][vertexJ->id]) {
+              ++matheus_model_2.nPreprocessings4;
+              matheus_model_2.model.add(matheus_model_2.y[i][f_][j] == 0);
+              break;
+            }
+          }
         }
       }
     }

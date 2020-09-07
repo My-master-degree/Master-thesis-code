@@ -123,11 +123,6 @@ void Subcycle_user_constraint::main() {
   //inequallitites
   for (const unordered_set<int>& S : components) 
     if (!S.count(0)) {
-      /*
-      for (int j : S) 
-        cout<<j<<", ";
-      cout<<endl;
-      */
       //\sum_{v_i \in V'\S} \sum_{v_j \in S} x_{ij} + \sum_{v_f \in F_0} y_{ifj} \geqslant 1 
       //lhs
       for (int i = 0; i < sc0; ++i) 

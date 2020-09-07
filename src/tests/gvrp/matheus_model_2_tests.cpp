@@ -54,7 +54,7 @@ void Matheus_model_2_tests::run() {
     //  Mip_start matheus_model_2 (*gvrp_instance, execution_time, gvrp_solution);  
     matheus_model_2.levelSubcycleCallback = 0;
     execute_model(matheus_model_2, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
-    resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model_2.nGreedyLP<<";"<<matheus_model_2.nBPPNRoutesLB<<";"<<matheus_model_2.nImprovedMSTNRoutesLB<<";"<<matheus_model_2.nPreprocessings1<<";"<<matheus_model_2.nPreprocessings2<<";"<<matheus_model_2.nPreprocessings3<<";"<<matheus_model_2.nPreprocessings4<<";"<<matheus_model_2.nPreprocessings5<<endl;
+    resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model_2.nGreedyLP<<";"<<matheus_model_2.nBPPNRoutesLB<<";"<<matheus_model_2.nImprovedMSTNRoutesLB<<";"<<matheus_model_2.nPreprocessings1<<";"<<matheus_model_2.nPreprocessings2<<";"<<matheus_model_2.nPreprocessings3<<";"<<matheus_model_2.nPreprocessings4<<endl;
     ++gvrp_instance;
     ++i;
   }
@@ -79,7 +79,7 @@ void Matheus_model_2_tests::execute_model(Matheus_model_2& matheus_model_2, cons
 
 void Matheus_model_2_tests::openResultFile (ofstream& resultsFile, string fileName) {
   resultsFile.open (fileName + string("md_2_results.csv"));
-  resultsFile<<"Instance;Solution;GAP;Cost;Time;Status;GreedyLP;BPP;ImprovedMST;preprocessing1;preprocessing2;preprocessing3;preprocessing4;preprocessin5"<<endl;
+  resultsFile<<"Instance;Solution;GAP;Cost;Time;Status;GreedyLP;BPP;ImprovedMST;preprocessing1;preprocessing2;preprocessing3;preprocessing4"<<endl;
 }
 
 void Matheus_model_2_tests::closeResultFile (ofstream& resultsFile) {

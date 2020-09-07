@@ -52,55 +52,68 @@ pair<vector<vector<double>>, vector<vector<double>>> utils::calculateGVRPReduced
   //for each pair
   for (int i = 0; i < sc0; ++i) {
     const Vertex * customerI =  c0[i];
+    int customerIid = customerI->id;
     for (int j = i + 1; j < sc0; ++j) {
       const Vertex * customerJ =  c0[j];
-      if (customerI->id != customerJ->id && gvrp_instance.time(depotId, customerI->id) + customerI->serviceTime + gvrp_instance.time(customerI->id, customerJ->id) + customerJ->serviceTime + gvrp_instance.time(customerI->id, depotId) <= gvrp_instance.timeLimit) 
+      int customerJid = customerJ->id;
+      if (customerIid != customerJid && 
+          gvrp_instance.time(depotId, customerIid) + customerI->serviceTime + gvrp_instance.time(customerIid, customerJid) + customerJ->serviceTime + gvrp_instance.time(customerIid, depotId) <= gvrp_instance.timeLimit) {
         //origin afs
         for (int f = 0; f < gvrp_afs_tree.f0.size(); f++) {
           int fId = gvrp_afs_tree.f0[f]->id;
-          double spentTime = gvrp_afs_tree.times[f] + gvrp_instance.time(fId, customerI->id) + customerI->serviceTime;
-          double spentFuel = gvrp_instance.fuel(fId, customerI->id);
-          if (spentFuel <= gvrp_instance.vehicleFuelCapacity && spentTime + gvrp_instance.time(customerI->id, customerJ->id) + customerJ->serviceTime + gvrp_instance.time(customerJ->id, depotId) <= gvrp_instance.timeLimit) 
-              //destiny afs
-              for (int r = f; r < gvrp_afs_tree.f0.size(); r++) {
-                int rId = gvrp_afs_tree.f0[r]->id;
-                if (spentTime + gvrp_instance.time(customerI->id, customerJ->id) + customerJ->serviceTime + gvrp_instance.time(customerJ->id, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) {
-                  //direct travel
-                  if (spentFuel + gvrp_instance.fuel(customerI->id, customerJ->id) + gvrp_instance.fuel(customerJ->id, rId) <= gvrp_instance.vehicleFuelCapacity) {
-                    double time = gvrp_instance.time(customerI->id, customerJ->id);
-                    double cost = gvrp_instance.distances[customerI->id][customerJ->id];
-                    if (closestTime[customerI->id][customerJ->id] < 0.0 || time < closestTime[customerI->id][customerJ->id]) 
-                      closestTime[customerI->id][customerJ->id] = closestTime[customerJ->id][customerI->id] = time;
-                    if (closestDistance[customerI->id][customerJ->id] < 0.0 || cost < closestDistance[customerI->id][customerJ->id]) 
-                      closestDistance[customerI->id][customerJ->id] = closestDistance[customerJ->id][customerI->id] = cost;
-                  } else 
-                    //intermediate travel
-                    for (int f_ = 0; f_ < gvrp_afs_tree.f0.size(); f_++) {
-                      int f_Id = gvrp_afs_tree.f0[f_]->id;
-                      //fuel and time feasible
-                      if (spentFuel + gvrp_instance.fuel(customerI->id, f_Id) <= gvrp_instance.vehicleFuelCapacity && spentTime + gvrp_instance.time(customerI->id, f_Id) + gvrp_afs_tree.f0[f_]->serviceTime + gvrp_instance.time(f_Id, gvrp_instance.depot.id) <= gvrp_instance.timeLimit) 
-                        //intermediate afs destiny
-                        for (int r_ = f_; r_ < gvrp_afs_tree.f0.size(); r_++) {
-                          int r_Id = gvrp_afs_tree.f0[r_]->id;
-                          //time feasible
-                          if (gvrp_instance.fuel(r_Id, customerJ->id) + gvrp_instance.fuel(customerJ->id, rId) <= gvrp_instance.vehicleFuelCapacity && spentTime + gvrp_instance.time(customerI->id, f_Id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, customerJ->id) + customerJ->serviceTime + gvrp_instance.time(customerJ->id, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) {
-                            double time = gvrp_instance.time(customerI->id, customerJ->id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, customerJ->id);
-                            double cost = gvrp_instance.distances[customerI->id][f_Id] + gvrp_afs_tree.pairCosts[f_][r_] + gvrp_instance.distances[r_Id][customerJ->id];
-                            if (closestTime[customerI->id][customerJ->id] < 0.0 || time < closestTime[customerI->id][customerJ->id]) 
-                              closestTime[customerI->id][customerJ->id] = closestTime[customerJ->id][customerI->id] = time;
-                            if (closestDistance[customerI->id][customerJ->id] < 0.0 || cost < closestDistance[customerI->id][customerJ->id]) 
-                              closestDistance[customerI->id][customerJ->id] = closestDistance[customerJ->id][customerI->id] = cost;
-                          }
+          double spentTime = gvrp_afs_tree.times[f] + gvrp_instance.time(fId, customerIid) + customerI->serviceTime;
+          double spentFuel = gvrp_instance.fuel(fId, customerIid);
+          if (spentFuel <= gvrp_instance.vehicleFuelCapacity && 
+              spentTime + gvrp_instance.time(customerIid, customerJid) + customerJ->serviceTime + gvrp_instance.time(customerJid, depotId) <= gvrp_instance.timeLimit) {
+            //destiny afs
+            for (int r = 0; r < gvrp_afs_tree.f0.size(); r++) {
+              int rId = gvrp_afs_tree.f0[r]->id;
+              if (spentTime + gvrp_instance.time(customerIid, customerJid) + customerJ->serviceTime + gvrp_instance.time(customerJid, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) {
+                //direct travel
+                if (spentFuel + gvrp_instance.fuel(customerIid, customerJid) + gvrp_instance.fuel(customerJid, rId) <= gvrp_instance.vehicleFuelCapacity) {
+                  double time = gvrp_instance.time(customerIid, customerJid);
+                  double cost = gvrp_instance.distances[customerIid][customerJid];
+                  if (closestTime[customerIid][customerJid] < 0.0 || time < closestTime[customerIid][customerJid]) 
+                    closestTime[customerIid][customerJid] = closestTime[customerJid][customerIid] = time;
+                  if (closestDistance[customerIid][customerJid] < 0.0 || cost < closestDistance[customerIid][customerJid]) 
+                    closestDistance[customerIid][customerJid] = closestDistance[customerJid][customerIid] = cost;
+                } else {
+                  //intermediate travel
+                  for (int f_ = 0; f_ < gvrp_afs_tree.f0.size(); f_++) {
+                    int f_Id = gvrp_afs_tree.f0[f_]->id;
+                    //fuel and time feasible
+                    if (spentFuel + gvrp_instance.fuel(customerIid, f_Id) <= gvrp_instance.vehicleFuelCapacity && 
+                        spentTime + gvrp_instance.time(customerIid, f_Id) + gvrp_afs_tree.f0[f_]->serviceTime + gvrp_instance.time(f_Id, customerJid) + customerJ->serviceTime + gvrp_instance.time(customerJid, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) {
+                      //intermediate afs destiny
+                      for (int r_ = 0; r_ < gvrp_afs_tree.f0.size(); r_++) {
+                        int r_Id = gvrp_afs_tree.f0[r_]->id;
+                        //time feasible
+                        if (gvrp_instance.fuel(r_Id, customerJid) + gvrp_instance.fuel(customerJid, rId) <= gvrp_instance.vehicleFuelCapacity && 
+                            spentTime + gvrp_instance.time(customerIid, f_Id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, customerJid) + customerJ->serviceTime + gvrp_instance.time(customerJid, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) {
+                          double time = gvrp_instance.time(customerIid, f_Id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, customerJid);
+                          double cost = gvrp_instance.distances[customerIid][f_Id] + gvrp_afs_tree.pairCosts[f_][r_] + gvrp_instance.distances[r_Id][customerJid];
+                          if (closestTime[customerIid][customerJid] < 0.0 || 
+                              time < closestTime[customerIid][customerJid]) 
+                            closestTime[customerIid][customerJid] = closestTime[customerJid][customerIid] = time;
+                          if (closestDistance[customerIid][customerJid] < 0.0 || 
+                              cost < closestDistance[customerIid][customerJid]) 
+                            closestDistance[customerIid][customerJid] = closestDistance[customerJid][customerIid] = cost;
                         }
-                    }
-                } 
-              }
+                      }
+                    } 
+                  }
+                }
+              } 
+            }
+          }
         }
+      }
     }
   } 
   //set unfinded distances
   for (int i = 0; i < stotal; ++i) 
     closestDistance[i][i] = closestTime[i][i] = 0.0;
+  /*
   for (int i = 1; i < sc0; ++i)
     for (int j = 1; j < sc0; ++j) {
       int iId = c0[i]->id,
@@ -110,6 +123,7 @@ pair<vector<vector<double>>, vector<vector<double>>> utils::calculateGVRPReduced
         closestTime[iId][jId] = closestTime[iId][depotId] + closestTime[depotId][jId];
       }
     }
+    */
   return {closestDistance, closestTime};
 }
 

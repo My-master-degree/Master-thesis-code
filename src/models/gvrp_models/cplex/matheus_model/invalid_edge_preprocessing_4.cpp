@@ -28,7 +28,8 @@ void Invalid_edge_preprocessing_4::add () {
           for (int r = 0; r < matheus_model.f0.size(); ++r) {
             const Vertex * vertexR = matheus_model.f0[r];
             if (matheus_model.afsToCustomerFuel(f, i) + matheus_model.customerToAfsFuel(i, f_) <= matheus_model.instance.vehicleFuelCapacity 
-                && matheus_model.afsToCustomerFuel(f_, j) + matheus_model.customerToAfsFuel(j, r) <= matheus_model.instance.vehicleFuelCapacity                      && matheus_model.gvrp_afs_tree->times[f] + matheus_model.instance.time(vertexF->id, vertexI->id) + matheus_model.time(i, f_, j) + vertexJ->serviceTime + matheus_model.instance.time(vertexJ->id, vertexR->id) + matheus_model.gvrp_afs_tree->times[r] <= matheus_model.instance.timeLimit) { 
+                && matheus_model.afsToCustomerFuel(f_, j) + matheus_model.customerToAfsFuel(j, r) <= matheus_model.instance.vehicleFuelCapacity                      
+                && matheus_model.gvrp_afs_tree->times[f] + matheus_model.instance.time(vertexF->id, vertexI->id) + matheus_model.time(i, f_, j) + vertexJ->serviceTime + matheus_model.instance.time(vertexJ->id, vertexR->id) + matheus_model.gvrp_afs_tree->times[r] <= matheus_model.instance.timeLimit) { 
               valid = true;
               f = matheus_model.f0.size();
               break;
@@ -38,6 +39,22 @@ void Invalid_edge_preprocessing_4::add () {
         if (!valid) {
           matheus_model.model.add(matheus_model.y[i][f_][j] == 0);
           ++matheus_model.nPreprocessings4;
+        } else {
+          const Vertex * vertexF_ = matheus_model.f0[f_];
+          for (int f = 0; f < matheus_model.f0.size(); ++f) {
+            const Vertex * vertexF = matheus_model.f0[f];
+            if (f_ != f &&
+                matheus_model.customerToAfsFuel(i, f) <= matheus_model.customerToAfsFuel(i, f_) && 
+                matheus_model.afsToCustomerFuel(f, j) <= matheus_model.afsToCustomerFuel(f_, j) &&
+                matheus_model.instance.time(vertexI->id, vertexF->id) <= matheus_model.instance.time(vertexI->id, vertexF_->id) && 
+                matheus_model.instance.time(vertexF->id, vertexJ->id) <= matheus_model.instance.time(vertexF_->id, vertexJ->id) && 
+                matheus_model.instance.distances[vertexI->id][vertexF->id] <= matheus_model.instance.distances[vertexI->id][vertexF_->id] && 
+                matheus_model.instance.distances[vertexF->id][vertexJ->id] <= matheus_model.instance.distances[vertexF_->id][vertexJ->id]) {
+              ++matheus_model.nPreprocessings4;
+              matheus_model.model.add(matheus_model.y[i][f_][j] == 0);
+              break;
+            }
+          }
         }
       }
     }

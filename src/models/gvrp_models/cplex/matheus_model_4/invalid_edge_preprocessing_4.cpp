@@ -50,7 +50,44 @@ void Invalid_edge_preprocessing_4::add () {
           if (!valid) {
             matheus_model_4.model.add(matheus_model_4.y[i][f_][r_][j] == 0);
             ++matheus_model_4.nPreprocessings4;
-          } 
+          } else {
+            const Vertex * vertexF_ = matheus_model_4._f[f_],
+                        * vertexR_ = matheus_model_4._f[r_];
+            for (int f = 0; f < matheus_model_4._f.size(); ++f) {
+              const Vertex * vertexF = matheus_model_4._f[f];
+              for (int r = 0; r < matheus_model_4._f.size(); ++r) {
+                const Vertex * vertexR = matheus_model_4._f[r];
+                if ((f_ != f || r_ != r) && 
+                    matheus_model_4.customerToAfsFuel(i, f) <= matheus_model_4.customerToAfsFuel(i, f_) &&
+                    matheus_model_4.afsToCustomerFuel(r, j) <= matheus_model_4.afsToCustomerFuel(r_, j) &&
+                    matheus_model_4.instance.time(vertexI->id, vertexF->id) <= matheus_model_4.instance.time(vertexI->id, vertexF_->id) &&
+                    matheus_model_4.instance.time(vertexR->id, vertexJ->id) <= matheus_model_4.instance.time(vertexR_->id, vertexJ->id) &&
+                    matheus_model_4.instance.distances[vertexI->id][vertexF->id] <= matheus_model_4.instance.distances[vertexI->id][vertexF_->id] &&
+                    matheus_model_4.instance.distances[vertexR->id][vertexJ->id] <= matheus_model_4.instance.distances[vertexR_->id][vertexJ->id]) {
+                  //get f, and r indexes
+                  int f1, r1, f2, r2;
+                  for (int k = 0; k < matheus_model_4.gvrp_afs_tree->f0.size(); ++k) {
+                    if (matheus_model_4.gvrp_afs_tree->f0[k]->id == vertexF_->id)
+                      f1 = k;
+                    if (matheus_model_4.gvrp_afs_tree->f0[k]->id == vertexR_->id)
+                      r1 = k;
+                    if (matheus_model_4.gvrp_afs_tree->f0[k]->id == vertexF->id)
+                      f2 = k;
+                    if (matheus_model_4.gvrp_afs_tree->f0[k]->id == vertexR->id)
+                      r2 = k;
+                  }
+                  //check time
+                  if (matheus_model_4.gvrp_afs_tree->pairTimes[f2][r2] <= matheus_model_4.gvrp_afs_tree->pairTimes[f1][r1] &&
+                      matheus_model_4.gvrp_afs_tree->pairCosts[f2][r2] <= matheus_model_4.gvrp_afs_tree->pairCosts[f1][r1]) { 
+                    ++matheus_model_4.nPreprocessings4;
+                    matheus_model_4.model.add(matheus_model_4.y[i][f_][r_][j] == 0);
+                    f = matheus_model_4._f.size();
+                    break;
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }

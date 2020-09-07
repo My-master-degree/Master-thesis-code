@@ -20,22 +20,28 @@ Invalid_edge_preprocessing::Invalid_edge_preprocessing (Matheus_model_2& matheus
 void Invalid_edge_preprocessing::add () {
   //invalid edges
   list<pair<int, int>> edges = get_invalid_edges_1(matheus_model_2.instance);
-  matheus_model_2.nPreprocessings1 = edges.size();
+  matheus_model_2.nPreprocessings1 = 0;
   for (auto const& [i, j] : edges) {
     auto c1 = matheus_model_2.customersC0Indexes.find(i),
          c2 = matheus_model_2.customersC0Indexes.find(j);
     auto f1 = matheus_model_2.afssF0Indexes.find(i),
          f2 = matheus_model_2.afssF0Indexes.find(j);
     //both are customers
-    if (c1 != matheus_model_2.customersC0Indexes.end() && c2 != matheus_model_2.customersC0Indexes.end()) 
+    if (c1 != matheus_model_2.customersC0Indexes.end() && c2 != matheus_model_2.customersC0Indexes.end()) {
       matheus_model_2.model.add(matheus_model_2.x[c1->second][c2->second] == 0);
+      ++matheus_model_2.nPreprocessings1;
+    }
     //first is afs and second is customer
     if (f1 != matheus_model_2.afssF0Indexes.end() && c2 != matheus_model_2.customersC0Indexes.end()) 
-      for (int i = 0; i < matheus_model_2.c0.size(); ++i)
+      for (int i = 0; i < matheus_model_2.c0.size(); ++i) {
         matheus_model_2.model.add(matheus_model_2.y[i][f1->second][c2->second] == 0);
+        ++matheus_model_2.nPreprocessings1;
+      }
     //first is customer and second is afs 
     if (c1 != matheus_model_2.customersC0Indexes.end() && f2 != matheus_model_2.afssF0Indexes.end()) 
-      for (int i = 0; i < matheus_model_2.c0.size(); ++i)
+      for (int i = 0; i < matheus_model_2.c0.size(); ++i) {
         matheus_model_2.model.add(matheus_model_2.y[c1->second][f2->second][i] == 0);
+        ++matheus_model_2.nPreprocessings1;
+      }
   }
 }

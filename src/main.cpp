@@ -59,11 +59,11 @@ int main (int argc, char **argv)
   cout<<"============    MATHEUS MODEL    =============="<<endl;
   Matheus_model_tests matheus_model_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_tests.run();
-  /*
     //Matheus model 2
   cout<<"============    MATHEUS 2 MODEL    =============="<<endl;
   Matheus_model_2_tests matheus_model_2_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_2_tests.run();
+  /*
   //cubic model
   cout<<"============    CUBIC MODEL    =============="<<endl;
   Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);

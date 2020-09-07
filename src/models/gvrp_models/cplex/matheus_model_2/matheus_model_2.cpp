@@ -7,7 +7,6 @@
 #include "models/gvrp_models/cplex/matheus_model_2/invalid_edge_preprocessing_2.hpp"
 #include "models/gvrp_models/cplex/matheus_model_2/invalid_edge_preprocessing_3.hpp"
 #include "models/gvrp_models/cplex/matheus_model_2/invalid_edge_preprocessing_4.hpp"
-#include "models/gvrp_models/cplex/matheus_model_2/invalid_edge_preprocessing_5.hpp"
 #include "models/gvrp_models/gvrp_feasible_solution_heuristic.hpp"
 
 #include <sstream>
@@ -26,7 +25,7 @@ using namespace models::gvrp_models::cplex::matheus_model_2;
 
 using namespace std;
 
-Matheus_model_2::Matheus_model_2(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), f0(vector<const Vertex *> (instance.afss.size() + 1)), nGreedyLP(0), BPPTimeLimit(100000000), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nPreprocessings5(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0), RELAXED(false) {
+Matheus_model_2::Matheus_model_2(const Gvrp_instance& instance, unsigned int time_limit) : Gvrp_model(instance, time_limit), c0(vector<const Vertex *> (instance.customers.size() + 1)), f0(vector<const Vertex *> (instance.afss.size() + 1)), nGreedyLP(0), BPPTimeLimit(100000000), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0), RELAXED(false) {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with metric distances");
   //c_0
@@ -64,7 +63,6 @@ Matheus_model_2::Matheus_model_2(const Gvrp_instance& instance, unsigned int tim
   preprocessings.push_back(new Invalid_edge_preprocessing_2(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_3(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_4(*this));
-  preprocessings.push_back(new Invalid_edge_preprocessing_5(*this));
   //heuristic callbacks
 //  heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
   //customer min required fuel
@@ -443,113 +441,6 @@ void Matheus_model_2::createModel() {
     model.add(c);
     expr.end();
     expr = IloExpr(env);
-    //solution fuel lb alpha 1
-    for (int i = 0; i < c0.size(); ++i) {
-      for (int f = 0; f < f0.size(); ++f)
-        expr -= alpha * y[0][f][i];
-      for (int j = 0; j < c0.size(); ++j) {
-        expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
-        for (int f = 0; f < f0.size(); ++f)
-          expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - instance.vehicleFuelCapacity/2.0) * y[i][f][j];
-      }
-    }
-    c = IloConstraint (expr >= 0);
-    c.setName("solution fuel LB alpha 1");
-    model.add(c);
-    expr.end();
-    expr = IloExpr(env);
-    //solution fuel lb alpha 2
-    for (int i = 0; i < c0.size(); ++i) {
-      for (int f = 0; f < f0.size(); ++f)
-        expr -= alpha * y[i][f][0];
-      for (int j = 0; j < c0.size(); ++j) {
-        expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
-        for (int f = 0; f < f0.size(); ++f)
-          expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - instance.vehicleFuelCapacity/2.0) * y[i][f][j];
-      }
-    }
-    c = IloConstraint (expr >= 0);
-    c.setName("solution fuel LB alpha 2");
-    model.add(c);
-    expr.end();
-    expr = IloExpr(env);
-    //solution fuel lb alpha 3
-    for (int i_ = 1; i_ < c0.size(); ++i_) 
-      for (int j_ = 1; j_ < c0.size(); ++j_) {
-        for (int i = 0; i < c0.size(); ++i) {
-          for (int j = 0; j < c0.size(); ++j) {
-            expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
-            for (int f = 0; f < f0.size(); ++f)
-              expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - instance.vehicleFuelCapacity/2.0) * y[i][f][j];
-          }
-        }
-        for (int f = 0; f < f0.size(); ++f)
-          expr -= alpha * y[i_][f][j_];
-        c = IloConstraint (expr >= 0);
-        constraintName<<"solution fuel LB alpha 3 in customer"<<c0[i_]->id<<" and "<<c0[j_]->id;
-        c.setName(constraintName.str().c_str());
-        model.add(c);
-        expr.end();
-        expr = IloExpr(env);
-        constraintName.clear();
-        constraintName.str("");
-      }
-    //solution fuel lb lambda 1
-    for (int i = 0; i < c0.size(); ++i) {
-      expr += psi * x[i][0];
-      for (int f = 0; f < f0.size(); ++f)
-        expr -= 2 * lambda * y[0][f][i] + psi * y[0][f][i];
-      for (int j = 0; j < c0.size(); ++j) {
-        expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
-        for (int f = 0; f < f0.size(); ++f)
-          expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - psi) * y[i][f][j];
-      }
-    }
-    c = IloConstraint (expr >= 0);
-    c.setName("solution fuel LB lambda 1");
-    model.add(c);
-    expr.end();
-    expr = IloExpr(env);
-    //solution fuel lb lambda 2
-    for (int i = 0; i < c0.size(); ++i) {
-      expr += psi * x[0][i];
-      for (int f = 0; f < f0.size(); ++f)
-        expr -= (2 * lambda + psi) * y[i][f][0];
-      for (int j = 0; j < c0.size(); ++j) {
-        expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
-        for (int f = 0; f < f0.size(); ++f)
-          expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - psi) * y[i][f][j];
-      }
-    }
-    c = IloConstraint (expr >= 0);
-    c.setName("solution fuel LB lambda 2");
-    model.add(c);
-    expr.end();
-    expr = IloExpr(env);
-    //solution fuel lb lambda 3
-    for (int i_ = 0; i_ < c0.size(); ++i_) 
-      for (int j_ = 0; j_ < c0.size(); ++j_) {
-        for (int f = 0; f < f0.size(); ++f)
-          expr -= 2 * lambda * y[i_][f][j_];
-        for (int i = 0; i < c0.size(); ++i) {
-          expr += psi * x[0][i];
-          for (int f = 0; f < f0.size(); ++f)
-            expr += psi * y[0][f][i];
-          for (int j = 0; j < c0.size(); ++j) {
-            expr += instance.fuel(c0[i]->id, c0[j]->id) * x[i][j];
-            for (int f = 0; f < f0.size(); ++f)
-              expr += (instance.fuel(c0[i]->id, f0[f]->id) + instance.fuel(f0[f]->id, c0[j]->id) - psi) * y[i][f][j];
-          }
-        }
-        c = IloConstraint (expr >= 0);
-        constraintName<<"solution fuel LB lambda 3 in customers "<<c0[i_]->id<<" and "<<c0[j_]->id;
-        c.setName(constraintName.str().c_str());
-        model.add(c);
-        expr.end();
-        expr = IloExpr(env);
-        constraintName.clear();
-        constraintName.str("");
-      }
 
 
 
@@ -558,13 +449,10 @@ void Matheus_model_2::createModel() {
 
     /*
     vector<vector<int>> routes_ = {
-      {0, 21, 20, 0, 13, 0},
-      {0, 9, 2, 0 },
-      {0, 10, 4, 1, 0 },
-      {0, 11, 15, 23, 0 },
-      {0, 19, 1, 12, 14, 22, 0 },
-      {0, 16, 5, 8, 7, 0 },
-      {0, 18, 17, 6, 2, 0 }
+      {0, 10, 3, 10, 1, 0,},
+      {0, 2, 7, 13, 9, 14, 5, 0,},
+      {0, 2, 8, 2, 6, 0,},
+      {0, 4, 11, 4, 15, 12, 10, 0}
     };
     list<list<Vertex>> routes;
     for (const vector<int>& route_ : routes_) {
@@ -576,7 +464,6 @@ void Matheus_model_2::createModel() {
           route.push_back(Vertex(*f0[afssF0Indexes[node]]));
       routes.push_back(route);
     }
-
     double currFuel, 
            currTime;
     for (const list<Vertex>& route : routes) {
