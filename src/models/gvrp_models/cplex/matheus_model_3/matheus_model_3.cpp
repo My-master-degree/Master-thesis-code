@@ -79,11 +79,6 @@ Matheus_model_3::Matheus_model_3(const Gvrp_instance& instance, unsigned int tim
       dummies[dummy_id] = &afs;
       timesLBs[dummy_id] = timesLBs[afs.id];
     }
-
-
-  
-
-
   //reductions
   const auto& gvrpReducedGraphs = calculateGVRPReducedGraphs (instance, *gvrp_afs_tree);
   gvrpReducedGraphDistances = gvrpReducedGraphs.first;

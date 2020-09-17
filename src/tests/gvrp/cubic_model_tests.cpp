@@ -9,7 +9,6 @@
 #include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing.hpp"
 #include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing_2.hpp"
 #include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing_3.hpp"
-#include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing_4.hpp"
 #include "utils/util.hpp"
 #include "SampleConfig.h"
 
@@ -51,6 +50,13 @@ void Cubic_model_tests::run() {
   openResultFile(resultsFile, solution_name);
   i = 0;
   for (const string& instance : instances) {
+    /*
+    if (i < 2) {
+      gvrp_instance++;
+      i++;
+      continue;
+    }
+    */
     cout<<instance<<endl;
     Cubic_model cubic_model (*gvrp_instance, execution_time);  
     //keep this line, for some strange bug it is necessary to define the time limit explicitly 

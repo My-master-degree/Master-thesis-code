@@ -14,7 +14,9 @@
 
 #include <map>
 #include <unordered_map>
+#include <unordered_set>
 #include <set>
+#include <list>
 #include <ilcplex/ilocplex.h>
 ILOSTLBEGIN
 
@@ -35,6 +37,7 @@ namespace models {
           public:
             explicit Matheus_model_3(const Gvrp_instance& gvrp_instance, unsigned int time_limit); 
             ~Matheus_model_3(); 
+            list<unordered_set<int>> previousSubsets;
             pair<Gvrp_solution, Mip_solution_info> run();
             unordered_map<int, list<int>> afs_dummies;
             unordered_map<int, const Vertex *> dummies;

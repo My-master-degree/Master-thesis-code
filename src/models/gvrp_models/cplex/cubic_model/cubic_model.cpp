@@ -14,7 +14,6 @@
 #include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing.hpp"
 #include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing_2.hpp"
 #include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing_3.hpp"
-#include "models/gvrp_models/cplex/cubic_model/invalid_edge_preprocessing_4.hpp"
 #include "models/gvrp_models/cplex/cubic_model/lazy_constraint.hpp"
 #include "models/gvrp_models/cplex/cubic_model/user_constraint.hpp"
 #include "models/gvrp_models/cplex/cubic_model/extra_constraint.hpp"
@@ -81,7 +80,6 @@ Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit
   preprocessings.push_back(new Invalid_edge_preprocessing(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_2(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_3(*this));
-  preprocessings.push_back(new Invalid_edge_preprocessing_4(*this));
   //heuristic callbacks
   heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
 }

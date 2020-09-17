@@ -531,6 +531,7 @@ void Matheus_model::createModel() {
         constraintName.str("");
       }
     }
+    /*
     //new inequalities
     //solution lb
     for (int i = 0; i < c0.size(); ++i) 
@@ -555,6 +556,7 @@ void Matheus_model::createModel() {
     model.add(c);
     expr.end();
     expr = IloExpr(env);
+    */
 
 
 
