@@ -48,9 +48,7 @@ void Matheus_model_4_tests::run() {
   int i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
-//    Gvrp_feasible_solution_heuristic gfsh (*gvrp_instance);
-//    Gvrp_solution gvrp_solution = gfsh.run();
-//    Mip_start matheus_model_4 (*gvrp_instance, execution_time, gvrp_solution);  
+    removeDistanceSymmetries (gvrp_instance->distances);
     Matheus_model_4 matheus_model_4 (*gvrp_instance, execution_time);  
 //    matheus_model_4.RELAXED = true;
     execute_model(matheus_model_4, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);

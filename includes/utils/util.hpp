@@ -46,5 +46,6 @@ namespace utils {
   Vrp_instance read_augerat_vrp_1995_setP_instance (const string& file_path);
   list<string> listFilesFromDir(string path);
   Gvrp_solution read_gvrp_solution (const string& file_path, const Gvrp_instance& gvrp_instance);
+  void removeDistanceSymmetries (vector<vector<double>>& distances);
 } 
 #endif

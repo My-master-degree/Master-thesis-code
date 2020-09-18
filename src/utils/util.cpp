@@ -485,6 +485,7 @@ list<pair<int, int>> utils::get_invalid_edges_2 (const Gvrp_instance& gvrp_insta
       }
       if (!valid) {
         edges.push_back({customer.id, gvrp_instance.depot.id});
+        edges.push_back({gvrp_instance.depot.id, customer.id});
       }
     }
   }
@@ -1089,4 +1090,11 @@ Vrp_instance utils::read_augerat_vrp_1995_setP_instance (const string& file_path
   //remove header
   vertexes.erase (vertexes.begin());
   return Vrp_instance (vertexes, depot, distances, METRIC, vertexes.size());
+}
+
+void utils::removeDistanceSymmetries (vector<vector<double>>& distances) {
+  const size_t n = distances.size();
+  for (size_t i = 0; i < n; ++i) 
+    for (size_t j = i + 1; j < n; ++j) 
+      distances[i][j] -= 1e-2;
 }

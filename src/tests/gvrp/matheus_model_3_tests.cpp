@@ -46,11 +46,9 @@ void Matheus_model_3_tests::run() {
   openResultFile(resultsFile, solution_name);
   for (const string& instance : instances) {
     cout<<instance<<endl;
-    Gvrp_feasible_solution_heuristic gfsh (*gvrp_instance);
-    Gvrp_solution gvrp_solution = gfsh.run();
+    removeDistanceSymmetries (gvrp_instance->distances);
     Matheus_model_3 matheus_model_3 (*gvrp_instance, execution_time);  
 //    matheus_model_3.RELAXED = true;
-    //  Mip_start matheus_model_3 (*gvrp_instance, execution_time, gvrp_solution);  
     matheus_model_3.levelSubcycleCallback = 0;
     execute_model(matheus_model_3, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name + instance<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<matheus_model_3.nGreedyLP<<";"<<matheus_model_3.nBPPNRoutesLB<<";"<<matheus_model_3.nImprovedMSTNRoutesLB<<";"<<matheus_model_3.nPreprocessings1<<";"<<matheus_model_3.nPreprocessings2<<";"<<matheus_model_3.nPreprocessings3<<";"<<matheus_model_3.nPreprocessings4<<endl;
