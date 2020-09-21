@@ -83,7 +83,7 @@ Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit
   preprocessings.push_back(new Invalid_edge_preprocessing_3(*this));
   preprocessings.push_back(new Invalid_edge_preprocessing_4(*this));
   //heuristic callbacks
-  heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
+//  heuristic_callbacks.push_back(new Greedy_lp_heuristic(*this));
 }
 
 Cubic_model::~Cubic_model() {
