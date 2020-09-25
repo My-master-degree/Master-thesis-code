@@ -90,9 +90,9 @@ void Subcycle_lazy_constraint::main() {
       int bppNRoutesLB = calculateGVRP_BPP_NRoutesLB(cubic_model.instance, vertices, closestsTimes, cubic_model.BPPTimeLimit);
       int maxNRoutes = max(improvedMSTNRoutesLB, bppNRoutesLB);
       if (improvedMSTNRoutesLB == maxNRoutes) 
-        ++cubic_model.nImprovedMSTNRoutesLB;
+        ++cubic_model.nImprovedMSTNRoutesLBLazy;
       if (bppNRoutesLB == maxNRoutes) 
-        ++cubic_model.nBPPNRoutesLB;
+        ++cubic_model.nBPPNRoutesLBLazy;
       for (int k_ = 0; k_ < cubic_model.instance.maxRoutes; k_++) { 
         for (int customer_ : customersComponent) {
           //getting lhs

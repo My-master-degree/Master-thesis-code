@@ -48,7 +48,6 @@ void Matheus_model_4_tests::run() {
   int i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
-    removeDistanceSymmetries (gvrp_instance->distances);
     Matheus_model_4 matheus_model_4 (*gvrp_instance, execution_time);  
 //    matheus_model_4.RELAXED = true;
     execute_model(matheus_model_4, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);

@@ -46,7 +46,6 @@ void Matheus_model_3_tests::run() {
   openResultFile(resultsFile, solution_name);
   for (const string& instance : instances) {
     cout<<instance<<endl;
-    removeDistanceSymmetries (gvrp_instance->distances);
     Matheus_model_3 matheus_model_3 (*gvrp_instance, execution_time);  
 //    matheus_model_3.RELAXED = true;
     matheus_model_3.levelSubcycleCallback = 0;

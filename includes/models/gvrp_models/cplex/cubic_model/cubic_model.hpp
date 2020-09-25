@@ -59,6 +59,8 @@ namespace models {
             int nPreprocessings4;
             int nImprovedMSTNRoutesLB;
             int nBPPNRoutesLB;
+            int nImprovedMSTNRoutesLBLazy;
+            int nBPPNRoutesLBLazy;
             int nRoutesLB;
             double solLB;
             Matrix3DVal x_vals;

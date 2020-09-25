@@ -39,7 +39,7 @@ using namespace models::gvrp_models;
 using namespace models::gvrp_models::cplex;
 using namespace models::gvrp_models::cplex::cubic_model;
 
-Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit): Gvrp_model(instance, time_limit), afss(unordered_set<int> (instance.afss.size())), nGreedyLP(0), BPPTimeLimit(100000000), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0), RELAXED(false)  {
+Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit): Gvrp_model(instance, time_limit), afss(unordered_set<int> (instance.afss.size())), nGreedyLP(0), BPPTimeLimit(100000000), levelSubcycleCallback(0), nPreprocessings1(0), nPreprocessings2(0), nPreprocessings3(0), nPreprocessings4(0), nImprovedMSTNRoutesLB(0), nBPPNRoutesLB(0), nImprovedMSTNRoutesLBLazy(0), nBPPNRoutesLBLazy(0), RELAXED(false)  {
   if (instance.distances_enum != METRIC)
     throw string("Error: The compact model requires a G-VRP instance with symmetric or metric distances");
   //fill all and customers
