@@ -46,8 +46,10 @@ void Invalid_edge_preprocessing_4::add () {
             }
             */
   list<pair<int, int>> edges = get_invalid_edges_4(cubic_model.instance, *cubic_model.gvrp_afs_tree);
-  cubic_model.nPreprocessings4 = edges.size();
+  cubic_model.nPreprocessings4 = 0;
   for (const auto& [i, j] : edges)
-    for (int k = 0; k < cubic_model.instance.maxRoutes; k++) 
+    for (int k = 0; k < cubic_model.instance.maxRoutes; k++) {
       cubic_model.model.add(cubic_model.x[k][i][j] == 0);
+      ++cubic_model.nPreprocessings4;
+    }
 }

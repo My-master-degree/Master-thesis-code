@@ -327,7 +327,7 @@ void Matheus_model_4::createModel() {
     for (int i = 0; i < c0.size(); ++i) 
       for (int f = 0; f < _f.size(); ++f)
         for (int r = 0; r < _f.size(); ++r)
-        model.add(y[i][f][r][i] == 0);
+          model.add(y[i][f][r][i] == 0);
     //y_{ifrj} = 0, \forall v_i, v_j \in C, \forall v_f, v_r \in F^{''} : v_0 \in P_{fr}^{G[F_0]}
     for (int f = 0; f < _f.size(); ++f)
       for (int r = 0; r < _f.size(); ++r) {
@@ -335,8 +335,9 @@ void Matheus_model_4::createModel() {
         for (const Vertex& afs : path)
           if (afs.id == instance.depot.id) {
             for (int i = 0; i < c0.size(); ++i) 
-              for (int i = 0; i < c0.size(); ++i) 
-                model.add(y[i][f][r][i] == 0);
+              for (int j = 0; j < c0.size(); ++j) 
+                if (i != j) 
+                  model.add(y[i][f][r][j] == 0);
             break;
           }
       }
@@ -587,12 +588,11 @@ void Matheus_model_4::createModel() {
 
 
 
-
     /*
     vector<vector<int>> routes_ = {
-    {0, 7, 9, 7, 2, 10, 12, 3, 8, 10, 0},
-    {0, 10, 15, 11, 4, 10, 1, 0},
-    {0, 6, 7, 13, 7, 5, 7, 0},
+      {0, 1, 10, 4, 11, 15, 10, 12, 10, 0, },
+      {0, 6, 7, 5, 7, 9, 7, 13, 7, 0  },
+      {0, 10, 3, 8, 10, 2, 7, 0},
     };
     list<list<Vertex>> routes;
     for (const vector<int>& route_ : routes_) {

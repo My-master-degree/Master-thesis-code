@@ -27,7 +27,7 @@ void Invalid_edge_preprocessing_C4_C5::add () {
     if (closestAFS + lh_model.customersFuel(i, 0) > lh_model.instance.vehicleFuelCapacity) {
       lh_model.model.add(lh_model.x[0][i] == 0);
       lh_model.model.add(lh_model.x[i][0] == 0);
-      ++lh_model.nPreprocessings1;
+      lh_model.nPreprocessings1 += 2;
     }
   }
 }

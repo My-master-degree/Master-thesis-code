@@ -478,7 +478,7 @@ list<pair<int, int>> utils::get_invalid_edges_2 (const Gvrp_instance& gvrp_insta
       bool valid = false;
       for (int f = 0; f < gvrp_afs_tree.f0.size(); ++f) {
         if (gvrp_instance.fuel(gvrp_afs_tree.f0[f]->id, customer.id) + gvrp_instance.fuel(customer.id, gvrp_instance.depot.id) <= gvrp_instance.vehicleFuelCapacity
-            && gvrp_afs_tree.times[f] + gvrp_instance.fuel(gvrp_afs_tree.f0[f]->id, customer.id) + customer.serviceTime + gvrp_instance.time(customer.id, gvrp_instance.depot.id) <= gvrp_instance.vehicleFuelCapacity) {
+            && gvrp_afs_tree.times[f] + gvrp_instance.time(gvrp_afs_tree.f0[f]->id, customer.id) + customer.serviceTime + gvrp_instance.time(customer.id, gvrp_instance.depot.id) <= gvrp_instance.vehicleFuelCapacity) {
           valid = true;
           break;
         }

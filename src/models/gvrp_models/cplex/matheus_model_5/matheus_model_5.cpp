@@ -337,8 +337,9 @@ void Matheus_model_5::createModel() {
         for (const Vertex& afs : path)
           if (afs.id == instance.depot.id) {
             for (int i = 0; i < c0.size(); ++i) 
-              for (int i = 0; i < c0.size(); ++i) 
-                model.add(y[i][f][r][i] == 0);
+              for (int j = 0; j < c0.size(); ++j) 
+                if (i != j) 
+                  model.add(y[i][f][r][j] == 0);
             break;
           }
       }

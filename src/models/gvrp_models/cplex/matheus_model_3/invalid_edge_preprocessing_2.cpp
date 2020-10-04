@@ -20,15 +20,11 @@ Invalid_edge_preprocessing_2::Invalid_edge_preprocessing_2 (Matheus_model_3& mat
 void Invalid_edge_preprocessing_2::add () {
   list<pair<int, int>> edges = get_invalid_edges_2(matheus_model_3.instance, *matheus_model_3.gvrp_afs_tree);
   matheus_model_3.nPreprocessings2 = edges.size();
+  int depotId = matheus_model_3.instance.depot.id;
   for (const auto& [i, j] : edges)
-    if (i == matheus_model_3.instance.depot.id) {
-      auto d = matheus_model_3.afs_dummies[i];
-      for (int depot_dummy : d) 
-        matheus_model_3.model.add(matheus_model_3.x[depot_dummy][j] == 0);
+    if (i == depotId) {
+      matheus_model_3.model.add(matheus_model_3.x[depotId][j] == 0);
     } else {
-      auto d = matheus_model_3.afs_dummies[j];
-      for (int depot_dummy : d) 
-        matheus_model_3.model.add(matheus_model_3.x[i][depot_dummy] == 0);
+      matheus_model_3.model.add(matheus_model_3.x[i][depotId] == 0);
     }
-
 }

@@ -496,12 +496,11 @@ void Cubic_model::createModel() {
 
 
 
-
     /*
     list<list<int>> routesIds = {
-{0, 1, 10, 2, 13, 9, 14, 5, 7, 13, 8, 10, 3, 10, 0},
-{0, 6, 0},
-{0, 10, 4, 15, 11, 15, 12, 10, 0},
+      {0, 19, 5, 14, 2, 16, 2, 0},
+      {0, 6, 2, 17, 18, 3, 2, 1, 0},
+      {0, 9, 7, 2, 12, 15, 11, 4, 1, 10, 2, 13, 8, 0},
     };
     list<list<Vertex>> routes;
     for (const list<int>& routeId : routesIds) {
