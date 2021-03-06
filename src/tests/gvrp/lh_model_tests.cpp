@@ -29,7 +29,7 @@ void LH_model_tests::run() {
   list<Gvrp_instance> gvrp_instances;
   int i = 0;
   for (const string& instance : instances){
-//    Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
+    //      Gvrp_instance gvrp_instance = erdogan_instance_reader(PROJECT_INSTANCES_PATH + string("EMH/") + instance);
     Gvrp_instance gvrp_instance = matheus_instance_reader(PROJECT_INSTANCES_PATH + string("new/non-consec/") + instance);
     gvrp_instances.push_back(gvrp_instance);
   }
@@ -42,8 +42,9 @@ void LH_model_tests::run() {
   i = 0;
   for (const string& instance : instances) {
     cout<<instance<<endl;
+    //cout<<solution;
     LH_model lh_model (*gvrp_instance, execution_time);  
-    lh_model.RELAXED = true;
+//    lh_model.RELAXED = false;
     execute_model(lh_model, instance, solution_name, nIntSol, VERBOSE, mipSolInfo);
     resultsFile<<instance<<";"<<solution_name<<";"<<mipSolInfo.gap<<";"<<int(mipSolInfo.cost)<<"."<<int(mipSolInfo.cost*100)%100<<";"<<mipSolInfo.elapsed_time<<";"<<mipSolInfo.status<<";"<<lh_model.nPreprocessings0<<";"<<lh_model.nPreprocessings1<<";"<<lh_model.nPreprocessings2<<";"<<lh_model.nPreprocessings3<<endl;
     gvrp_instance++;

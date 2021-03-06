@@ -68,6 +68,7 @@ int main (int argc, char **argv)
   cout<<"============    CUBIC MODEL    =============="<<endl;
   Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);
   cubic_model_tests.run();
+  /*
     //Matheus model 3
   cout<<"============    MATHEUS 3 MODEL    =============="<<endl;
   Matheus_model_3_tests matheus_model_3_tests (VERBOSE, execution_time, nIntSol);
@@ -80,7 +81,6 @@ int main (int argc, char **argv)
   cout<<"============    MATHEUS 5 MODEL    =============="<<endl;
   Matheus_model_5_tests matheus_model_5_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_5_tests.run();
-  /*
     //Relaxation tests
   cout<<"============    RELAXATION TESTS    =============="<<endl;
   Relaxation_tests relaxation_tests (VERBOSE, execution_time, nIntSol);

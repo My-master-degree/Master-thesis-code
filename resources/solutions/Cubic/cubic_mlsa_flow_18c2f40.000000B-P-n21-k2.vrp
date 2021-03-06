@@ -1,0 +1,15 @@
+Route 1: 0 16 16 2 20 9 20 0 (cost: 88) (time: 59.7255)
+Route 2: 0 20 7 12 20 0 (cost: 101) (time: 78.9804)
+Route 3: 0 20 3 12 18 12 0 (cost: 123) (time: 81.4118)
+Route 4: 0 5 20 14 20 0 (cost: 76) (time: 55.4902)
+Route 5: 0 6 12 0 (cost: 68) (time: 28.3333)
+Route 6: 0 4 12 10 12 0 (cost: 85) (time: 55.6667)
+Route 7: 0 12 1 12 20 0 (cost: 110) (time: 79.1569)
+Route 8: 0 12 19 12 0 (cost: 100) (time: 53.9608)
+Route 9: 0 12 11 15 12 0 (cost: 92) (time: 55.8039)
+Route 10: 0 12 8 12 0 (cost: 94) (time: 53.8431)
+Route 11: 0 20 13 20 0 (cost: 68) (time: 53.3333)
+Route 12: 0 20 17 20 0 (cost: 64) (time: 53.2549)
+Total cost: 1069
+Infeasibilities found:
+Route 1: Repeats the customer 16

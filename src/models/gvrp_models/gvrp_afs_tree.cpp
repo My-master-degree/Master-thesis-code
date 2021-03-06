@@ -26,8 +26,8 @@ Gvrp_afs_tree::Gvrp_afs_tree(const Gvrp_instance& gvrp_instance) {
   //dijkstra
   //setup
   int curr,
-         f,
-         r;
+      f,
+      r;
   double cost, 
          time;
   queue<int> q;

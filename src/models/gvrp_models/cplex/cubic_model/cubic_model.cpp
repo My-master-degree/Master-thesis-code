@@ -56,6 +56,7 @@ Cubic_model::Cubic_model(const Gvrp_instance& instance, unsigned int _time_limit
   const auto& gvrpReducedGraphs = calculateGVRPReducedGraphs (instance, *gvrp_afs_tree);
   vector<vector<double>> gvrpReducedGraphDistances = gvrpReducedGraphs.first;
   gvrpReducedGraphTimes = gvrpReducedGraphs.second;
+
   //set sol lb
   vector<const Vertex *> c0 (instance.customers.size() + 1);
   c0[0] = &instance.depot;

@@ -491,15 +491,19 @@ void LH_model::createModel() {
     }
 
 
-
-
-
     /*
     vector<vector<int>> routes_ = {
-      {0, 1, 10, 2, 7, 13, 9, 7, 19, 0},
-      {0, 6, 7, 5, 16, 7, 14, 7, 0},
-      {0, 17, 8, 3, 10, 12, 15, 11, 4, 0}
+      {1, 11, 31, 30, 1},
+      {1, 13, 15, 24, 16, 14, 22, 20, 1},
+      {1, 5, 12, 28, 18, 17, 1},
+      {1, 23, 27, 25, 1},
+      {1, 19, 2, 29, 26, 21, 1},
     };
+    for (vector<int>& route : routes_) {
+      for (size_t i = 0; i < route.size(); ++i) {
+        --route[i];
+      }
+    }
     list<list<Vertex>> routes;
     for (const vector<int>& route_ : routes_) {
       list<Vertex> route;
@@ -541,9 +545,13 @@ void LH_model::createModel() {
           if (i > 0) 
             model.add(v[i - 1][f] == currFuel);
           currTime += time(i, f, j);
+
           currFuel = instance.vehicleFuelCapacity - afsToCustomerFuel(f, j);
         }
       }
+      for (const Vertex& vertex : route)
+        cout<<vertex.id<<" ";
+      cout<<"("<<currFuel<<"), ("<<currTime<<")"<<endl;
     }
     */
 

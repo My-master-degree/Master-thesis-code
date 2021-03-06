@@ -88,10 +88,15 @@ pair<vector<vector<double>>, vector<vector<double>>> utils::calculateGVRPReduced
                       for (int r_ = 0; r_ < gvrp_afs_tree.f0.size(); r_++) {
                         int r_Id = gvrp_afs_tree.f0[r_]->id;
                         //time feasible
-                        if (gvrp_instance.fuel(r_Id, customerJid) + gvrp_instance.fuel(customerJid, rId) <= gvrp_instance.vehicleFuelCapacity && 
-                            spentTime + gvrp_instance.time(customerIid, f_Id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, customerJid) + customerJ->serviceTime + gvrp_instance.time(customerJid, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) {
-                          double time = gvrp_instance.time(customerIid, f_Id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, customerJid);
-                          double cost = gvrp_instance.distances[customerIid][f_Id] + gvrp_afs_tree.pairCosts[f_][r_] + gvrp_instance.distances[r_Id][customerJid];
+                        if (gvrp_instance.fuel(r_Id, customerJid) + gvrp_instance.fuel(customerJid, rId) <= gvrp_instance.vehicleFuelCapacity) {
+                          double time, cost;
+                          if (spentTime + gvrp_instance.time(customerIid, f_Id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, customerJid) + customerJ->serviceTime + gvrp_instance.time(customerJid, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) {
+                            time = gvrp_instance.time(customerIid, f_Id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, customerJid);
+                            cost = gvrp_instance.distances[customerIid][f_Id] + gvrp_afs_tree.pairCosts[f_][r_] + gvrp_instance.distances[r_Id][customerJid];
+                          } else {
+                            time = gvrp_instance.time(customerIid, f_Id) + gvrp_afs_tree.times[f_] + gvrp_afs_tree.times[r_] + gvrp_instance.time(r_Id, customerJid);
+                            cost = gvrp_instance.distances[customerIid][f_Id] + gvrp_afs_tree.pairCosts[f_][0] + gvrp_afs_tree.pairCosts[0][r_] + gvrp_instance.distances[r_Id][customerJid];
+                          }
                           if (closestTime[customerIid][customerJid] < 0.0 || 
                               time < closestTime[customerIid][customerJid]) 
                             closestTime[customerIid][customerJid] = closestTime[customerJid][customerIid] = time;
@@ -215,25 +220,28 @@ double utils::calculateGvrpLBByImprovedMST (const vector<const Vertex *>& vertic
         }
       }
     }
+
     //insert best edges
 //    cout<<"Edges: "<<endl;
     for (int i = 0; i < svertices; ++i) {
       setI = dsu.findSet(i);
       //if edge exist
       if (bestEdge[setI].first != -1) {
-        int j = bestEdge[setI].second;
-        setJ = dsu.findSet(j);
-        if (setI != setJ) {
-          adjMatrix[i][j] = true;
-          dsu.join(i, j);
+        int j = bestEdge[setI].first,
+            k = bestEdge[setI].second;
+        int setK = dsu.findSet(k);
+        if (setI != setK) {
+          adjMatrix[j][k] = true;
+          dsu.join(j, k);
           --nTrees;
           MSTCost += bestEdgeCost[setI];
- //         cout<<"("<<i<<", "<<j<<") ";
         }
-        bestEdgeCost[setI] = bestEdgeCost[setJ] = DBL_MAX;
-        bestEdge[setI] = bestEdge[setJ] = {-1, -1};
+  //      bestEdgeCost[setI] = bestEdgeCost[setK] = DBL_MAX;
+   //     bestEdge[setI] = bestEdge[setK] = {-1, -1};
       }
     }
+    bestEdge = vector<pair<int, int>> (svertices, {-1, -1});
+    bestEdgeCost = vector<double> (svertices, DBL_MAX);
 //    cout<<endl;
 //    cout<<"Sets:"<<endl;
     set<int> sets;
@@ -249,9 +257,19 @@ double utils::calculateGvrpLBByImprovedMST (const vector<const Vertex *>& vertic
     }
     */
   }
+//  cout<<MSTCost<<endl;
+
+
+  for (int i = 0; i < svertices; ++i) 
+    for (int j = 0; j < svertices; ++j) 
+      if (adjMatrix[i][j] == true)
+//        cout<<"("<<vertices[i]->id + 1<<", "<<vertices[j]->id + 1<<")";
+//  cout<<endl;
   //greedy boruvka
 //  cout<<"greedy borukva"<<endl;
   for (int i = 0; i < svertices; ++i) {
+//    cout<<"MST without "<<vertices[i]->id + 1<<endl;
+//    cout<<"\tRemoved edges";
 //    cout<<"\tIn vertex "<<i<<endl;
     nodeI = vertices[i];
     dsu.clean();
@@ -262,14 +280,21 @@ double utils::calculateGvrpLBByImprovedMST (const vector<const Vertex *>& vertic
       if (adjMatrix[i][j] || adjMatrix[j][i]) {
         MSTCost -= gvrpReducedGraph[nodeI->id][nodeJ->id];
         adjMatrix[i][j] = adjMatrix[j][i] = false; 
+//        cout<<"("<<nodeI->id + 1<<", "<<nodeJ->id + 1<<"): "<<gvrpReducedGraph[nodeI->id][nodeJ->id]<<", ";
       }
     }
+//    cout<<endl;
+//    cout<<"\tnew MST cost "<<MSTCost<<endl;
+//    cout<<"\tnew edges: ";
 //    cout<<"\tpopulating DSU"<<endl;
     //populate dsu
     for (int j = 0; j < svertices; ++j) 
       for (int k = 0; k < svertices; ++k) 
-        if (adjMatrix[j][k])
+        if (adjMatrix[j][k]) {
             dsu.join(j, k);
+//            cout<<"("<<vertices[j]->id + 1<<", "<<vertices[k]->id + 1<<")";
+        }
+//    cout<<endl;
 //    cout<<"\tSets:"<<endl;
     set<int> sets;
     for (int i = 0; i < svertices; ++i) 
@@ -289,6 +314,7 @@ double utils::calculateGvrpLBByImprovedMST (const vector<const Vertex *>& vertic
 //    cout<<"\tborukva again"<<endl;
     //borukva
     while (nTrees > 2) {
+//      cout<<"\t# trees"<<nTrees<<endl;
 //      cout<<"\tnTrees: "<<nTrees<<endl;
       //calculate best cuts
       for (int j = 0; j < svertices; ++j) {
@@ -296,11 +322,11 @@ double utils::calculateGvrpLBByImprovedMST (const vector<const Vertex *>& vertic
           nodeJ = vertices[j];
           setJ = dsu.findSet(j);
           for (int k = 0; k < svertices; ++k) {
-            if (k != i) {
+            if (k != i && k != j) {
               nodeK = vertices[k];
               cost = gvrpReducedGraph[nodeJ->id][nodeK->id];
               //cout<<"\t\t"<<j<<" "<<k<<" "<<nodeJ->id<<" "<<nodeK->id<<" "<<cost<<endl;
-              if (j != k && setJ != dsu.findSet(k) && cost < bestEdgeCost[setJ]) {
+              if (setJ != dsu.findSet(k) && cost < bestEdgeCost[setJ]) {
                 bestEdgeCost[setJ] = cost;
                 bestEdge[setJ] = {j, k};
               }
@@ -308,25 +334,29 @@ double utils::calculateGvrpLBByImprovedMST (const vector<const Vertex *>& vertic
           }
         }
       }
+//      cout<<"\tinserted edges: ";
       //insert best edges
 //      cout<<"\tInserted edges: "<<endl<<"\t\t";
       for (int j = 0; j < svertices; ++j) {
         setJ = dsu.findSet(j);
         //if edge exist
         if (bestEdge[setJ].first != -1) {
-          int k = bestEdge[setJ].second;
-          setK = dsu.findSet(k);
-          if (setJ != setK) {
-            adjMatrix[j][k] = true;
-            dsu.join(setJ, setK);
+          int k = bestEdge[setJ].first,
+              l = bestEdge[setJ].second;
+          int setL = dsu.findSet(l);
+          if (setJ != setL) {
+            adjMatrix[k][l] = true;
+            dsu.join(k, l);
             --nTrees;
             MSTCost += bestEdgeCost[setJ];
+//            cout<<"("<<vertices[k]->id + 1<<", "<<vertices[l]->id + 1<<"): "<<gvrpReducedGraph[vertices[k]->id][vertices[l]->id]<<", ";
 //            cout<<"("<<k<<", "<<j<<"), ";
           }
-          bestEdgeCost[setJ] = bestEdgeCost[setK] = DBL_MAX;
-          bestEdge[setJ] = bestEdge[setK] = {-1, -1};
+          bestEdgeCost[setJ] = bestEdgeCost[setL] = DBL_MAX;
+          bestEdge[setJ] = bestEdge[setL] = {-1, -1};
         }
       }
+//      cout<<endl<<"\tcurrent MST cost "<<MSTCost<<endl;
 //      cout<<endl;
 //      cout<<"\tSets:"<<endl;
       sets.clear();
@@ -555,7 +585,7 @@ list<pair<int, int>> utils::get_invalid_edges_4 (const Gvrp_instance& gvrp_insta
             distance = gvrp_instance.distances[f0[f]->id][i.id] + gvrp_instance.distances[i.id][f0[r]->id];
             if (distance * gvrp_instance.vehicleFuelConsumptionRate <= gvrp_instance.vehicleFuelCapacity && times[f] + (distance/gvrp_instance.vehicleAverageSpeed) + i.serviceTime + times[r] <= gvrp_instance.timeLimit) { 
               invalidEdge = false;
-              f = sf0;
+//              f = sf0;
               break;
             }
           }

@@ -1,0 +1,13 @@
+Route 1: 0 6 33 63 23 1 43 41 42 64 0 (cost: 113) (time: 19.3294)
+Route 2: 0 12 39 9 25 18 50 32 40 0 (cost: 84) (time: 17.9882)
+Route 3: 0 17 32 44 3 24 49 16 63 51 0 (cost: 90) (time: 19.0588)
+Route 4: 0 26 53 19 53 35 8 13 27 4 0 (cost: 94) (time: 19.1059)
+Route 5: 0 30 48 47 21 28 22 62 28 2 0 (cost: 90) (time: 19.0588)
+Route 6: 0 34 52 13 54 13 57 15 13 46 0 (cost: 87) (time: 19.0235)
+Route 7: 0 39 58 39 0 (cost: 64) (time: 9.75294)
+Route 8: 0 67 7 53 14 11 65 38 10 39 0 (cost: 94) (time: 19.1059)
+Route 9: 0 68 28 61 69 36 37 5 29 45 0 (cost: 95) (time: 19.1176)
+Total cost: 811
+Infeasibilities found:
+Route 1: Edge (64,0) requires fuel capacity greater than the available -18
+Route 1: Edge (64,0) requires fuel capacity greater than beta

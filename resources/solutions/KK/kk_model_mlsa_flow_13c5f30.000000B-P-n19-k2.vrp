@@ -1,0 +1,4 @@
+Route 1: 0 1 10 3 16 8 10 0 (cost: 86) (time: 40.6863)
+Route 2: 0 6 5 9 5 15 13 5 18 0 (cost: 98) (time: 46.9216)
+Route 3: 0 5 7 2 10 12 14 11 4 0 (cost: 106) (time: 47.0784)
+Total cost: 290
