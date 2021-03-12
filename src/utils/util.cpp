@@ -93,7 +93,8 @@ pair<vector<vector<double>>, vector<vector<double>>> utils::calculateGVRPReduced
                           if (spentTime + gvrp_instance.time(customerIid, f_Id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, customerJid) + customerJ->serviceTime + gvrp_instance.time(customerJid, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) {
                             time = gvrp_instance.time(customerIid, f_Id) + gvrp_afs_tree.pairTimes[f_][r_] + gvrp_instance.time(r_Id, customerJid);
                             cost = gvrp_instance.distances[customerIid][f_Id] + gvrp_afs_tree.pairCosts[f_][r_] + gvrp_instance.distances[r_Id][customerJid];
-                          } else {
+                          } else if (spentTime + gvrp_instance.time(customerIid, f_Id) + gvrp_afs_tree.times[f_] <= gvrp_instance.timeLimit &&
+                              gvrp_afs_tree.times[r_] + gvrp_instance.time(r_Id, customerJid) + customerJ->serviceTime + gvrp_instance.time(customerJid, rId) + gvrp_afs_tree.times[r] <= gvrp_instance.timeLimit) {
                             time = gvrp_instance.time(customerIid, f_Id) + gvrp_afs_tree.times[f_] + gvrp_afs_tree.times[r_] + gvrp_instance.time(r_Id, customerJid);
                             cost = gvrp_instance.distances[customerIid][f_Id] + gvrp_afs_tree.pairCosts[f_][0] + gvrp_afs_tree.pairCosts[0][r_] + gvrp_instance.distances[r_Id][customerJid];
                           }
@@ -629,6 +630,168 @@ double utils::calculateGvrpBestNRoutesLB (const Gvrp_instance& gvrp_instance, co
   const auto& closestsTimes = calculateClosestsGVRPCustomers(gvrpReducedGraphTimes, c0);
   return max(int(ceil(calculateGvrpLBByImprovedMSTTime(c0, closestsTimes, gvrpReducedGraphTimes)/gvrp_instance.timeLimit)), calculateGVRP_BPP_NRoutesLB(gvrp_instance, c0, closestsTimes, 1000000));
 }
+
+Gvrp_instance utils::andelmin_bartolini_instance_reader(const string& file_path){
+  string line, token;
+  ifstream inFile;
+  list<Vertex> afss, 
+    customers;
+  Vertex depot;
+  stringstream ss;
+  double vehicleFuelCapacity,
+         vehicleFuelConsumptionRate,
+         timeLimit,
+         vehicleAverageSpeed,
+         customerServiceTime,
+         afsServiceTime;
+  int id = 0,
+      nCustomers,
+      nAFSs;
+  //read file
+  inFile.open(file_path);
+  if (!inFile)
+    throw string("Unable to open file ") + string(file_path);
+  getline(inFile, line);
+  ss.str(line);
+  //ignore instance name
+  while (getline(ss, token, ' ') && token.size() == 0);
+  //ignore # customers
+  while (getline(ss, token, ' ') && token.size() == 0);
+  nCustomers = stoi(token, NULL);
+  //ignore # AFSs 
+  while (getline(ss, token, ' ') && token.size() == 0);
+  nAFSs = stoi(token, NULL);
+  //get route time limit
+  while (getline(ss, token, ' ') && token.size() == 0);
+  timeLimit = stod(token, NULL);
+  //get vehicle fuel capacity
+  while (getline(ss, token, ' ') && token.size() == 0);
+  vehicleFuelCapacity = stod(token, NULL);
+  //get vehicle average speed
+  while (getline(ss, token, ' ') && token.size() == 0);
+  vehicleAverageSpeed = stod(token, NULL);
+  //get customer service time
+  while (getline(ss, token, ' ') && token.size() == 0);
+  customerServiceTime = stod(token, NULL);
+  //get AFS service time
+  while (getline(ss, token, ' ') && token.size() == 0);
+  afsServiceTime = stod(token, NULL);
+  //get vehicle fuel consumption rate 
+  //AB2
+  if (vehicleAverageSpeed > 0.7)
+    vehicleFuelConsumptionRate = 0.2137;
+  //AB1
+  else
+    vehicleFuelConsumptionRate = 0.2;
+  //get depot
+  ss.clear();
+  getline(inFile, line);
+  ss.str(line);
+  // ignore id
+  while (getline(ss, token, ' ') && token.size() == 0);
+  // get type
+  while (getline(ss, token, ' ') && token.size() == 0);
+  // get x
+  while (getline(ss, token, ' ') && token.size() == 0);
+  depot.x = stod(token, NULL);
+  // get y
+  while (getline(ss, token, ' ') && token.size() == 0);
+  depot.y = stod(token, NULL);
+  // get service time
+  depot.serviceTime = 0;
+  //get AFSs
+  for (int i = 0; i < nAFSs; ++i) {
+    // read line
+    ss.clear();
+    getline(inFile, line);
+    ss.str(line);
+    // ignore id
+    while (getline(ss, token, ' ') && token.size() == 0);
+    Vertex afs (0, 0, 0, afsServiceTime);
+    // get type
+    while (getline(ss, token, ' ') && token.size() == 0);
+    // get x
+    while (getline(ss, token, ' ') && token.size() == 0);
+    afs.x = stod(token, NULL);
+    // get y
+    while (getline(ss, token, ' ') && token.size() == 0);
+    afs.y = stod(token, NULL);
+    afss.push_back(afs);
+  }
+  //get customers
+  for (int i = 0; i < nCustomers; ++i) {
+    // read line
+    ss.clear();
+    getline(inFile, line);
+    ss.str(line);
+    // ignore id
+    while (getline(ss, token, ' ') && token.size() == 0);
+    Vertex customer (stoi(token, NULL), 0, 0, customerServiceTime);
+    // ignore type
+    while (getline(ss, token, ' ') && token.size() == 0);
+    // get x
+    while (getline(ss, token, ' ') && token.size() == 0);
+    customer.x = stod(token, NULL);
+    // get y
+    while (getline(ss, token, ' ') && token.size() == 0);
+    customer.y = stod(token, NULL);
+    customers.push_back(customer);
+  }
+  // get infeasible customers
+  getline(inFile, line);
+  getline(inFile, line);
+  list<int> infeasibleCustomers;
+  if (inFile.peek() != EOF) {
+    ss.clear();
+    getline(inFile, line);
+    ss.str(line);
+    while (getline(ss, token, ' '))
+      if (token.size() > 0) 
+        infeasibleCustomers.push_back(stoi(token, NULL));
+  }
+  // remove infeasible customers
+  for (int oriId : infeasibleCustomers) {
+    for (list<Vertex>::iterator i = customers.begin(); i != customers.end(); ++i)
+      if (i->id == oriId) {
+        customers.erase(i); 
+        break;
+      }
+  }
+  inFile.close();
+  //calculate distances
+  size_t total_size = afss.size() + customers.size() + 1;
+  vector<Vertex> vertexes (total_size);
+  int j = 0; 
+  vertexes[j++] = depot;
+  for (list<Vertex>::iterator i = afss.begin(); i != afss.end(); i++) {
+    i->id = ++id;
+    vertexes[j++] = *i;
+  }
+  for (list<Vertex>::iterator i = customers.begin(); i != customers.end(); i++) {
+    i->id = ++id;
+    vertexes[j++] = *i;
+  }
+  vector<vector<double> > distances(total_size);
+  double radiusOfEarth = 4182.44949; // miles, 6371km; 
+//  double radiusOfEarth = 6371.0; // miles, 6371km; 
+  for (int i = 0; i < total_size; i++){
+    distances[i] = vector<double> (total_size);
+    for (int j = 0; j < total_size; j++){
+//      double PI = 4.0*atan(1.0);
+      double dLat1 = vertexes[i].y * (M_PI/180.0);
+      double dLat2 = vertexes[j].y * (M_PI/180.0);
+      double dLat = dLat1 - dLat2; 
+      double dLon = (vertexes[i].x - vertexes[j].x) * (M_PI/180.0); 
+      double a = pow(sin(dLat / 2), 2) + pow(sin(dLon / 2), 2) * cos(dLat1) * cos(dLat2); 
+//      double c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
+      double c = 2 * asin(sqrt(a));
+      distances[vertexes[i].id][vertexes[j].id] = radiusOfEarth * c;
+      //      distances[vertexes[i].id][vertexes[j].id] = sqrt(pow(vertexes[i].x - vertexes[j].x, 2) + pow(vertexes[i].y - vertexes[j].y, 2)); 
+    }
+  }
+  return Gvrp_instance(afss, customers, depot, vehicleFuelCapacity, distances, METRIC, customers.size(), timeLimit, vehicleFuelConsumptionRate, vehicleAverageSpeed);
+}
+
 //reading
 Gvrp_instance utils::matheus_instance_reader(const string& file_path){
   string line, token;

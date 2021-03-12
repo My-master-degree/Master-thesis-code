@@ -43,6 +43,7 @@ namespace utils {
   Vrp_instance read_uchoa_vrp_instance (const string &file_path);    
 //  vector<vector<int>> read_uchoa_vrp_solution (const string &file_path);    
   Gvrp_instance erdogan_instance_reader(const string file_path);
+  Gvrp_instance andelmin_bartolini_instance_reader(const string& file_path);
   Vrp_instance read_augerat_vrp_1995_setP_instance (const string& file_path);
   list<string> listFilesFromDir(string path);
   Gvrp_solution read_gvrp_solution (const string& file_path, const Gvrp_instance& gvrp_instance);
