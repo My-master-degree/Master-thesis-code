@@ -39,10 +39,10 @@ int main (int argc, char **argv)
         nIntSol = 2100000000;
     }
   //experiments
-  /*
     //instance generation model
   Model_tests model_tests (VERBOSE, execution_time, nIntSol);
   model_tests.run();
+  /*
     //EMH model
   cout<<"============    EMH MODEL    =============="<<endl;
   EMH_model_tests emh_model_tests (VERBOSE, execution_time, nIntSol);
@@ -63,12 +63,10 @@ int main (int argc, char **argv)
   cout<<"============    MATHEUS 2 MODEL    =============="<<endl;
   Matheus_model_2_tests matheus_model_2_tests (VERBOSE, execution_time, nIntSol);
   matheus_model_2_tests.run();
-  */
   //cubic model
   cout<<"============    CUBIC MODEL    =============="<<endl;
   Cubic_model_tests cubic_model_tests (VERBOSE, execution_time, nIntSol);
   cubic_model_tests.run();
-  /*
     //Matheus model 3
   cout<<"============    MATHEUS 3 MODEL    =============="<<endl;
   Matheus_model_3_tests matheus_model_3_tests (VERBOSE, execution_time, nIntSol);

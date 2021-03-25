@@ -48,6 +48,7 @@ void Model_tests::run() {
       Mip_solution_info mip_solution_info;
       Gvrp_instance * gvrp_instance = nullptr;
       double vehicleFuelCapacity = 0.0;
+      double elapsedTime = 0;
       //bs
       for (int l = 0, r = 1000000000, m = floor(r/2.0); l <= r; m = floor(l + (r - l)/2.0)) {
         int afssLB = vrp_instance->customers.size() * ratio;
@@ -59,6 +60,7 @@ void Model_tests::run() {
           pair<Gvrp_instance, Mip_solution_info > sol = flow_model.run();    
           gvrp_instance = new Gvrp_instance (sol.first);
           mip_solution_info = sol.second;
+          elapsedTime += mip_solution_info.elapsed_time;
           vehicleFuelCapacity = m;
           if (sol.first.afss.size() == afssLB) 
             r = m - 1;
@@ -73,7 +75,7 @@ void Model_tests::run() {
       }
       //write in file
       if (gvrp_instance == nullptr)
-          resultsFile<<instance<<";-;-;-;-;-;-;-;"<<mip_solution_info.gap<<";"<<mip_solution_info.cost<<";"<<mip_solution_info.elapsed_time<<";"<<mip_solution_info.status<<";"<<ratio<<endl;
+          resultsFile<<instance<<";-;-;-;-;-;-;-;"<<mip_solution_info.gap<<";"<<mip_solution_info.cost<<";"<<elapsedTime<<";"<<mip_solution_info.status<<";"<<ratio<<endl;
       else {
         string sol_file_name = solution_name + to_string(gvrp_instance->customers.size()) + string ("c") + to_string(gvrp_instance->afss.size()) + string ("f") + to_string(vehicleFuelCapacity) + string("B-") + instance;
 
@@ -90,7 +92,7 @@ void Model_tests::run() {
 
 
         gvrp_instance->write_in_csv(PROJECT_INSTANCES_PATH + string("new/") + sol_file_name);
-        resultsFile<<instance<<";"<<sol_file_name<<";"<<gvrp_instance->customers.size()<<";"<<gvrp_instance->afss.size()<<";"<<gvrp_instance->vehicleFuelCapacity<<";"<<gvrp_instance->timeLimit<<";"<<gvrp_instance->customers.front().serviceTime<<";"<<gvrp_instance->afss.front().serviceTime<<";"<<mip_solution_info.gap<<";"<<int(mip_solution_info.cost)<<"."<<int(mip_solution_info.cost*100)%100<<";"<<mip_solution_info.elapsed_time<<";"<<mip_solution_info.status<<";"<<ratio<<endl;
+        resultsFile<<instance<<";"<<sol_file_name<<";"<<gvrp_instance->customers.size()<<";"<<gvrp_instance->afss.size()<<";"<<gvrp_instance->vehicleFuelCapacity<<";"<<gvrp_instance->timeLimit<<";"<<gvrp_instance->customers.front().serviceTime<<";"<<gvrp_instance->afss.front().serviceTime<<";"<<mip_solution_info.gap<<";"<<int(mip_solution_info.cost)<<"."<<int(mip_solution_info.cost*100)%100<<";"<<elapsedTime<<";"<<mip_solution_info.status<<";"<<ratio<<endl;
         delete gvrp_instance;
       }
     }
