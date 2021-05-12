@@ -1,3 +1,4 @@
-g++ -O0 -c -m64 -O -fPIC -fno-strict-aliasing -fexceptions -DNDEBUG -DIL_STD -I/opt/ibm/ILOG/CPLEX_Studio_Community129/cplex/include -I/opt/ibm/ILOG/CPLEX_Studio_Community129/concert/include cplex-cpp-ex.cpp
 
-g++ -O0 -m64 -O -fPIC -fno-strict-aliasing -fexceptions -DNDEBUG -DIL_STD -I/opt/ibm/ILOG/CPLEX_Studio_Community129/cplex/include -I/opt/ibm/ILOG/CPLEX_Studio_Community129/concert/include -L/opt/ibm/ILOG/CPLEX_Studio_Community129/cplex/lib/x86-64_linux/static_pic -L/opt/ibm/ILOG/CPLEX_Studio_Community129/concert/lib/x86-64_linux/static_pic -o a cplex-cpp-ex.o -lconcert -lilocplex -lcplex -lm -lpthread -ldl
+This is my Master thesis code. In this repository you will find a series of solution implementations for the [Green-Vechile Routing Problem (G-VRP)](https://www.sciencedirect.com/science/article/pii/S1366554511001062). The code documentation can be found [here](https://codedocs.xyz/My-master-degree/Master-thesis-code/).
+
+For more information, fell free to reach me out matheusdiogenesandrade@ic.unicamp.br.
